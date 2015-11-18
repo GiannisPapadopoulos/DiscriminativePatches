@@ -16,11 +16,12 @@
 
 #include "data/TrainingData.h"
 #include "IO/IOUtils.h"
-
+#include "featureExtraction/cvHOG.h"
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/ml/ml.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/opencv.hpp>
 
 #include <iostream>
 
@@ -37,6 +38,7 @@ mai::UDoMLDP::~UDoMLDP()
 {}
 
 
+
 void mai::UDoMLDP::UnsupervisedDiscovery(std::string &strFilePathPositives, std::string &strFilePathNegatives)
 {
 	TrainingData* td = new TrainingData();
@@ -45,13 +47,13 @@ void mai::UDoMLDP::UnsupervisedDiscovery(std::string &strFilePathPositives, std:
 
 	std::vector<Mat> images;
 
-	IOUtils::LoadImages ( images, IMREAD_COLOR, strFilePathPositives );
+	IOUtils::loadImages ( images, IMREAD_COLOR, strFilePathPositives );
 
 	td->setPositives(images);
 
 	images.clear();
 
-	IOUtils::LoadImages ( images, IMREAD_COLOR, strFilePathNegatives );
+	IOUtils::loadImages ( images, IMREAD_COLOR, strFilePathNegatives );
 
 	td->setNegatives(images);
 
@@ -60,11 +62,33 @@ void mai::UDoMLDP::UnsupervisedDiscovery(std::string &strFilePathPositives, std:
 	//	1.b natural world dataset N
 	//2. Split datasets each in 2 equal sized disjoint parts {D1, D2}, {N1, N2}
 	//3. Compute HOG descriptors for D1 at multiple resolutions ( at 7 different scales )
+
+	Mat img = td->getPositives()[0];
+	Size s = img.size();
+
+	Mat resizedImage;
+	cv::resize(img, resizedImage, Size(640,480));
+	s = resizedImage.size();
+
+	Size cellSize = Size(80,60);
+	Size blockStride = Size(20,15);
+	Size blockSize = Size(160,120);
+
+	vector< float> descriptorsValues;
+	cvHOG::extractFeatures(descriptorsValues, resizedImage, cellSize, blockStride, blockSize);
+
+	Mat out;
+	cvHOG::getHOGDescriptorVisualImage(out, resizedImage, descriptorsValues, s, cellSize, 1, 3.0);
+
+	//show image
+	cv::imshow("origin", out);
+	cv::waitKey();
+
 	//4. Take random sample patches S from D1 ( ~ 150 per image ) disallowing highly overlapping patches or patches without gradient energy (e.g. sky patches )
 	//5. Compute clusters K from S using kmeans with high k = S/4
 
-	Mat data, labels;
-	td->getUniformTrainingData(data, labels);
+//	Mat data, labels;
+//	td->getUniformTrainingData(data, labels);
 
 	//6. Loop until convergence, i.e. top patches do not change ( 4 iterations ? ):
 	//	6.1 Loop over all K(i) >= 3, skip small clusters
@@ -81,3 +105,5 @@ void mai::UDoMLDP::UnsupervisedDiscovery(std::string &strFilePathPositives, std:
 	//	7.3 sum up score
 	//8. Select top n classifiers from above scores
 }
+
+

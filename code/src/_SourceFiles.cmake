@@ -2,7 +2,7 @@
 set( RelativeDir "src" )
 set( RelativeSourceGroup "Source Files" )
 
-set( SubDirs data IO )
+set( SubDirs data featureExtraction IO )
 
 set( DirFiles
 	main.cpp
