@@ -31,7 +31,7 @@ mai::IOUtils::IOUtils()
 mai::IOUtils::~IOUtils()
 {}
 
-bool mai::IOUtils::LoadImages( std::vector<Mat> &vImages, int iMode, const string &strDirectory )
+bool mai::IOUtils::loadImages( std::vector<Mat> &vImages, int iMode, const string &strDirectory )
 {
 	boost::filesystem::path directory( boost::filesystem::initial_path<boost::filesystem::path>() );
 	directory = boost::filesystem::system_complete( boost::filesystem::path( strDirectory ) );
@@ -66,7 +66,7 @@ bool mai::IOUtils::LoadImages( std::vector<Mat> &vImages, int iMode, const strin
 	return true;
 }
 
-void mai::IOUtils::ConvertImages( std::vector<Mat> &vImages, std::vector<Mat> &vConvertedImages, int iMode )
+void mai::IOUtils::convertImages( std::vector<Mat> &vImages, std::vector<Mat> &vConvertedImages, int iMode )
 {
 	for( Mat image : vImages)
 	{
@@ -80,7 +80,7 @@ void mai::IOUtils::ConvertImages( std::vector<Mat> &vImages, std::vector<Mat> &v
 	}
 }
 
-void mai::IOUtils::GetMaxImageDimensions( std::vector<Mat> &vImages, int &iMaxHeight, int &iMaxWidth )
+void mai::IOUtils::getMaxImageDimensions( std::vector<Mat> &vImages, int &iMaxHeight, int &iMaxWidth )
 {
 	iMaxHeight = 0;
 	iMaxWidth = 0;
@@ -96,7 +96,30 @@ void mai::IOUtils::GetMaxImageDimensions( std::vector<Mat> &vImages, int &iMaxHe
 	}
 }
 
-void mai::IOUtils::SampleImages( std::vector<Mat> &vImages, std::vector<Mat> &vSampledImages, int iHeight, int iWidth )
+void mai::IOUtils::sampleImage( Mat &image, Mat &sampledImage, int iHeight, int iWidth )
+{
+	cv::Size s = image.size();
+	int iW = s.width;
+	int iH = s.height;
+
+	if ( iW * iH == iHeight * iWidth )
+		sampledImage = image;
+	else
+	{
+		if ( iW * iH < iHeight * iWidth )
+		{
+			pyrUp( image, sampledImage, Size( iWidth, iHeight ) );
+		}
+		else
+		{
+			pyrDown( image, sampledImage, Size( iWidth, iHeight ) );
+		}
+	}
+
+	assert( !sampledImage.empty() );
+}
+
+void mai::IOUtils::sampleImages( std::vector<Mat> &vImages, std::vector<Mat> &vSampledImages, int iHeight, int iWidth )
 {
 	for( Mat image : vImages)
 	{
@@ -127,7 +150,7 @@ void mai::IOUtils::SampleImages( std::vector<Mat> &vImages, std::vector<Mat> &vS
 	}
 }
 
-void mai::IOUtils::ShowImages( std::vector<Mat> &vImages )
+void mai::IOUtils::showImages( std::vector<Mat> &vImages )
 {
 	for( Mat image : vImages)
 	{

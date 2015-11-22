@@ -48,7 +48,7 @@ public:
 	 * @param iMode			OpenCV loading mode
 	 * @param directory		file path to laod from
 	 */
-	static bool LoadImages( std::vector<cv::Mat> &vImages, int iMode, const std::string &strDirectory );
+	static bool loadImages( std::vector<cv::Mat> &vImages, int iMode, const std::string &strDirectory );
 
 	/**
 	 * Convert given images
@@ -62,7 +62,7 @@ public:
 	 * @param[out] vConvertedImages	converted results
 	 * @param iMode					OpenCV conversion mode
 	 */
-	static void ConvertImages( std::vector<cv::Mat> &vImages, std::vector<cv::Mat> &vConvertedImages, int iMode );
+	static void convertImages( std::vector<cv::Mat> &vImages, std::vector<cv::Mat> &vConvertedImages, int iMode );
 
 	/**
 	 * Calculate max dimension of given images
@@ -71,7 +71,17 @@ public:
 	 * @param iMaxHeight	max height
 	 * @param iMaxWidth		max width
 	 */
-	static void GetMaxImageDimensions( std::vector<cv::Mat> &vImages, int &iMaxHeight, int &iMaxWidth );
+	static void getMaxImageDimensions( std::vector<cv::Mat> &vImages, int &iMaxHeight, int &iMaxWidth );
+
+	/**
+		 * Sample image to given size
+		 *
+		 * @param[in] images			to be sampled
+		 * @param[out] iampledImages	sampled result
+		 * @param iHeight				sample height
+		 * @param iWidth				sample width
+		 */
+	static void sampleImage( cv::Mat &image, cv::Mat &sampledImage, int iHeight, int iWidth );
 
 	/**
 	 * Sample images to given size
@@ -81,12 +91,12 @@ public:
 	 * @param iHeight				sample height
 	 * @param iWidth				sample width
 	 */
-	static void SampleImages( std::vector<cv::Mat> &vImages, std::vector<cv::Mat> &vSampledImages, int iHeight, int iWidth );
+	static void sampleImages( std::vector<cv::Mat> &vImages, std::vector<cv::Mat> &vSampledImages, int iHeight, int iWidth );
 
 	/**
 	 * Show given images and wait for keystroke between each.
 	 */
-	static void ShowImages( std::vector<cv::Mat> &vImages );
+	static void showImages( std::vector<cv::Mat> &vImages );
 
 private:
 	/**
