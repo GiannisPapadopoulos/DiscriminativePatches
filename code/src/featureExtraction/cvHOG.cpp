@@ -20,30 +20,36 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 
+#include <boost/lexical_cast.hpp>
+
 using namespace cv;
 
 using namespace std;
 
 mai::cvHOG::cvHOG()
+//	: m_pHOG(new HOGDescriptor)
 {}
 mai::cvHOG::~cvHOG()
 {}
 
 void mai::cvHOG::extractFeatures(vector< float> &descriptorsValues,
 								Mat &image,
-								Size cellSize,
+								Size blockSize,
 								Size blockStride,
-								Size blockSize)
+								Size cellSize,
+								Size winStride,
+								Size padding)
 {
 	Size sizeImage = image.size();
+
+	cout << "[mai::cvHOG::extractFeatures] computing HOG with blocksize " << blockSize << ", blockstride " << blockStride << ", cellSize " << cellSize << endl;
 
 	HOGDescriptor hog( sizeImage, blockSize, blockStride, cellSize, 9);
 
 	vector< Point> locations;
-	hog.compute( image, descriptorsValues, Size(0,0), Size(0,0), locations);
+	hog.compute( image, descriptorsValues, winStride, padding, locations);
 
 	cout << "[mai::cvHOG::extractFeatures] descriptor size: " << descriptorsValues.size() << endl;
-
 }
 
 void mai::cvHOG::getHOGDescriptorVisualImage(Mat &outImage,
@@ -167,6 +173,8 @@ void mai::cvHOG::getHOGDescriptorVisualImage(Mat &outImage,
                       CV_RGB(100,100,100),
                       1);
 
+            float cellGradient = 0;
+
             // draw in each cell all 9 gradient strengths
             for (int bin=0; bin<gradientBinSize; bin++)
             {
@@ -197,7 +205,23 @@ void mai::cvHOG::getHOGDescriptorVisualImage(Mat &outImage,
                      CV_RGB(0,0,255),
                      1);
 
+                cellGradient += currentGradStrength;
+
             } // for (all bins)
+
+            cellGradient /= gradientBinSize;
+            cellGradient = round( cellGradient * 1000.0 );// / 1000.0;
+
+            string text = boost::lexical_cast<std::string>(cellGradient);
+            int fontFace = FONT_HERSHEY_SCRIPT_SIMPLEX;
+            double fontScale = 0.5;
+            int thickness = 1;
+            int baseline=0;
+            Size textSize = getTextSize(text, fontFace,
+                                        fontScale, thickness, &baseline);
+            // then put the text itself
+            putText(outImage, text, Point(drawX*scaleFactor,drawY*scaleFactor), fontFace, fontScale,
+                    Scalar::all(255), thickness, 8);
 
         } // for (cellx)
     } // for (celly)

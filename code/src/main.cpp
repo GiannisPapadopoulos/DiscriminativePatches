@@ -1,13 +1,16 @@
-/*****************************************************************************/
-/* Master AI Project 4
-/* Mid-level discriminative patches
-/*
-/* Authors: Salil Bhat, Ioannis Papadopoulos, Stefan Selzer, Chang Sun 
-/*
-/*****************************************************************************/
-/* THIS SOFTWARE IS PROVIDED 'AS IS'. ANY WARRANTIES ARE DISCLAIMED. IN
-/* NO CASE SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY DAMAGES.
-/*****************************************************************************/
+/*****************************************************************************
+ * Master AI project ws15 group 4
+ * Mid-level discriminative patches
+ *
+ * cvHOG.h
+ *
+ *  Created on: Nov 18, 2015
+ *      Author: stefan
+ *
+ *****************************************************************************
+ * THIS SOFTWARE IS PROVIDED 'AS IS'. ANY WARRANTIES ARE DISCLAIMED. IN
+ * NO CASE SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY DAMAGES.
+ *****************************************************************************/
 
 #include <iostream>
 #include <string>
@@ -28,8 +31,7 @@ int main(int argc, char** argv )
 			<< argv[0] << " [options]" << endl
 			<< "options:" << endl
 			<< "\t-pos <file path>" << endl
-			<< "\t-neg <file path>" << endl
-			<< "\t-discover" << endl;
+			<< "\t-neg <file path>" << endl;
 		return -1;
 	}
 
@@ -63,18 +65,20 @@ int main(int argc, char** argv )
 				return -1;
 			}
 		}
-
-		if(string(argv[i]) == "-discover")
-		{
-			//strFilepathPositives = "/home/stefan/Documents/AI/project_1/bsps";
-			//strFilepathNegatives = "/home/stefan/Documents/AI/project_1/bsps";
-
-			UDoMLDP* main = new UDoMLDP();
-			main->UnsupervisedDiscovery(strFilepathPositives, strFilepathNegatives);
-
-			delete main;
-		}
 	}
+
+	//strFilepathPositives = "/home/stefan/Documents/AI/project_1/bsps";
+	//strFilepathNegatives = "/home/stefan/Documents/AI/project_1/bsps";
+
+
+	// Use EITHER this one for testing
+	//UDoMLDP::unsupervisedDiscovery(strFilepathPositives, strFilepathNegatives);
+
+
+	// OR this one
+	UDoMLDP* main = new UDoMLDP();
+	main->basicDetecion(strFilepathPositives, strFilepathNegatives);
+	delete main;
 
 	return 0;
 }

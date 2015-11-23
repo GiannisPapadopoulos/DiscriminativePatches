@@ -48,7 +48,7 @@ public:
 	 * @param iMode			OpenCV loading mode
 	 * @param directory		file path to laod from
 	 */
-	static bool loadImages( std::vector<cv::Mat> &vImages, int iMode, const std::string &strDirectory );
+	static bool loadImages( std::vector<cv::Mat*> &vImages, int iMode, const std::string &strDirectory );
 
 	/**
 	 * Convert given images

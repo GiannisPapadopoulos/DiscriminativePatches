@@ -22,6 +22,8 @@
 
 namespace mai{
 
+class DataSet;
+
 /**
  * Unsupervised discovery of mid-level discriminative patches
  */
@@ -39,15 +41,41 @@ public:
 	virtual ~UDoMLDP();
 
 	/**
+	 * Basic algorithm:
+	 * Loads positive and negative images.
+	 * Computes HOG features for each image.
+	 * Trains svm ousing all patches.
+	 */
+	void basicDetecion( std::string &strFilePathPositives, std::string &strFilePathNegatives );
+
+	/**
 	 * Main algorithm
 	 */
-	void UnsupervisedDiscovery( std::string &strFilePathPositives, std::string &strFilePathNegatives );
+	static void unsupervisedDiscovery( std::string &strFilePathPositives, std::string &strFilePathNegatives );
+
+private:
+
+	/**
+	 * @see featureExtraction/cvHOG::extractFeatures
+	 */
+	void computeHOGForDataSet(DataSet* data,
+			cv::Size imageSize,
+			cv::Size blockSize,
+			cv::Size blockStride,
+			cv::Size cellSize,
+			cv::Size winStride,
+			cv::Size padding);
+
+	/**
+	 * trains a svm with all positive and negative patches
+	 */
+	void trainSVM();
+
+	DataSet*	m_pPositives;
+	DataSet*	m_pNegatives;
 
 };
 
 }// namespace mai
-
-
-
 
 #endif /* SRC_UDOMLDP_H_ */

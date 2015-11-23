@@ -31,7 +31,6 @@ mai::TrainingData::TrainingData()
 mai::TrainingData::~TrainingData()
 {
 	m_vPositives.clear();
-
 	m_vNegatives.clear();
 }
 
@@ -40,12 +39,12 @@ std::vector<cv::Mat> mai::TrainingData::getPositives() const
 	return m_vPositives;
 }
 
-void mai::TrainingData::setPositives( std::vector<cv::Mat> vImages )
+void mai::TrainingData::setPositives( std::vector<cv::Mat*> &vImages )
 {
-	for( cv::Mat image : vImages)
+	for( cv::Mat* image : vImages)
 	{
-		m_vPositives.push_back(image);
-		setMaxImageDimensions(image);
+		m_vPositives.push_back(*image);
+		setMaxImageDimensions(*image);
 	}
 }
 
@@ -54,12 +53,12 @@ std::vector<cv::Mat> mai::TrainingData::getNegatives() const
 	return m_vNegatives;
 }
 
-void mai::TrainingData::setNegatives( std::vector<cv::Mat> vImages )
+void mai::TrainingData::setNegatives( std::vector<cv::Mat*> &vImages )
 {
-	for( cv::Mat image : vImages)
+	for( cv::Mat* image : vImages)
 	{
-		m_vNegatives.push_back(image);
-		setMaxImageDimensions(image);
+		m_vNegatives.push_back(*image);
+		setMaxImageDimensions(*image);
 	}
 }
 

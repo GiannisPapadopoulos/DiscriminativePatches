@@ -30,6 +30,11 @@ class cvHOG
 public:
 
 	/**
+	 * Initializes object
+	 */
+	cvHOG();
+
+	/**
 	 * Clears data
 	 */
 	virtual ~cvHOG();
@@ -37,19 +42,24 @@ public:
 	/**
 	 * Cell and block size have to divide image size.
 	 * Cell size has to divide block size.
+	 * Block stride has to be multiple of cell size.
 	 * descriptorsValues.size = ((img.width / cellsize) - 1) * ((img.height/cellsize) - 1 ) * bins (9) * number of cells per block
 	 *
 	 * @param[out] descriptorsValues	extracted features
 	 * @param[in] image			from which features are extracted
-	 * @param cellSize
-	 * @param blockStride
 	 * @param blockSize
+	 * @param blockStride
+	 * @param cellSize
+	 * @param winStride		?
+	 * @param padding		?
 	 */
 	static void extractFeatures(std::vector< float> &descriptorsValues,
 											cv::Mat &image,
-											cv::Size cellSize,
-											cv::Size blockStride,
-											cv::Size blockSize);
+											cv::Size blockSize = cv::Size(16,16),
+											cv::Size blockStride = cv::Size(8,8),
+											cv::Size cellSize = cv::Size(8,8),
+											cv::Size winStride = cv::Size(0,0),
+											cv::Size padding = cv::Size(0,0));
 
 	/**
 	 * Visualize HOG descriptor on image
@@ -64,10 +74,8 @@ public:
 	                                   double vizFactor);
 
 private:
-	/**
-	 * Initializes object
-	 */
-	cvHOG();
+
+	//cv::HOGDescriptor	m_pHOG;
 
 };
 

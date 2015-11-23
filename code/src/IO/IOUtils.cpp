@@ -31,7 +31,7 @@ mai::IOUtils::IOUtils()
 mai::IOUtils::~IOUtils()
 {}
 
-bool mai::IOUtils::loadImages( std::vector<Mat> &vImages, int iMode, const string &strDirectory )
+bool mai::IOUtils::loadImages( std::vector<Mat*> &vImages, int iMode, const string &strDirectory )
 {
 	boost::filesystem::path directory( boost::filesystem::initial_path<boost::filesystem::path>() );
 	directory = boost::filesystem::system_complete( boost::filesystem::path( strDirectory ) );
@@ -55,7 +55,8 @@ bool mai::IOUtils::loadImages( std::vector<Mat> &vImages, int iMode, const strin
 			if( !image.empty() )// Check for valid input
 			{
 				cout << "Image loaded successfully: " << itr->path() << endl;
-				vImages.push_back ( image );
+				Mat* pImage = new Mat(image);
+				vImages.push_back(pImage);
 			}
 			else
 			{
