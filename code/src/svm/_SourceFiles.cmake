@@ -1,13 +1,10 @@
 # _SourceFiles.cmake
-set( RelativeDir "src/data" )
-set( RelativeSourceGroup "Source Files\\data" )
+set( RelativeDir "src/svm" )
+set( RelativeSourceGroup "Source Files\\svm" )
 
 set( DirFiles
-	DataSet.h
-	GenerateTestData.cpp
-	GenerateTestData.h
-	TrainingData.cpp
-	TrainingData.h
+	umSVM.cpp
+	umSVM.h
 )
 
 set( DirFiles_SourceGroup "${RelativeSourceGroup}" )

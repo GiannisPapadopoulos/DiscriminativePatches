@@ -23,6 +23,7 @@
 namespace mai{
 
 class DataSet;
+class umSVM;
 
 /**
  * Unsupervised discovery of mid-level discriminative patches
@@ -67,12 +68,37 @@ private:
 			cv::Size padding);
 
 	/**
-	 * trains a svm with all positive and negative patches
+	 * Predict dataset
+	 * @see svm/umSVM::predict
 	 */
-	void trainSVM();
+	void predictDataSetbySVM(DataSet* data);
 
-	DataSet*	m_pPositives;
-	DataSet*	m_pNegatives;
+	/**
+	 * @see svm/umSVM::train
+	 */
+	void trainSVMOnDataSets(DataSet* positives,
+			DataSet* negatives);
+
+	/**
+	 * Put the descriptorValues from the DataSet into TrainingData and setup lables like given
+	 * @param[in] data				positive or negative training data
+	 * @param[out] vTrainingData	training data matrix
+	 * @param[out] vLabel			labels matrix
+	 * @param fLabel				labels for this set, e.g. 1.0 if positive or 0.0 if negative
+	 */
+	void collectTrainingDataAndLables(DataSet* data,
+			std::vector< float> &vTrainingData,
+			std::vector< float> &vLabels,
+			float fLabel);
+
+
+	DataSet*	m_pPositiveTrain;
+	DataSet*	m_pNegativeTrain;
+
+	DataSet*	m_pPositiveValid;
+	DataSet*	m_pNegativeValid;
+
+	umSVM*		m_pSVM;
 
 };
 
