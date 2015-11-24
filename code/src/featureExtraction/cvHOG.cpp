@@ -32,7 +32,7 @@ mai::cvHOG::cvHOG()
 mai::cvHOG::~cvHOG()
 {}
 
-void mai::cvHOG::extractFeatures(vector< float> &descriptorsValues,
+void mai::cvHOG::extractFeatures(vector<float> &descriptorsValues,
 								Mat &image,
 								Size blockSize,
 								Size blockStride,

@@ -53,7 +53,7 @@ public:
 	 * @param winStride		?
 	 * @param padding		?
 	 */
-	static void extractFeatures(std::vector< float> &descriptorsValues,
+	static void extractFeatures(std::vector<float> &descriptorsValues,
 											cv::Mat &image,
 											cv::Size blockSize = cv::Size(16,16),
 											cv::Size blockStride = cv::Size(8,8),

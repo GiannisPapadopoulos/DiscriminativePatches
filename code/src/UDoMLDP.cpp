@@ -90,7 +90,7 @@ void mai::UDoMLDP::unsupervisedDiscovery(std::string &strFilePathPositives, std:
 	Size blockStride = Size(20,15);
 	Size blockSize = Size(80,60);
 
-	vector< float> descriptorsValues;
+	vector<float> descriptorsValues;
 	cvHOG::extractFeatures(descriptorsValues, resizedImage, blockSize, blockStride, cellSize);
 
 	Mat out;
@@ -139,9 +139,9 @@ void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string 
 
 	int iMH, iMW;
 	m_pPositiveTrain->getMaxDImensions(iMW, iMH);
-	cout << "Max dimensions train pos " << iMW << "x" << iMH << endl;
+	cout << "Num positive training images: " << m_pPositiveTrain->getImageCount() << ", Max dimensions: " << iMW << "x" << iMH << endl;
 	m_pPositiveValid->getMaxDImensions(iMW, iMH);
-	cout << "Max dimensions valid pos " << iMW << "x" << iMH << endl;
+	cout << "Num positive validation images: " << m_pPositiveValid->getImageCount() << ", Max dimensions: " << iMW << "x" << iMH << endl;
 
 	images.clear();
 
@@ -155,9 +155,9 @@ void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string 
 	m_pNegativeValid->setImages(images2HalfNeg);
 
 	m_pNegativeTrain->getMaxDImensions(iMW, iMH);
-	cout << "Max dimensions train neg " << iMW << "x" << iMH << endl;
+	cout << "Num negative training images: " << m_pNegativeTrain->getImageCount() << ", Max dimensions: " << iMW << "x" << iMH << endl;
 	m_pNegativeValid->getMaxDImensions(iMW, iMH);
-	cout << "Max dimensions valid neg " << iMW << "x" << iMH << endl;
+	cout << "Num negative validation images: " << m_pNegativeValid->getImageCount() << ", Max dimensions: " << iMW << "x" << iMH << endl;
 
 
 	// OpenCV Documentation says that blocksize has to be 16x16 and cellsize 8x8. Other values are not supported.
@@ -205,9 +205,12 @@ void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string 
 	trainSVMOnDataSets(m_pPositiveTrain, m_pNegativeTrain);
 
 	// prediction sample
-	vector< float> descriptorsValues;
+	// !! has to correspond with training data !!
+	vector<float> descriptorsValues;
 	m_pPositiveValid->getDescriptorValuesFromImageAt(0, descriptorsValues);
 	Mat sampleMat = (Mat_<float>(1,1) << descriptorsValues[0]);
+	// single patch image:
+	//Mat sampleMat = (Mat_<float>(1,descriptorsValues.size()) << descriptorsValues);
 
 	float fResult = m_pSVM->predict(sampleMat, false);
 
@@ -223,7 +226,7 @@ void mai::UDoMLDP::predictDataSetbySVM(DataSet* data)
 {
 	for(int i = 0; i < data->getImageCount(); ++i)
 	{
-		vector< float> descriptorsValues;
+		vector<float> descriptorsValues;
 		data->getDescriptorValuesFromImageAt(i, descriptorsValues);
 
 		for(unsigned int j = 0; j < descriptorsValues.size(); ++j)
@@ -264,42 +267,74 @@ void mai::UDoMLDP::computeHOGForDataSet(DataSet* data,
 
 void mai::UDoMLDP::trainSVMOnDataSets(DataSet* positives, DataSet* negatives)
 {
-	// Collect patches
-	vector< float> vPositives;
-	vector< float> vPositiveLabels;
-	collectTrainingDataAndLables(positives, vPositives, vPositiveLabels, 1.0);
+	Mat data(0, 0, CV_32FC1);;
+	Mat labels(0, 0, CV_32SC1);
 
-	vector< float> vNegatives;
-	vector< float> vNegativeLabels;
-	collectTrainingDataAndLables(negatives, vNegatives, vNegativeLabels, 0.0);
+	//loading method:
 
-	vector< float> vData;
-	vData.insert(std::end(vData), std::begin(vPositives), std::end(vPositives));
-	vData.insert(std::end(vData), std::begin(vNegatives), std::end(vNegatives));
+	setupTrainingData(positives, negatives, data, labels);
 
-	vector< float> vLabels;
-	vLabels.insert(std::end(vLabels), std::begin(vPositiveLabels), std::end(vPositiveLabels));
-	vLabels.insert(std::end(vLabels), std::begin(vNegativeLabels), std::end(vNegativeLabels));
+	//setupTrainingDataForSinglePatchImage(positives, negatives, data, labels);
 
-	// setup training matrices
-	int iNumPatches = vPositives.size() + vNegatives.size();
-	// rows, columns, type, datapointer
-	Mat data( iNumPatches, 1, CV_32FC1, &vData[0]);
-	Mat labels( iNumPatches, 1, CV_32SC1, &vLabels[0]);// CV_32FC1 not integral ??
+//	cout << data.size() << " - " << labels.size() << endl;
+//	cout << data.at<float>(121103) << endl;
+//	cout << (float)labels.at<uchar>(0) << endl;
 
 	std::vector<float> vSupport;
 	m_pSVM->trainSVM(data, labels, vSupport);
 
 }
 
-void mai::UDoMLDP::collectTrainingDataAndLables(DataSet* data,
-		std::vector< float> &vTrainingData,
-		std::vector< float> &vLabels,
+/**
+ * Construct Mat for trainingdata.
+ * Calls collectTrainingDataAndLabels for positives and negatives
+ */
+void mai::UDoMLDP::setupTrainingData(DataSet* positives,
+		DataSet* negatives,
+		Mat &trainingData,
+		Mat &labels)
+{
+	// Collect patches
+	vector<float> vPositives;
+	vector<float> vPositiveLabels;
+	collectTrainingDataAndLabels(positives, vPositives, vPositiveLabels, 1.0);
+
+	vector<float> vNegatives;
+	vector<float> vNegativeLabels;
+	collectTrainingDataAndLabels(negatives, vNegatives, vNegativeLabels, 0.0);
+
+	vector<float> vData;
+	vData.insert(std::end(vData), std::begin(vPositives), std::end(vPositives));
+	vData.insert(std::end(vData), std::begin(vNegatives), std::end(vNegatives));
+
+	vector<float> vLabels;
+	vLabels.insert(std::end(vLabels), std::begin(vPositiveLabels), std::end(vPositiveLabels));
+	vLabels.insert(std::end(vLabels), std::begin(vNegativeLabels), std::end(vNegativeLabels));
+
+	// setup training matrices
+	unsigned int iNumPatches = vPositives.size() + vNegatives.size();
+
+	//	// rows, columns, type, datapointer
+	//	Mat data( iNumPatches, 1, CV_32FC1, &vData[0]);
+	//	Mat labels( iNumPatches, 1, CV_32SC1, &vLabels[0]);// CV_32FC1 not integral ??
+	trainingData.create(iNumPatches, 1, CV_32FC1);
+	labels.create(iNumPatches, 1, CV_32SC1);
+
+	for(unsigned int i = 0; i < iNumPatches ; ++i)
+	{
+		trainingData.at<float>(i) = vData[i];
+		labels.at<uchar>(i) = vLabels[i];
+	}
+}
+
+void mai::UDoMLDP::collectTrainingDataAndLabels(DataSet* data,
+		std::vector<float> &vTrainingData,
+		std::vector<float> &vLabels,
 		float fLabel)
 {
 	for(int i = 0; i < data->getImageCount(); ++i)
 	{
-		vector< float> descriptorsValues;
+		vector<float> descriptorsValues;
 		data->getDescriptorValuesFromImageAt(i, descriptorsValues);
 
 		vTrainingData.insert(std::end(vTrainingData), std::begin(descriptorsValues), std::end(descriptorsValues));
@@ -308,4 +343,83 @@ void mai::UDoMLDP::collectTrainingDataAndLables(DataSet* data,
 			vLabels.push_back(fLabel);
 		}
 	}
+}
+
+void mai::UDoMLDP::setupTrainingDataForSinglePatchImage(DataSet* positives,
+				DataSet* negatives,
+				Mat &trainingData,
+				Mat &labels)
+{
+	// Collect patches
+	int iFeatureSizePos, iFeatureSizeNeg;
+	vector<vector<float> > vPositives;
+	vector<float> vPositiveLabels;
+	iFeatureSizePos = collectTrainingDataAndLabelsForSingelPatchImage(positives, vPositives, vPositiveLabels, 1.0);
+
+	vector<vector<float> > vNegatives;
+	vector<float> vNegativeLabels;
+	iFeatureSizeNeg = collectTrainingDataAndLabelsForSingelPatchImage(negatives, vNegatives, vNegativeLabels, 0.0);
+
+	if(iFeatureSizeNeg != iFeatureSizePos)
+	{
+		cout << "[setupTrainingDataForSinglePatchImage] ERROR feature size for positive and negative do not match" << endl;
+		return;
+	}
+
+	vector<vector<float> > vData;
+	vData.insert(std::end(vData), std::begin(vPositives), std::end(vPositives));
+	vData.insert(std::end(vData), std::begin(vNegatives), std::end(vNegatives));
+
+	vector<float> vLabels;
+	vLabels.insert(std::end(vLabels), std::begin(vPositiveLabels), std::end(vPositiveLabels));
+	vLabels.insert(std::end(vLabels), std::begin(vNegativeLabels), std::end(vNegativeLabels));
+
+	// setup training matrices
+	unsigned int iNumPatches = vPositives.size() + vNegatives.size();
+
+	trainingData.create(iNumPatches, iFeatureSizePos, CV_32FC1);
+	labels.create(iNumPatches, 1, CV_32SC1);
+
+	for(unsigned int i = 0; i < iNumPatches ; ++i)
+	{
+		vector<float> vCurrentData = vData[i];
+		for(unsigned int j = 0; j < vCurrentData.size(); ++j)
+		{
+			trainingData.at<float>(i, j) = vCurrentData[j];
+		}
+		labels.at<uchar>(i) = vLabels[i];
+	}
+
+//	cout << trainingData.size() << " - " << labels.size() << endl;
+//	cout << trainingData.at<float>(0, 121103) << " _ " << vData[0][121103] << endl;
+//	cout << (float)labels.at<uchar>(0) << " l " << vLabels[0] << endl;
+
+}
+
+int mai::UDoMLDP::collectTrainingDataAndLabelsForSingelPatchImage(DataSet* data,
+		std::vector<std::vector<float> > &vTrainingData,
+		std::vector<float> &vLabels,
+		float fLabel)
+{
+	unsigned int iDescriptorValueSize = 0;
+
+	for(int i = 0; i < data->getImageCount(); ++i)
+	{
+		vector<float> descriptorsValues;
+		data->getDescriptorValuesFromImageAt(i, descriptorsValues);
+
+		if(iDescriptorValueSize == 0)
+		{
+			iDescriptorValueSize = descriptorsValues.size();
+		}
+		if (iDescriptorValueSize == descriptorsValues.size()) {
+			vTrainingData.push_back(descriptorsValues);
+			vLabels.push_back(fLabel);
+		}
+		else
+		{
+			cout << "[collectTrainingDataAndLabelsForSingelPatchImage] ERROR training data has to be uniform!" << endl;
+		}
+	}
+	return iDescriptorValueSize;
 }

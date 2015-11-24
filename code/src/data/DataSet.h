@@ -34,6 +34,7 @@ public:
 	DataSet()
 		: m_iMaxHeight(0)
 		, m_iMaxWidth(0)
+		, m_iDescriptorSize(0)
 	{};
 
 	/**
@@ -69,7 +70,7 @@ public:
 		return NULL;
 	};
 
-	bool addDescriptorValuesToImageAt(int iIndex, const std::vector<float>& vDescriptorValues)
+	bool addDescriptorValuesToImageAt(int iIndex, const std::vector<float> &vDescriptorValues)
 	{
 		if(m_vData[iIndex] != NULL)
 		{
@@ -79,7 +80,7 @@ public:
 		return false;
 	};
 
-	bool getDescriptorValuesFromImageAt(int iIndex, std::vector<float>& vDescriptorValues)
+	bool getDescriptorValuesFromImageAt(int iIndex, std::vector<float> &vDescriptorValues)
 	{
 		if(m_vData[iIndex] != NULL)
 		{
@@ -102,6 +103,11 @@ public:
 	{
 		iMaxHeight = m_iMaxHeight;
 		iMaxWidth = m_iMaxWidth;
+	};
+
+	int getDescriptorValueSize() const
+	{
+		return m_iDescriptorSize;
 	};
 
 private:
@@ -130,7 +136,7 @@ private:
 			return m_vDescriptorValues;
 		};
 
-		void setDescriptorValues(const std::vector<float>& vDescriptorValues) {
+		void setDescriptorValues(const std::vector<float> &vDescriptorValues) {
 			m_vDescriptorValues = vDescriptorValues;
 		};
 
@@ -153,6 +159,8 @@ private:
 
 	int	m_iMaxHeight;
 	int	m_iMaxWidth;
+
+	int m_iDescriptorSize;
 
 };
 

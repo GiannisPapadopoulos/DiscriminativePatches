@@ -12,8 +12,8 @@
  * NO CASE SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY DAMAGES.
  *****************************************************************************/
 
-#ifndef SRC_IO_GENERATETESTDATA_H_
-#define SRC_IO_GENERATETESTDATA_H_
+#ifndef SRC_DATA_GENERATETESTDATA_H_
+#define SRC_DATA_GENERATETESTDATA_H_
 
 #include <opencv2/core/core.hpp>
 
@@ -39,4 +39,4 @@ private:
 
 }  // namespace mai
 
-#endif /* SRC_IO_GENERATETESTDATA_H_ */
+#endif /* SRC_DATA_GENERATETESTDATA_H_ */
