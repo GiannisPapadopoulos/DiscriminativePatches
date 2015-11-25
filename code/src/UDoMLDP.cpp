@@ -167,6 +167,9 @@ void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string 
 	Size cellSize = Size(20,15);
 	Size blockStride = Size(20,15);
 	Size blockSize = Size(80,60);
+
+	// Image will be resized to this size !
+	// If the original size is not divideable by cellsize e.g.
 	Size imageSize = Size(640,480);
 
 	// Not sure about these
@@ -204,22 +207,16 @@ void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string 
 
 	trainSVMOnDataSets(m_pPositiveTrain, m_pNegativeTrain);
 
-	// prediction sample
-	// !! has to correspond with training data !!
-	vector<float> descriptorsValues;
-	m_pPositiveValid->getDescriptorValuesFromImageAt(0, descriptorsValues);
-	Mat sampleMat = (Mat_<float>(1,1) << descriptorsValues[0]);
-	// single patch image:
-	//Mat sampleMat = (Mat_<float>(1,descriptorsValues.size()) << descriptorsValues);
-
-	float fResult = m_pSVM->predict(sampleMat, false);
-
-	cout << "SVM predict for " << descriptorsValues[0] << " is " << fResult << ", DFvalue " << m_pSVM->predict(sampleMat, true) << endl;
+	// Prediction has to correspond with training data !!
+	// check code of trainSVMOnDataSets
 
 	//predictDataSetbySVM(m_pPositiveValid);
 
 	//predictDataSetbySVM(m_pNegativeValid);
 
+	predictDataSetbySVMForSinglePatchImage(m_pPositiveValid);
+
+	predictDataSetbySVMForSinglePatchImage(m_pNegativeValid);
 }
 
 void mai::UDoMLDP::predictDataSetbySVM(DataSet* data)
@@ -239,6 +236,18 @@ void mai::UDoMLDP::predictDataSetbySVM(DataSet* data)
 			cout << "SVM predict for " << descriptorsValues[j] << " is " << fResultLabel << ", DFvalue " << fResultValue << endl;
 		}
 	}
+
+	// prediction sample
+//	vector<float> descriptorsValues;
+//	m_pPositiveValid->getDescriptorValuesFromImageAt(0, descriptorsValues);
+//	Mat sampleMat = (Mat_<float>(1,1) << descriptorsValues[0]);
+//	// single patch image:
+//	//Mat sampleMat = (Mat_<float>(1,descriptorsValues.size()) << descriptorsValues);
+//
+//	float fResult = m_pSVM->predict(sampleMat, false);
+//
+//	cout << "SVM predict for " << descriptorsValues[0] << " is " << fResult << ", DFvalue " << m_pSVM->predict(sampleMat, true) << endl;
+
 }
 
 void mai::UDoMLDP::computeHOGForDataSet(DataSet* data,
@@ -272,9 +281,9 @@ void mai::UDoMLDP::trainSVMOnDataSets(DataSet* positives, DataSet* negatives)
 
 	//loading method:
 
-	setupTrainingData(positives, negatives, data, labels);
+	//setupTrainingData(positives, negatives, data, labels);
 
-	//setupTrainingDataForSinglePatchImage(positives, negatives, data, labels);
+	setupTrainingDataForSinglePatchImage(positives, negatives, data, labels);
 
 //	cout << data.size() << " - " << labels.size() << endl;
 //	cout << data.at<float>(121103) << endl;
@@ -422,4 +431,26 @@ int mai::UDoMLDP::collectTrainingDataAndLabelsForSingelPatchImage(DataSet* data,
 		}
 	}
 	return iDescriptorValueSize;
+}
+
+void mai::UDoMLDP::predictDataSetbySVMForSinglePatchImage(DataSet* data)
+{
+	for(int i = 0; i < data->getImageCount(); ++i)
+	{
+		vector<float> descriptorsValues;
+		data->getDescriptorValuesFromImageAt(i, descriptorsValues);
+
+		// setup matrix
+		Mat predictionData(1, descriptorsValues.size(), CV_32FC1);;
+
+		for(unsigned int j = 0; j < descriptorsValues.size(); ++j)
+		{
+			predictionData.at<float>(0, j) = descriptorsValues[j];
+		}
+
+		float fResultLabel = m_pSVM->predict(predictionData, false);
+		float fResultValue = m_pSVM->predict(predictionData, true);
+
+		cout << "SVM predict for image " << i << " is " << fResultLabel << ", DFvalue " << fResultValue << endl;
+	}
 }

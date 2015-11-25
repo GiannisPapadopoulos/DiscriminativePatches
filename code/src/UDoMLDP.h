@@ -27,6 +27,12 @@ class umSVM;
 
 /**
  * Unsupervised discovery of mid-level discriminative patches
+ *
+ * The function unsupervisedDiscovery is meant to implement the papers algorithm.
+ *
+ * As we are far from that, there is another function for more simpliefied procedure:
+ * basicDetecion
+ *
  */
 class UDoMLDP
 {
@@ -43,9 +49,18 @@ public:
 
 	/**
 	 * Basic algorithm:
-	 * Loads positive and negative images.
-	 * Computes HOG features for each image.
-	 * Trains svm ousing all patches.
+	 * Loads positive and negative images and splits them by half.
+	 * The members m_pPositiveTrain, m_pNegativeTrain, m_pPositiveValid and
+	 * m_pNegativeValid are then filled with the images and ready for further use.
+	 *
+	 * Next HOG features are computed for each image.
+	 * Adjust the size of blocks, strides and cells in code !
+	 * The method called is computeHOGForDataSet
+	 *
+	 * Next the svm is trained with the training datasets.
+	 * Method called: trainSVMOnDataSets.
+	 *
+	 * Then the prediction is done with the validation datasets.
 	 */
 	void basicDetecion(std::string &strFilePathPositives, std::string &strFilePathNegatives);
 
@@ -57,6 +72,11 @@ public:
 private:
 
 	/**
+	 * Computes features for all images in data.
+	 * Adds them as DescriptorValues to the corresponding image in the DataSet.
+	 * @see class DataSet::ImageWithDescriptors
+	 *
+	 * Method used:
 	 * @see featureExtraction/cvHOG::extractFeatures
 	 */
 	void computeHOGForDataSet(DataSet* data,
@@ -74,25 +94,30 @@ private:
 	void predictDataSetbySVM(DataSet* data);
 
 	/**
-	 * !! Check the implementation on which loading method to use !!
+	 * Calls methods to setup training data:
+	 * Either setupTrainingData or setupTrainingDataForSinglePatchImage can be used.
+	 * Check and adjust code as needed !
+	 *
+	 * Then svm is trained using:
 	 * @see svm/umSVM::train
 	 */
 	void trainSVMOnDataSets(DataSet* positives,
 			DataSet* negatives);
 
 	/**
-	 * Construct Mat for trainingdata.
+	 * Contruct Mat for trainingdata and labels used by svm.
 	 * Calls collectTrainingDataAndLabels for positives and negatives
+	 * Training data are the single floats of the feature vectors !
 	 */
 	void setupTrainingData(DataSet* positives,
 			DataSet* negatives,
 			cv::Mat &trainingData,
 			cv::Mat &labels);
 	/**
-	 * Put the descriptorValues from the DataSet into TrainingData and setup lables like given
+	 * Put the descriptorValues from the DataSet into TrainingData and setup labels like given
 	 * @param[in] data				positive or negative training data
-	 * @param[out] vTrainingData	training data matrix
-	 * @param[out] vLabel			labels matrix
+	 * @param[out] vTrainingData	training data vector
+	 * @param[out] vLabel			labels vector
 	 * @param fLabel				labels for this set, e.g. 1.0 if positive or 0.0 if negative
 	 */
 	void collectTrainingDataAndLabels(DataSet* data,
@@ -100,22 +125,40 @@ private:
 			std::vector<float> &vLabels,
 			float fLabel);
 
+
+	/**
+	 * Contruct Mat for trainingdata and labels used by svm.
+	 * Calls collectTrainingDataAndLabelsForSingelPatchImage for positives and negatives.
+	 * Training data is the whole feature vector of an image ( image = patch ).
+	 * There should be number of image rows in the training matrix and number of features columns.
+	 */
 	void setupTrainingDataForSinglePatchImage(DataSet* positives,
 				DataSet* negatives,
 				cv::Mat &trainingData,
 				cv::Mat &labels);
 
+	/**
+	 * Put the descriptorValues from the DataSet into TrainingData and setup labels like given
+	 */
 	int collectTrainingDataAndLabelsForSingelPatchImage(DataSet* data,
 			std::vector<std::vector<float> > &vTrainingData,
 			std::vector<float> &vLabels,
 			float fLabel);
 
+	/**
+	 * Convert each feature vector to matrix and do svm predict on that.
+	 */
+	void predictDataSetbySVMForSinglePatchImage(DataSet* data);
+
+
+	// Training datasets
 	DataSet*	m_pPositiveTrain;
 	DataSet*	m_pNegativeTrain;
-
+	// Validation datasets
 	DataSet*	m_pPositiveValid;
 	DataSet*	m_pNegativeValid;
 
+	// trainable svm
 	umSVM*		m_pSVM;
 
 };

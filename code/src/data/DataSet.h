@@ -111,6 +111,9 @@ public:
 
 private:
 
+	/**
+	 * Connects images with its feature vectors.
+	 */
 	class ImageWithDescriptors
 	{
 	public:
