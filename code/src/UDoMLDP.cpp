@@ -13,6 +13,7 @@
  *****************************************************************************/
 
 #include "UDoMLDP.h"
+#include "Constants.h"
 
 #include "svm/umSVM.h"
 #include "data/DataSet.h"
@@ -262,7 +263,9 @@ void mai::UDoMLDP::computeHOGForDataSet(DataSet* data,
 	{
 		const Mat* image = data->getImageAt(i);
 
-		cout << "[mai::UDoMLDP::computeHOGForDataSet] resizing image to " << imageSize << endl;
+		if(Constants::DEBUG_MAIN_ALG) {
+		  cout << "[mai::UDoMLDP::computeHOGForDataSet] resizing image to " << imageSize << endl;
+		}
 		Mat resizedImage;
 		cv::resize(*image, resizedImage, imageSize);
 

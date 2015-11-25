@@ -13,6 +13,7 @@
  *****************************************************************************/
 
 #include "IOUtils.h"
+#include "../Constants.h"
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/ml/ml.hpp>
@@ -41,7 +42,9 @@ bool mai::IOUtils::loadImages( std::vector<Mat*> &vImages, int iMode, const stri
 		cout << "ERROR loading images. Path does not exist: " << directory << endl;
 		return false;
 	}
-	cout << "Loading images from " << directory << endl;
+	if(Constants::DEBUG_IMAGE_LOADING) {
+	  cout << "Loading images from " << directory << endl;
+	}
 
 	boost::filesystem::directory_iterator end_itr; // default construction yields past-the-end
 
@@ -54,7 +57,9 @@ bool mai::IOUtils::loadImages( std::vector<Mat*> &vImages, int iMode, const stri
 
 			if( !image.empty() )// Check for valid input
 			{
-				cout << "Image loaded successfully: " << itr->path() << endl;
+			  if(Constants::DEBUG_IMAGE_LOADING) {
+			    cout << "Image loaded successfully: " << itr->path() << endl;
+			  }
 				Mat* pImage = new Mat(image);
 				vImages.push_back(pImage);
 			}

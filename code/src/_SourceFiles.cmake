@@ -8,6 +8,7 @@ set( DirFiles
 	main.cpp
 	UDoMLDP.cpp
 	UDoMLDP.h
+	Constants.h
 )
 
 set( DirFiles_SourceGroup "${RelativeSourceGroup}" )

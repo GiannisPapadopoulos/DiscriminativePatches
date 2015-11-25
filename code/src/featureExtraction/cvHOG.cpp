@@ -14,6 +14,7 @@
 
 
 #include "cvHOG.h"
+#include "../Constants.h"
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/ml/ml.hpp>
@@ -44,14 +45,18 @@ void mai::cvHOG::extractFeatures(vector<float> &descriptorsValues,
 {
 	Size sizeImage = image.size();
 
-	cout << "[mai::cvHOG::extractFeatures] computing HOG with blocksize " << blockSize << ", blockstride " << blockStride << ", cellSize " << cellSize << endl;
+	if(Constants::DEBUG_HOG) {
+	  cout << "[mai::cvHOG::extractFeatures] computing HOG with blocksize " << blockSize << ", blockstride " << blockStride << ", cellSize " << cellSize << endl;
+	}
 
 	HOGDescriptor hog( sizeImage, blockSize, blockStride, cellSize, 9);
 
 	vector< Point> locations;
 	hog.compute( image, descriptorsValues, winStride, padding, locations);
 
-	cout << "[mai::cvHOG::extractFeatures] descriptor size: " << descriptorsValues.size() << endl;
+  if(Constants::DEBUG_HOG) {
+    cout << "[mai::cvHOG::extractFeatures] descriptor size: " << descriptorsValues.size() << endl;
+  }
 }
 
 void mai::cvHOG::getHOGDescriptorVisualImage(Mat &outImage,
