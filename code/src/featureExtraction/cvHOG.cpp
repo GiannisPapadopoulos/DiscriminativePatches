@@ -22,6 +22,8 @@
 
 #include <boost/lexical_cast.hpp>
 
+#include <cmath>
+
 using namespace cv;
 
 using namespace std;

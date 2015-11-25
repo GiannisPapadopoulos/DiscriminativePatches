@@ -10,15 +10,16 @@ endif()
 
 project( MAI_project4 )
 
-SET(OpenCV_DIR "/home/stefan/Downloads/opencv-2.4.11/install/share/OpenCV")
+#SET(OpenCV_DIR "/home/stefan/Downloads/opencv-2.4.11/install/share/OpenCV")
 find_package( OpenCV REQUIRED )
 
-include_directories( ${OpenCV_INCLUDE_DIRS} )
+include_directories( ${OpenCV_INCLUDE_DIR} )
 
-SET(Boost_INCLUDE_DIR /home/stefan/Downloads/boost_1_59_0/install/include)
+#SET(Boost_INCLUDE_DIR /home/stefan/Downloads/boost_1_59_0/install/include)
 find_package( Boost COMPONENTS system filesystem REQUIRED)
 
-include_directories(${Boost_INCLUDE_DIR})
+include_directories( ${Boost_INCLUDE_DIRS} )
+link_directories( ${Boost_LIBRARY_DIRS} )
 
 include( "src/_SourceFiles.cmake" )
 

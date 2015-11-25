@@ -18,6 +18,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/ml/ml.hpp>
 
+#include <iostream>
+
 using namespace cv;
 
 using namespace std;

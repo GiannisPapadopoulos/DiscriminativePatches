@@ -19,6 +19,7 @@
 #include <opencv2/ml/ml.hpp>
 
 #include <string>
+#include <vector>
 
 namespace mai{
 
