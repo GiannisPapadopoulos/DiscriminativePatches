@@ -20,7 +20,10 @@
 #include "data/TrainingData.h"
 #include "IO/IOUtils.h"
 #include "featureExtraction/cvHOG.h"
+#include "utils/ImageDisplayUtils.h"
 
+
+#include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/ml/ml.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -436,12 +439,19 @@ int mai::UDoMLDP::collectTrainingDataAndLabelsForSingelPatchImage(DataSet* data,
 	return iDescriptorValueSize;
 }
 
+bool isPositivePrediction(float svmPrediction) {
+  // TODO Is this correct?
+  return svmPrediction != 0;
+}
+
 void mai::UDoMLDP::predictDataSetbySVMForSinglePatchImage(DataSet* data)
 {
 	for(int i = 0; i < data->getImageCount(); ++i)
 	{
 		vector<float> descriptorsValues;
 		data->getDescriptorValuesFromImageAt(i, descriptorsValues);
+
+    const Mat* image = data->getImageAt(i);
 
 		// setup matrix
 		Mat predictionData(1, descriptorsValues.size(), CV_32FC1);;
@@ -454,6 +464,13 @@ void mai::UDoMLDP::predictDataSetbySVMForSinglePatchImage(DataSet* data)
 		float fResultLabel = m_pSVM->predict(predictionData, false);
 		float fResultValue = m_pSVM->predict(predictionData, true);
 
-		cout << "SVM predict for image " << i << " is " << fResultLabel << ", DFvalue " << fResultValue << endl;
+		std::string winName;
+
+		winName = isPositivePrediction(fResultLabel) ? "Pos" : "Neg";
+
+    cout << "SVM predict for image " << i << " is " << fResultLabel << ", DFvalue " << fResultValue << endl;
+
+    ImageDisplayUtils::displayImage(winName, *image);
+
 	}
 }

@@ -11,13 +11,13 @@ endif()
 project( MAI_project4 )
 
 #SET(OpenCV_DIR "/home/stefan/Downloads/opencv-2.4.11/install/share/OpenCV")
-#SET(OpenCV_DIR "/home/giannis/Downloads/large/opencv-2.4.11/install")
+SET(OpenCV_DIR "/home/giannis/Downloads/large/opencv-2.4.11/install")
 find_package( OpenCV REQUIRED )
 
 include_directories( ${OpenCV_INCLUDE_DIR} )
 
 #SET(Boost_INCLUDE_DIR /home/stefan/Downloads/boost_1_59_0/install/include) 
-#SET(Boost_INCLUDE_DIR /home/giannis/Downloads/large/boost_1_59_0) 
+SET(Boost_INCLUDE_DIR /home/giannis/Downloads/large/boost_1_59_0) 
 
 
 find_package( Boost COMPONENTS system filesystem REQUIRED)
