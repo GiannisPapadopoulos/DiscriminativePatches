@@ -168,13 +168,15 @@ void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string 
 	// Experiments say otherwise !?
 	// blockssize and blockstride have to multiples of cellsize
 	// image size has to be multiple of blocksize
-	Size cellSize = Size(20,15);
-	Size blockStride = Size(20,15);
-	Size blockSize = Size(80,60);
+
+  // Not really sure what these should be set to for 96x96 patches
+	Size cellSize = Size(8,8);
+	Size blockStride = Size(16,16);
+	Size blockSize = Size(16,16);
 
 	// Image will be resized to this size !
 	// If the original size is not divideable by cellsize e.g.
-	Size imageSize = Size(640,480);
+	Size imageSize = Size(96,96);
 
 	// Not sure about these
 	Size winStride = Size(0,0);
@@ -467,6 +469,10 @@ void mai::UDoMLDP::predictDataSetbySVMForSinglePatchImage(DataSet* data)
 		std::string winName;
 
 		winName = isPositivePrediction(fResultLabel) ? "Pos" : "Neg";
+
+		destroyWindow("Pos");
+    destroyWindow("Neg");
+
 
     cout << "SVM predict for image " << i << " is " << fResultLabel << ", DFvalue " << fResultValue << endl;
 
