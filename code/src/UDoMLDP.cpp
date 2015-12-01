@@ -55,91 +55,22 @@ mai::UDoMLDP::~UDoMLDP()
 	delete m_pSVM;
 }
 
-void mai::UDoMLDP::unsupervisedDiscovery(std::string &strFilePathPositives, std::string &strFilePathNegatives)
-{
-	TrainingData* td = new TrainingData();
-
-	//1. Load data
-
-	std::vector<Mat*> images;
-
-	IOUtils::loadImages ( images, IMREAD_COLOR, strFilePathPositives );
-
-	td->setPositives(images);
-
-	images.clear();
-
-	IOUtils::loadImages ( images, IMREAD_COLOR, strFilePathNegatives );
-
-	td->setNegatives(images);
-
-
-	//	1.a discovery dataset D
-	//	1.b natural world dataset N
-	//2. Split datasets each in 2 equal sized disjoint parts {D1, D2}, {N1, N2}
-	//3. Compute HOG descriptors for D1 at multiple resolutions ( at 7 different scales )
-
-	Mat img = td->getPositives()[0];
-	Size s = img.size();
-
-	// image size has to be multiple of blocksize
-	Mat resizedImage;
-	cv::resize(img, resizedImage, Size(640,480));
-	s = resizedImage.size();
-
-	// OpenCV Documentation says that blocksize has to be 16x16 and cellsize 8x8. Other values are not supported.
-	// Experiments say otherwise !?
-	// blockssize and blockstride have to multiples of cellsize
-	Size cellSize = Size(20,15);
-	Size blockStride = Size(20,15);
-	Size blockSize = Size(80,60);
-
-	vector<float> descriptorsValues;
-	cvHOG::extractFeatures(descriptorsValues, resizedImage, blockSize, blockStride, cellSize);
-
-	Mat out;
-	cvHOG::getHOGDescriptorVisualImage(out, resizedImage, descriptorsValues, s, cellSize, 2, 4.0);
-
-	//show image
-	cv::imshow("origin", out);
-	cv::waitKey();
-
-	//4. Take random sample patches S from D1 ( ~ 150 per image ) disallowing highly overlapping patches or patches without gradient energy (e.g. sky patches )
-	//5. Compute clusters K from S using kmeans with high k = S/4
-
-//	Mat data, labels;
-//	td->getUniformTrainingData(data, labels);
-
-	//6. Loop until convergence, i.e. top patches do not change ( 4 iterations ? ):
-	//	6.1 Loop over all K(i) >= 3, skip small clusters
-	//		6.1.a train svm on K(i) as positives and N1 as negatives -> classifiers Cnew(i)
-	//		6.1.b hard mining ?
-	//		6.1.c detect clusters Knew(i) from top m=5 firings for each detector by running Cnew(i) on validation dataset D2 for additional patches to prevent overfitting
-	//
-	//	6.2 Add Knew to clusters K
-	//	6.3 Add Cnew to classifiers C
-	//	6.4 Swap datasets D and N
-	//7. Loop over all classifiers to compute ranking
-	//	7.1 Compute purity: sum up svm detector scores of top r cluster members ( r > m )
-	//	7.2 Compute discriminativness: ratio of firings for cluster on D and D u N ( rarely )
-	//	7.3 sum up score
-	//8. Select top n classifiers from above scores
-
-	delete td;
-}
-
 void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string &strFilePathNegatives)
 {
 	std::vector<Mat*> images;
 
 	IOUtils::loadImages ( images, IMREAD_COLOR, strFilePathPositives );
 	cout << "Num positive images " << images.size() << endl;
+	int iPercentageValidationImages = images.size()/Constants::DATESET_DIVIDER > 1 ? images.size()/Constants::DATESET_DIVIDER : 1;
 
-	std::vector<Mat*> images2Half(std::make_move_iterator(images.begin() + images.size()/2), std::make_move_iterator(images.end()));
-	images.erase(images.begin() + images.size()/2, images.end());
+	std::vector<Mat*> images2Half(std::make_move_iterator(images.begin() + iPercentageValidationImages), std::make_move_iterator(images.end()));
+	images.erase(images.begin() + iPercentageValidationImages, images.end());
 
-	m_pPositiveTrain->setImages(images);
-	m_pPositiveValid->setImages(images2Half);
+	IOUtils::addFlippedImages( images2Half, 1 );
+	IOUtils::addFlippedImages( images, 1 );
+
+	m_pPositiveTrain->setImages(images2Half);
+	m_pPositiveValid->setImages(images);
 
 	int iMH, iMW;
 	m_pPositiveTrain->getMaxDImensions(iMW, iMH);
@@ -151,36 +82,31 @@ void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string 
 
 	IOUtils::loadImages ( images, IMREAD_COLOR, strFilePathNegatives );
 	cout << "Num negative images " << images.size() << endl;
+	iPercentageValidationImages = images.size()/Constants::DATESET_DIVIDER > 1 ? images.size()/Constants::DATESET_DIVIDER : 1;
 
-	std::vector<Mat*> images2HalfNeg(std::make_move_iterator(images.begin() + images.size()/2), std::make_move_iterator(images.end()));
-	images.erase(images.begin() + images.size()/2, images.end());
+	std::vector<Mat*> images2HalfNeg(std::make_move_iterator(images.begin() + iPercentageValidationImages), std::make_move_iterator(images.end()));
+	images.erase(images.begin() + iPercentageValidationImages, images.end());
 
-	m_pNegativeTrain->setImages(images);
-	m_pNegativeValid->setImages(images2HalfNeg);
+	IOUtils::addFlippedImages( images2HalfNeg, 1 );
+	IOUtils::addFlippedImages( images, 1 );
+
+	m_pNegativeTrain->setImages(images2HalfNeg);
+	m_pNegativeValid->setImages(images);
 
 	m_pNegativeTrain->getMaxDImensions(iMW, iMH);
 	cout << "Num negative training images: " << m_pNegativeTrain->getImageCount() << ", Max dimensions: " << iMW << "x" << iMH << endl;
 	m_pNegativeValid->getMaxDImensions(iMW, iMH);
 	cout << "Num negative validation images: " << m_pNegativeValid->getImageCount() << ", Max dimensions: " << iMW << "x" << iMH << endl;
 
-
-	// OpenCV Documentation says that blocksize has to be 16x16 and cellsize 8x8. Other values are not supported.
-	// Experiments say otherwise !?
-	// blockssize and blockstride have to multiples of cellsize
-	// image size has to be multiple of blocksize
-
-  // Not really sure what these should be set to for 96x96 patches
-	Size cellSize = Size(8,8);
-	Size blockStride = Size(16,16);
-	Size blockSize = Size(16,16);
-
-	// Image will be resized to this size !
-	// If the original size is not divideable by cellsize e.g.
-	Size imageSize = Size(96,96);
+	Size cellSize = Size(Constants::HOG_CELLSIZE, Constants::HOG_CELLSIZE);
+	Size blockStride = Size(Constants::HOG_BLOCKSTRIDE, Constants::HOG_BLOCKSTRIDE);
+	Size blockSize = Size(Constants::HOG_BLOCKSIZE, Constants::HOG_BLOCKSIZE);
+	Size imageSize = Size(Constants::HOG_IMAGE_SIZE_X, Constants::HOG_IMAGE_SIZE_Y);
 
 	// Not sure about these
 	Size winStride = Size(0,0);
 	Size padding = Size(0,0);
+
 
 	this->computeHOGForDataSet(m_pPositiveTrain,
 			imageSize,
@@ -220,8 +146,10 @@ void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string 
 
 	//predictDataSetbySVM(m_pNegativeValid);
 
+	cout << "Positives prediction" << endl;
 	predictDataSetbySVMForSinglePatchImage(m_pPositiveValid);
 
+	cout << "Negatives prediction" << endl;
 	predictDataSetbySVMForSinglePatchImage(m_pNegativeValid);
 }
 

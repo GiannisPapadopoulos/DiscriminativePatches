@@ -48,7 +48,15 @@ public:
 	 * @param iMode			OpenCV loading mode
 	 * @param directory		file path to laod from
 	 */
-	static bool loadImages( std::vector<cv::Mat*> &vImages, int iMode, const std::string &strDirectory );
+	static bool loadImages( std::vector<cv::Mat*> &vImages, int iMode, const std::string &strDirectory, bool bEqualize = true );
+
+	/**
+	 * Double the images by adding flipped versions
+	 *
+	 * @param [out] vImages		image vector
+	 * @param		iFlipmode	horizontally: > 0
+	 */
+	static void addFlippedImages( std::vector<cv::Mat*> &vImages, int iFlipMode );
 
 	/**
 	 * Convert given images
@@ -62,7 +70,15 @@ public:
 	 * @param[out] vConvertedImages	converted results
 	 * @param iMode					OpenCV conversion mode
 	 */
-	static void convertImages( std::vector<cv::Mat> &vImages, std::vector<cv::Mat> &vConvertedImages, int iMode );
+	static void convertImages( std::vector<cv::Mat*> &vImages, std::vector<cv::Mat*> &vConvertedImages, int iMode );
+
+	/**
+	 * Apply histogram equalization on the input images
+	 *
+	 * @param[in] vImages			to be converted
+	 * @param[out] vConvertedImages	converted results
+	 */
+	static void equalizeImages( std::vector<cv::Mat*> &vImages, std::vector<cv::Mat*> &vConvertedImages );
 
 	/**
 	 * Calculate max dimension of given images
@@ -74,13 +90,13 @@ public:
 	static void getMaxImageDimensions( std::vector<cv::Mat> &vImages, int &iMaxHeight, int &iMaxWidth );
 
 	/**
-		 * Sample image to given size
-		 *
-		 * @param[in] images			to be sampled
-		 * @param[out] iampledImages	sampled result
-		 * @param iHeight				sample height
-		 * @param iWidth				sample width
-		 */
+	 * Sample image to given size
+	 *
+	 * @param[in] images			to be sampled
+	 * @param[out] iampledImages	sampled result
+	 * @param iHeight				sample height
+	 * @param iWidth				sample width
+	 */
 	static void sampleImage( cv::Mat &image, cv::Mat &sampledImage, int iHeight, int iWidth );
 
 	/**
@@ -97,6 +113,11 @@ public:
 	 * Show given images and wait for keystroke between each.
 	 */
 	static void showImages( std::vector<cv::Mat> &vImages );
+
+	/**
+	 * Show given image and wait for keystroke between each.
+	 */
+	static void showImage( cv::Mat &image );
 
 private:
 	/**

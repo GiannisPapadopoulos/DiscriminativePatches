@@ -13,6 +13,7 @@
  *****************************************************************************/
 
 #include "umSVM.h"
+#include "../Constants.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -42,9 +43,10 @@ int mai::umSVM::trainSVM(Mat &data,
 	CvSVMParams params;
 	params.svm_type    = CvSVM::C_SVC;
 	params.kernel_type = CvSVM::LINEAR;
-	params.gamma = 3;
-	params.degree = 3;
-	params.term_crit   = cvTermCriteria(CV_TERMCRIT_ITER, 100, 1e-6);
+	params.C = Constants::SVM_C_VALUE;
+//	params.gamma = 3;
+//	params.degree = 3;
+//	params.term_crit   = cvTermCriteria(CV_TERMCRIT_ITER, 100, 1e-6);
 
 	cout << "[mai::umSVM::trainSVM] training svm .." << endl;
 

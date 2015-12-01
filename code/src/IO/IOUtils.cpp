@@ -32,7 +32,7 @@ mai::IOUtils::IOUtils()
 mai::IOUtils::~IOUtils()
 {}
 
-bool mai::IOUtils::loadImages( std::vector<Mat*> &vImages, int iMode, const string &strDirectory )
+bool mai::IOUtils::loadImages( std::vector<Mat*> &vImages, int iMode, const string &strDirectory, bool bEqualize )
 {
 	boost::filesystem::path directory( boost::filesystem::initial_path<boost::filesystem::path>() );
 	directory = boost::filesystem::system_complete( boost::filesystem::path( strDirectory ) );
@@ -53,14 +53,23 @@ bool mai::IOUtils::loadImages( std::vector<Mat*> &vImages, int iMode, const stri
 		if ( !is_directory(itr->status()) )
 		{
 			//string strFilename = itr->path().leaf().string();
+#ifdef linux
 			Mat image = imread( itr->path().c_str(), iMode );
-
+#else
+			Mat image = imread( itr->path().string(), iMode );
+#endif
 			if( !image.empty() )// Check for valid input
 			{
-			  if(Constants::DEBUG_IMAGE_LOADING) {
-			    cout << "Image loaded successfully: " << itr->path() << endl;
-			  }
-				Mat* pImage = new Mat(image);
+				if(Constants::DEBUG_IMAGE_LOADING) {
+					cout << "Image loaded successfully: " << itr->path() << endl;
+				}
+
+				Mat* pImage;
+				if (bEqualize) {
+					cvtColor(image, image, CV_BGR2GRAY);
+					equalizeHist(image, image);
+				}
+				pImage = new Mat(image);
 				vImages.push_back(pImage);
 			}
 			else
@@ -72,16 +81,51 @@ bool mai::IOUtils::loadImages( std::vector<Mat*> &vImages, int iMode, const stri
 	return true;
 }
 
-void mai::IOUtils::convertImages( std::vector<Mat> &vImages, std::vector<Mat> &vConvertedImages, int iMode )
+void mai::IOUtils::addFlippedImages( std::vector<Mat*> &vImages, int iFlipMode )
 {
-	for( Mat image : vImages)
+	std::vector<Mat*> vDoubledImages;
+
+	for( Mat* image : vImages)
+	{
+		Mat flippedImage;
+		flip(*image, flippedImage, iFlipMode);
+
+		if( !flippedImage.empty() )// Check for valid input
+		{
+			Mat* pImage = new Mat(flippedImage);
+			vDoubledImages.push_back(pImage);
+		}
+	}
+
+	vImages.insert(std::end(vImages), std::begin(vDoubledImages), std::end(vDoubledImages));
+}
+
+void mai::IOUtils::convertImages( std::vector<Mat*> &vImages, std::vector<Mat*> &vConvertedImages, int iMode )
+{
+	for( Mat* image : vImages)
 	{
 		Mat convertedImage;
-		cvtColor(image, convertedImage, iMode);
+		cvtColor(*image, convertedImage, iMode);
 
 		if( !convertedImage.empty() )// Check for valid input
 		{
-			vConvertedImages.push_back ( convertedImage );
+			Mat* pImage = new Mat(convertedImage);
+			vConvertedImages.push_back(pImage);
+		}
+	}
+}
+
+void mai::IOUtils::equalizeImages( std::vector<Mat*> &vImages, std::vector<Mat*> &vConvertedImages )
+{
+	for( Mat* image : vImages)
+	{
+		Mat convertedImage;
+		equalizeHist(*image, convertedImage);
+
+		if( !convertedImage.empty() )// Check for valid input
+		{
+			Mat* pImage = new Mat(convertedImage);
+			vConvertedImages.push_back ( pImage );
 		}
 	}
 }
@@ -160,9 +204,14 @@ void mai::IOUtils::showImages( std::vector<Mat> &vImages )
 {
 	for( Mat image : vImages)
 	{
-		imshow("Image", image);
-		waitKey(0);
+		showImage( image );
 	}
+}
+
+void mai::IOUtils::showImage( Mat &image )
+{
+	imshow("Image", image);
+	waitKey(0);
 }
 
 

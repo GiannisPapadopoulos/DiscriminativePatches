@@ -28,11 +28,6 @@ class umSVM;
 /**
  * Unsupervised discovery of mid-level discriminative patches
  *
- * The function unsupervisedDiscovery is meant to implement the papers algorithm.
- *
- * As we are far from that, there is another function for more simpliefied procedure:
- * basicDetecion
- *
  */
 class UDoMLDP
 {
@@ -63,11 +58,6 @@ public:
 	 * Then the prediction is done with the validation datasets.
 	 */
 	void basicDetecion(std::string &strFilePathPositives, std::string &strFilePathNegatives);
-
-	/**
-	 * Main algorithm
-	 */
-	static void unsupervisedDiscovery(std::string &strFilePathPositives, std::string &strFilePathNegatives);
 
 private:
 
