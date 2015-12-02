@@ -48,14 +48,14 @@ public:
 		m_vData.clear();
 	};
 
-	int addImage(cv::Mat* image)
+	unsigned int addImage(cv::Mat* image)
 	{
 		m_vData.push_back(new ImageWithDescriptors(image));
 		setMaxImageDimensions(image);
 		return m_vData.size() - 1;
 	};
 
-	int getImageCount() const
+	unsigned int getImageCount() const
 	{
 		return m_vData.size();
 	};

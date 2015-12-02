@@ -33,6 +33,9 @@ class Constants {
     static const int HOG_IMAGE_SIZE_X = 16;
     static const int HOG_IMAGE_SIZE_Y = 16;
 
+    static const int HOG_VIZ_SCALEFACTOR = 4;
+    static constexpr double HOG_VIZ_VIZFACTOR = 3.0;
+
     static constexpr double SVM_C_VALUE = 0.1;
 
     /** Part of validation data */

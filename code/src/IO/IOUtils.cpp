@@ -14,6 +14,8 @@
 
 #include "IOUtils.h"
 #include "../Constants.h"
+#include "../data/DataSet.h"
+#include "../featureExtraction/cvHOG.h"
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/ml/ml.hpp>
@@ -214,5 +216,56 @@ void mai::IOUtils::showImage( Mat &image )
 	waitKey(0);
 }
 
+void mai::IOUtils::writeImages( std::vector<cv::Mat*> &vImages, std::string &strPath, std::string &strFileNameBase )
+{
+	for( unsigned int i = 0; i < vImages.size(); ++i)
+	{
+		Mat image = *vImages[i];
 
+		std::stringstream sstm;
+		sstm << strPath << "/" << strFileNameBase << "_" << i << ".jpg";
+		std::string strFileName = sstm.str();
+
+		imwrite(strFileName, image);
+	}
+}
+
+void mai::IOUtils::writeHOGImages( mai::DataSet* data,
+			std::string &strPath,
+			std::string &strFileNameBase,
+			cv::Size imageSize,
+			cv::Size cellSize,
+			int scaleFactor,
+			double vizFactor)
+{
+	for ( unsigned int i = 0; i < data->getImageCount(); ++i )
+	{
+		const Mat* image = data->getImageAt(i);
+		std::vector<float> vDescriptorValues;
+		data->getDescriptorValuesFromImageAt(i, vDescriptorValues);
+
+		if (vDescriptorValues.size() <= 0 || image == NULL) {
+			continue;
+		}
+
+		Mat resizedImage, outImage;
+		resize(*image, resizedImage, imageSize);
+		cvtColor(resizedImage, resizedImage, CV_GRAY2BGR);
+
+		cvHOG::getHOGDescriptorVisualImage(outImage,
+				resizedImage,
+				vDescriptorValues,
+				imageSize,
+				cellSize,
+				scaleFactor,
+				vizFactor);
+
+		std::stringstream sstm;
+		sstm << strPath << "/" << strFileNameBase << "_" << i << ".jpg";
+		std::string strFileName = sstm.str();
+
+		imwrite(strFileName, outImage);
+	}
+
+}
 

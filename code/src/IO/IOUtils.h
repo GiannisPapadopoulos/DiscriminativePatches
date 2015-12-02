@@ -22,6 +22,8 @@
 
 namespace mai{
 
+class DataSet;
+
 /**
  * Input and output tools
  */
@@ -118,6 +120,32 @@ public:
 	 * Show given image and wait for keystroke between each.
 	 */
 	static void showImage( cv::Mat &image );
+
+	/**
+	 * Write images as jpgs to a folder with indexed filename strFileNameBase_Index.jpg
+	 *
+	 * @param[in] vImages	images to write
+	 * @param strPath		existing filesystem folder without trailing slash
+	 * @param strFileNameBase	base part of filename
+	 */
+	static void writeImages( std::vector<cv::Mat*> &vImages,
+			std::string &strPath,
+			std::string &strFileNameBase );
+
+	/**
+	 * Write gradiented image as jpgs to a folder with indexed filename strFileNameBase_Index.jpg
+	 *
+	 * @param[in] data		images and descriptorvalues to write
+	 * @param strPath		existing filesystem folder without trailing slash
+	 * @param strFileNameBase	base part of filename
+	 */
+	static void writeHOGImages( DataSet* data,
+			std::string &strPath,
+			std::string &strFileNameBase,
+			cv::Size imageSize,
+			cv::Size cellSize,
+			int scaleFactor,
+			double vizFactor);
 
 private:
 	/**

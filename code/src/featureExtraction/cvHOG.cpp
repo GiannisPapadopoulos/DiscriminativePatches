@@ -159,8 +159,9 @@ void mai::cvHOG::getHOGDescriptorVisualImage(Mat &outImage,
         }
     }
 
-
+#ifdef DEBUG_HOG
     cout << "descriptorDataIdx = " << descriptorDataIdx << endl;
+#endif
 
     // draw cells
     for (int celly=0; celly<cells_in_y_dir; celly++)
@@ -216,19 +217,19 @@ void mai::cvHOG::getHOGDescriptorVisualImage(Mat &outImage,
 
             } // for (all bins)
 
-            cellGradient /= gradientBinSize;
-            cellGradient = round( cellGradient * 1000.0 );// / 1000.0;
-
-            string text = boost::lexical_cast<std::string>(cellGradient);
-            int fontFace = FONT_HERSHEY_SCRIPT_SIMPLEX;
-            double fontScale = 0.5;
-            int thickness = 1;
-            int baseline=0;
-            Size textSize = getTextSize(text, fontFace,
-                                        fontScale, thickness, &baseline);
-            // then put the text itself
-            putText(outImage, text, Point(drawX*scaleFactor,drawY*scaleFactor), fontFace, fontScale,
-                    Scalar::all(255), thickness, 8);
+//            cellGradient /= gradientBinSize;
+//            cellGradient = round( cellGradient * 1000.0 );// / 1000.0;
+//
+//            string text = boost::lexical_cast<std::string>(cellGradient);
+//            int fontFace = FONT_HERSHEY_SCRIPT_SIMPLEX;
+//            double fontScale = 0.5;
+//            int thickness = 1;
+//            int baseline=0;
+//            Size textSize = getTextSize(text, fontFace,
+//                                        fontScale, thickness, &baseline);
+//            // then put the text itself
+//            putText(outImage, text, Point(drawX*scaleFactor,drawY*scaleFactor), fontFace, fontScale,
+//                    Scalar::all(255), thickness, 8);
 
         } // for (cellx)
     } // for (celly)
