@@ -69,6 +69,11 @@ public:
 	 */
 	void loadSVM(std::string &strFilename);
 
+
+	void test1();
+
+	void test2();
+
 private:
 
 	CvSVM*	m_pSVM;

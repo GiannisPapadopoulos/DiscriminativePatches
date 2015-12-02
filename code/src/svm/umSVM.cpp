@@ -37,7 +37,7 @@ mai::umSVM::~umSVM()
 
 int mai::umSVM::trainSVM(Mat &data,
 		Mat &labels,
-		std::vector<float> &vSupport)
+		std::vector<std::vector<float> > &vSupport)
 {
 	// Set up SVM's parameters
 	CvSVMParams params;
@@ -46,7 +46,7 @@ int mai::umSVM::trainSVM(Mat &data,
 	params.C = Constants::SVM_C_VALUE;
 //	params.gamma = 3;
 //	params.degree = 3;
-//	params.term_crit   = cvTermCriteria(CV_TERMCRIT_ITER, 100, 1e-6);
+//	params.term_crit   = TermCriteria(CV_TERMCRIT_ITER, (int)1e7, 1e-6);
 
 	cout << "[mai::umSVM::trainSVM] training svm .." << endl;
 
@@ -56,12 +56,19 @@ int mai::umSVM::trainSVM(Mat &data,
 	int numSupportVectors = m_pSVM->get_support_vector_count();
 
 	vSupport.clear();
+	int featureSize = data.cols;
 	for(int i = 0; i < numSupportVectors; ++i)
 	{
-		vSupport.push_back(*(m_pSVM->get_support_vector(i)));
+		const float* supportVector = m_pSVM->get_support_vector(i);
+
+		std::vector<float> temp;
+		for (int j = 0; j < featureSize; ++j) {
+			temp.push_back(supportVector[j]);
+		}
+		vSupport.push_back(temp);
 	}
 
-	cout << "[mai::umSVM::trainSVM] svm trained, support vector count: " << numSupportVectors << endl;
+	cout << "[mai::umSVM::trainSVM] svm trained, support vector count: " << numSupportVectors << " with feature size " << featureSize << endl;
 
 	return numSupportVectors;
 }

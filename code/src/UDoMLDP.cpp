@@ -193,7 +193,7 @@ void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string 
 
 void mai::UDoMLDP::predictDataSetbySVM(DataSet* data)
 {
-	for(int i = 0; i < data->getImageCount(); ++i)
+	for(unsigned int i = 0; i < data->getImageCount(); ++i)
 	{
 		vector<float> descriptorsValues;
 		data->getDescriptorValuesFromImageAt(i, descriptorsValues);
@@ -263,15 +263,42 @@ void mai::UDoMLDP::trainSVMOnDataSets(DataSet* positives, DataSet* negatives)
 //	cout << data.at<float>(121103) << endl;
 //	cout << (float)labels.at<uchar>(0) << endl;
 
-	std::vector<float> vSupport;
+	std::vector<std::vector<float> > vSupport;
 	m_pSVM->trainSVM(data, labels, vSupport);
 
+	cout << "Searching support vectors in positives .." << endl;
+
+	searchSupportVector(positives, vSupport);
+
+	cout << "Searching support vectors in positives .." << endl;
+
+	searchSupportVector(negatives, vSupport);
+
+	cout << "Searching support vectors done." << endl;
 }
 
-/**
- * Construct Mat for trainingdata.
- * Calls collectTrainingDataAndLabels for positives and negatives
- */
+void mai::UDoMLDP::searchSupportVector(DataSet* data,
+			std::vector<std::vector<float> > vSupport)
+{
+	for(unsigned int i = 0; i < vSupport.size(); ++i)
+	{
+		std::vector<float> temp = vSupport[i];
+		std::sort(temp.begin(), temp.end());
+
+		for(unsigned int j = 0; j < data->getImageCount(); ++j)
+		{
+			std::vector<float> desc;
+			data->getDescriptorValuesFromImageAt(j, desc);
+
+			std::sort(desc.begin(), desc.end());
+			if(desc == temp)
+			{
+				cout << "Support Vector match at DateSet index " << j << endl;
+			}
+		}
+	}
+}
+
 void mai::UDoMLDP::setupTrainingData(DataSet* positives,
 		DataSet* negatives,
 		Mat &trainingData,

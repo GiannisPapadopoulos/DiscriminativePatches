@@ -94,6 +94,9 @@ private:
 	void trainSVMOnDataSets(DataSet* positives,
 			DataSet* negatives);
 
+	void searchSupportVector(DataSet* data,
+			std::vector<std::vector<float> > vSupport);
+
 	/**
 	 * Contruct Mat for trainingdata and labels used by svm.
 	 * Calls collectTrainingDataAndLabels for positives and negatives
