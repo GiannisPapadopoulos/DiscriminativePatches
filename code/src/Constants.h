@@ -20,6 +20,9 @@ class Constants {
     /** Whether to show debug information for the main algorithm (UDoMLDP) */
     static const bool DEBUG_MAIN_ALG = false;
 
+    /** Whether to show debug information for the svm */
+    static const bool DEBUG_SVM= true;
+
 	// OpenCV Documentation says that blocksize has to be 16x16 and cellsize 8x8. Other values are not supported.
 	// Experiments say otherwise !?
 	// blockssize and blockstride have to multiples of cellsize

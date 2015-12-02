@@ -139,9 +139,9 @@ private:
 			float fLabel);
 
 	/**
-	 * Convert each feature vector to matrix and do svm predict on that.
+	 * Convert each feature vector to matrix and do svm predict on that. Returns the number of positive matches
 	 */
-	void predictDataSetbySVMForSinglePatchImage(DataSet* data);
+	int predictDataSetbySVMForSinglePatchImage(DataSet* data);
 
 
 	// Training datasets
