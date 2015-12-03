@@ -60,6 +60,14 @@ public:
 	 */
 	static void addFlippedImages( std::vector<cv::Mat*> &vImages, int iFlipMode );
 
+  /**
+   * Add distorted images
+   *
+   * @param [out] vImages   image vector
+   * @param variationsOfEachImage The number of additional images to create from each input image
+   */
+  static void addDistortedImages( std::vector<cv::Mat*> &vImages, int variationsOfEachImage );
+
 	/**
 	 * Convert given images
 	 * OpenCV conversion modes:

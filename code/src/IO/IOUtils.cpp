@@ -102,6 +102,43 @@ void mai::IOUtils::addFlippedImages( std::vector<Mat*> &vImages, int iFlipMode )
 	vImages.insert(std::end(vImages), std::begin(vDoubledImages), std::end(vDoubledImages));
 }
 
+void mai::IOUtils::addDistortedImages( std::vector<Mat*> &vImages, int variationsOfEachImage )
+{
+  std::vector<Mat*> vDistortedImages;
+
+  for( Mat* image : vImages)
+  {
+    for(int i = 0; i < variationsOfEachImage; i++) {
+//      Mat distortedImage(image->rows, image->cols, CV_8U);
+      Mat distortedImage = image->clone();
+
+      cout << i << endl;
+
+     for(int row = 0; row < image->rows; row++) {
+       for(int col = 0; col < image->cols; col++) {
+         double pixelValue = image->at<double>(row, col);
+         distortedImage.at<double>(row, col) = pixelValue;
+       }
+     }
+
+     // Also crashes
+     // showImage(distortedImage);
+
+      if( !distortedImage.empty() )// Check for valid input
+      {
+        Mat* pImage = new Mat(distortedImage);
+        // Crashes with segmentation fault
+        vDistortedImages.push_back(pImage);
+      } else {
+        cout << "empty " << endl;
+      }
+    }
+  }
+  cout << "original " << vImages.size() << " dist " << vDistortedImages.size() << endl;
+  vImages.insert(std::end(vImages), std::begin(vDistortedImages), std::end(vDistortedImages));
+
+}
+
 void mai::IOUtils::convertImages( std::vector<Mat*> &vImages, std::vector<Mat*> &vConvertedImages, int iMode )
 {
 	for( Mat* image : vImages)
