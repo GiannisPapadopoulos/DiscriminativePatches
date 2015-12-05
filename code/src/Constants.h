@@ -11,6 +11,10 @@
 
 class Constants {
  public:
+
+  /** Whether to export the hog visualization as image files */
+  static const bool WRITE_HOG_IMAGES = false;
+
   /** Whether to show debug information for loading images */
     static const bool DEBUG_IMAGE_LOADING = false;
 
