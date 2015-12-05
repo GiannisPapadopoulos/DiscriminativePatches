@@ -185,11 +185,16 @@ void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string 
 	//predictDataSetbySVM(m_pNegativeValid);
 
 	cout << "Positives prediction" << endl;
-	//predictDataSetbySVMForSinglePatchImage(m_pPositiveValid);
-	predictWholeDataSetbySVMForSinglePatchImage(m_pPositiveValid);
+	//predictWholeDataSetbySVMForSinglePatchImage(m_pPositiveValid);
 
-	cout << "Negatives prediction" << endl;
-	predictDataSetbySVMForSinglePatchImage(m_pNegativeValid);
+	int numTruePositives = predictDataSetbySVMForSinglePatchImage(m_pPositiveValid);
+
+	cout << "correctly predicted positives: " << numTruePositives << " out of " << m_pPositiveValid->getImageCount() << endl;
+
+	int numFalsePositives =	predictDataSetbySVMForSinglePatchImage(m_pNegativeValid);
+	int correctlyPredictedNegatives = m_pNegativeValid->getImageCount() - numFalsePositives;
+
+	cout << "correctly predicted negatives: " << correctlyPredictedNegatives << " out of " << m_pNegativeValid->getImageCount() << endl;
 }
 
 void mai::UDoMLDP::predictDataSetbySVM(DataSet* data)
@@ -244,6 +249,10 @@ void mai::UDoMLDP::computeHOGForDataSet(DataSet* data,
 		vector< float> descriptorsValues;
 
 		cvHOG::extractFeatures(descriptorsValues, resizedImage, blockSize, blockStride, cellSize, winStride, padding);
+
+    if(Constants::DEBUG_MAIN_ALG) {
+      cout << "Number of descriptors: " << descriptorsValues.size() << endl;
+    }
 
 		data->addDescriptorValuesToImageAt(i, descriptorsValues);
 	}
@@ -366,6 +375,7 @@ void mai::UDoMLDP::setupTrainingDataForSinglePatchImage(DataSet* positives,
 	vector<vector<float> > vPositives;
 	vector<float> vPositiveLabels;
 	iFeatureSizePos = collectTrainingDataAndLabelsForSingelPatchImage(positives, vPositives, vPositiveLabels, 1.0);
+	cout << "number of features: " << iFeatureSizePos << endl;
 
 	vector<vector<float> > vNegatives;
 	vector<float> vNegativeLabels;
@@ -384,6 +394,8 @@ void mai::UDoMLDP::setupTrainingDataForSinglePatchImage(DataSet* positives,
 	vector<float> vLabels;
 	vLabels.insert(std::end(vLabels), std::begin(vPositiveLabels), std::end(vPositiveLabels));
 	vLabels.insert(std::end(vLabels), std::begin(vNegativeLabels), std::end(vNegativeLabels));
+
+	cout << "vdata " << vData.size() << "x" << vData[0].size() << " " << vData[50].size() << endl;
 
 	// setup training matrices
 	unsigned int iNumPatches = vPositives.size() + vNegatives.size();
@@ -440,8 +452,9 @@ bool isPositivePrediction(float svmPrediction) {
   return svmPrediction != 0;
 }
 
-void mai::UDoMLDP::predictDataSetbySVMForSinglePatchImage(DataSet* data)
+int mai::UDoMLDP::predictDataSetbySVMForSinglePatchImage(DataSet* data)
 {
+  int numPositiveMatches = 0;
 	for(unsigned int i = 0; i < data->getImageCount(); ++i)
 	{
 		vector<float> descriptorsValues;
@@ -458,15 +471,23 @@ void mai::UDoMLDP::predictDataSetbySVMForSinglePatchImage(DataSet* data)
 		float fResultLabel = m_pSVM->predict(predictionData, false);
 		float fResultValue = m_pSVM->predict(predictionData, true);
 
-		cout << "SVM predict for image " << i << " is " << fResultLabel << ", DFvalue " << fResultValue << endl;
+		if(isPositivePrediction(fResultLabel))
+		  numPositiveMatches++;
 
-//		// display
-//		const Mat* image = data->getImageAt(i);
-//		std::string  winName = isPositivePrediction(fResultLabel) ? "Pos" : "Neg";
-//		destroyWindow("Pos");
-//		ImageDisplayUtils::displayImage(winName, *image);
+		std::string winName;
+
+		winName = isPositivePrediction(fResultLabel) ? "Pos" : "Neg";
+
+		destroyWindow("Pos");
+    destroyWindow("Neg");
+
+    cout << "SVM predict for image " << i << " is " << fResultLabel << ", DFvalue " << fResultValue << endl;
+
+    const Mat* image = data->getImageAt(i);
+    ImageDisplayUtils::displayImage(winName, *image, 300);
 
 	}
+  return numPositiveMatches;
 }
 
 void mai::UDoMLDP::predictWholeDataSetbySVMForSinglePatchImage(DataSet* data)
