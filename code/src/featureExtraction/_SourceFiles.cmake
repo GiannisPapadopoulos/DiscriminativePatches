@@ -5,6 +5,8 @@ set( RelativeSourceGroup "Source Files\\featureExtraction" )
 set( DirFiles
 	cvHOG.cpp
 	cvHOG.h
+	umPCA.cpp
+	umPCA.h
 )
 
 set( DirFiles_SourceGroup "${RelativeSourceGroup}" )

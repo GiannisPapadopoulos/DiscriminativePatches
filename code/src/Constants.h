@@ -16,6 +16,7 @@ class Constants {
 
     /** Whether to show debug information for the HOG feature extractor */
     static const bool DEBUG_HOG = false;
+    static const bool DEBUG_PCA = true;
 
     /** Whether to show debug information for the main algorithm (UDoMLDP) */
     static const bool DEBUG_MAIN_ALG = false;
@@ -30,6 +31,7 @@ class Constants {
     static const int HOG_CELLSIZE = 8;
     static const int HOG_BLOCKSTRIDE = 8;
     static const int HOG_BLOCKSIZE = 16;
+    static const int HOG_BINS = 9;
 
 	// Image will be resized to this size !
 	// If the original size is not divideable by cellsize e.g.
@@ -38,6 +40,9 @@ class Constants {
 
     static const int HOG_VIZ_SCALEFACTOR = 4;
     static constexpr double HOG_VIZ_VIZFACTOR = 3.0;
+
+    /** Reduce features, 1 >= factor > 0 */
+    static constexpr double PCA_REDUCTION_FACTOR = 1.0;
 
     static constexpr double SVM_C_VALUE = 0.1;
 

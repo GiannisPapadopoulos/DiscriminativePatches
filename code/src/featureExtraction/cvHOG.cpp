@@ -40,23 +40,24 @@ void mai::cvHOG::extractFeatures(vector<float> &descriptorsValues,
 								Size blockSize,
 								Size blockStride,
 								Size cellSize,
+								int iNumBins,
 								Size winStride,
 								Size padding)
 {
 	Size sizeImage = image.size();
 
 	if(Constants::DEBUG_HOG) {
-	  cout << "[mai::cvHOG::extractFeatures] computing HOG with blocksize " << blockSize << ", blockstride " << blockStride << ", cellSize " << cellSize << endl;
+		cout << "[mai::cvHOG::extractFeatures] computing HOG with blocksize " << blockSize << ", blockstride " << blockStride << ", cellSize " << cellSize << ", num Bins " << iNumBins << endl;
 	}
 
-	HOGDescriptor hog( sizeImage, blockSize, blockStride, cellSize, 9);
+	HOGDescriptor hog( sizeImage, blockSize, blockStride, cellSize, iNumBins);
 
 	vector< Point> locations;
 	hog.compute( image, descriptorsValues, winStride, padding, locations);
 
-  if(Constants::DEBUG_HOG) {
-    cout << "[mai::cvHOG::extractFeatures] descriptor size: " << descriptorsValues.size() << endl;
-  }
+	if(Constants::DEBUG_HOG) {
+		cout << "[mai::cvHOG::extractFeatures] descriptor size: " << descriptorsValues.size() << endl;
+	}
 }
 
 void mai::cvHOG::getHOGDescriptorVisualImage(Mat &outImage,
@@ -65,11 +66,13 @@ void mai::cvHOG::getHOGDescriptorVisualImage(Mat &outImage,
                                Size winSize,
                                Size cellSize,
                                int scaleFactor,
-                               double vizFactor)
+                               double vizFactor,
+							   int iNumCellsPerBlock,
+							   int iNumBins)
 {
     resize(origImg, outImage, Size(origImg.cols*scaleFactor, origImg.rows*scaleFactor));
 
-    int gradientBinSize = 9;
+    int gradientBinSize = iNumBins;
     // dividing 180° into 9 bins, how large (in rad) is one bin?
     float radRangeForOneBin = 3.14/(float)gradientBinSize;
 
@@ -108,7 +111,7 @@ void mai::cvHOG::getHOGDescriptorVisualImage(Mat &outImage,
         for (int blocky=0; blocky<blocks_in_y_dir; blocky++)
         {
             // 4 cells per block ...
-            for (int cellNr=0; cellNr<4; cellNr++)
+            for (int cellNr=0; cellNr<iNumCellsPerBlock; cellNr++)
             {
                 // compute corresponding cell nr
                 int cellx = blockx;

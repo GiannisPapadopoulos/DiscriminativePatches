@@ -20,6 +20,7 @@
 #include "data/TrainingData.h"
 #include "IO/IOUtils.h"
 #include "featureExtraction/cvHOG.h"
+#include "featureExtraction/umPCA.h"
 #include "utils/ImageDisplayUtils.h"
 
 
@@ -248,7 +249,7 @@ void mai::UDoMLDP::computeHOGForDataSet(DataSet* data,
 
 		vector< float> descriptorsValues;
 
-		cvHOG::extractFeatures(descriptorsValues, resizedImage, blockSize, blockStride, cellSize, winStride, padding);
+		cvHOG::extractFeatures(descriptorsValues, resizedImage, blockSize, blockStride, cellSize, Constants::HOG_BINS, winStride, padding);
 
     if(Constants::DEBUG_MAIN_ALG) {
       cout << "Number of descriptors: " << descriptorsValues.size() << endl;
@@ -436,7 +437,23 @@ int mai::UDoMLDP::collectTrainingDataAndLabelsForSingelPatchImage(DataSet* data,
 			iDescriptorValueSize = descriptorsValues.size();
 		}
 		if (iDescriptorValueSize == descriptorsValues.size()) {
-			vTrainingData.push_back(descriptorsValues);
+
+			if(Constants::PCA_REDUCTION_FACTOR < 1.0 && Constants::PCA_REDUCTION_FACTOR > 0.0)
+			{
+				int iNumReducedComponents = (iDescriptorValueSize / Constants::HOG_BINS) * Constants::PCA_REDUCTION_FACTOR;
+				vector<float> reducedFeatures;
+
+				umPCA::decreaseHOGDescriptorCellsByPCA(descriptorsValues,
+						reducedFeatures,
+						iNumReducedComponents,
+						Constants::HOG_BINS);
+
+				vTrainingData.push_back(reducedFeatures);
+			}
+			else
+			{
+				vTrainingData.push_back(descriptorsValues);
+			}
 			vLabels.push_back(fLabel);
 		}
 		else
@@ -460,8 +477,24 @@ int mai::UDoMLDP::predictDataSetbySVMForSinglePatchImage(DataSet* data)
 		vector<float> descriptorsValues;
 		data->getDescriptorValuesFromImageAt(i, descriptorsValues);
 
+		if(Constants::PCA_REDUCTION_FACTOR < 1.0 && Constants::PCA_REDUCTION_FACTOR > 0.0)
+		{
+			int iNumReducedComponents = (descriptorsValues.size() / Constants::HOG_BINS) * Constants::PCA_REDUCTION_FACTOR;
+			vector<float> reducedFeatures;
+
+			umPCA::decreaseHOGDescriptorCellsByPCA(descriptorsValues,
+					reducedFeatures,
+					iNumReducedComponents,
+					Constants::HOG_BINS);
+
+			descriptorsValues.clear();
+			descriptorsValues = reducedFeatures;
+		}
+
 		// setup matrix
 		Mat predictionData(1, descriptorsValues.size(), CV_32FC1, &descriptorsValues[0]);;
+
+		cout << "predictionData " << predictionData.rows << "x" << predictionData.cols << endl;
 
 //		for(unsigned int j = 0; j < descriptorsValues.size(); ++j)
 //		{
