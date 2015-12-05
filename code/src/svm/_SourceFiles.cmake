@@ -3,6 +3,8 @@ set( RelativeDir "src/svm" )
 set( RelativeSourceGroup "Source Files\\svm" )
 
 set( DirFiles
+	svmtest.cpp
+	svmtest.h
 	umSVM.cpp
 	umSVM.h
 )

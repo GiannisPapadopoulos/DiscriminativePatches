@@ -16,6 +16,7 @@
 #include <string>
 
 #include "UDoMLDP.h"
+#include "svm/svmtest.h"
 
 using namespace std;
 using namespace mai;
@@ -62,6 +63,34 @@ int main(int argc, char** argv )
 			else
 			{
 				cerr << "ERROR: Option -neg given without filepath." << endl;
+				return -1;
+			}
+		}
+
+		if(string(argv[i]) == "-svmtest")
+		{
+			if(i+1 < argc)
+			{
+				int iTest = atoi(argv[i+1]);
+
+				if(iTest == 1)
+				{
+					SVMTest::test1();
+				}
+				else if (iTest == 2)
+				{
+					SVMTest::test2();
+				}
+				else
+				{
+					SVMTest::testGeneratedTestData();
+				}
+
+				return 0;
+			}
+			else
+			{
+				cerr << "ERROR: Option -svmtest given without number." << endl;
 				return -1;
 			}
 		}

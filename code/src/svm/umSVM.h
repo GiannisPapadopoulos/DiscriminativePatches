@@ -59,6 +59,8 @@ public:
 	 */
 	float predict(cv::Mat &data, bool bReturnfDFValue = false);
 
+	float predict(cv::Mat &data, cv::Mat &results);
+
 	/**
 	 *
 	 */

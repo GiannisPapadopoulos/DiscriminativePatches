@@ -185,7 +185,8 @@ void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string 
 	//predictDataSetbySVM(m_pNegativeValid);
 
 	cout << "Positives prediction" << endl;
-	predictDataSetbySVMForSinglePatchImage(m_pPositiveValid);
+	//predictDataSetbySVMForSinglePatchImage(m_pPositiveValid);
+	predictWholeDataSetbySVMForSinglePatchImage(m_pPositiveValid);
 
 	cout << "Negatives prediction" << endl;
 	predictDataSetbySVMForSinglePatchImage(m_pNegativeValid);
@@ -447,12 +448,12 @@ void mai::UDoMLDP::predictDataSetbySVMForSinglePatchImage(DataSet* data)
 		data->getDescriptorValuesFromImageAt(i, descriptorsValues);
 
 		// setup matrix
-		Mat predictionData(1, descriptorsValues.size(), CV_32FC1);;
+		Mat predictionData(1, descriptorsValues.size(), CV_32FC1, &descriptorsValues[0]);;
 
-		for(unsigned int j = 0; j < descriptorsValues.size(); ++j)
-		{
-			predictionData.at<float>(0, j) = descriptorsValues[j];
-		}
+//		for(unsigned int j = 0; j < descriptorsValues.size(); ++j)
+//		{
+//			predictionData.at<float>(0, j) = descriptorsValues[j];
+//		}
 
 		float fResultLabel = m_pSVM->predict(predictionData, false);
 		float fResultValue = m_pSVM->predict(predictionData, true);
@@ -465,5 +466,39 @@ void mai::UDoMLDP::predictDataSetbySVMForSinglePatchImage(DataSet* data)
 //		destroyWindow("Pos");
 //		ImageDisplayUtils::displayImage(winName, *image);
 
+	}
+}
+
+void mai::UDoMLDP::predictWholeDataSetbySVMForSinglePatchImage(DataSet* data)
+{
+	// Collect patches
+	int iFeatureSize;
+	vector<vector<float> > vFeatures;
+	vector<float> vLabels;
+	iFeatureSize = collectTrainingDataAndLabelsForSingelPatchImage(data, vFeatures, vLabels, 1.0);
+
+	// setup matrix
+	unsigned int iNumPatches = vFeatures.size();
+
+	Mat predictionData(iNumPatches, iFeatureSize, CV_32FC1);
+
+	for(unsigned int i = 0; i < iNumPatches ; ++i)
+	{
+		vector<float> vCurrentData = vFeatures[i];
+		for(unsigned int j = 0; j < vCurrentData.size(); ++j)
+		{
+			predictionData.at<float>(i, j) = vCurrentData[j];
+		}
+	}
+
+	Mat results(iNumPatches, 1, CV_32SC1);
+
+	float fResultValue = m_pSVM->predict(predictionData, results);
+
+	cout << "SVM predict result has  " << results.rows << " rows and " << results.cols << " columns. Return value: " << fResultValue << endl;
+
+	for(int i = 0; i < results.rows; ++i)
+	{
+		cout << "SVM predict for image " << i << " is " << (float)results.at<uchar>(i) << endl;
 	}
 }

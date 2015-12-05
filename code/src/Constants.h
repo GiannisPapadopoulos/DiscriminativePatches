@@ -25,13 +25,13 @@ class Constants {
 	// blockssize and blockstride have to multiples of cellsize
 	// image size has to be multiple of blocksize
     static const int HOG_CELLSIZE = 8;
-    static const int HOG_BLOCKSTRIDE = 16;
+    static const int HOG_BLOCKSTRIDE = 8;
     static const int HOG_BLOCKSIZE = 16;
 
 	// Image will be resized to this size !
 	// If the original size is not divideable by cellsize e.g.
-    static const int HOG_IMAGE_SIZE_X = 16;
-    static const int HOG_IMAGE_SIZE_Y = 16;
+    static const int HOG_IMAGE_SIZE_X = 96;
+    static const int HOG_IMAGE_SIZE_Y = 96;
 
     static const int HOG_VIZ_SCALEFACTOR = 4;
     static constexpr double HOG_VIZ_VIZFACTOR = 3.0;

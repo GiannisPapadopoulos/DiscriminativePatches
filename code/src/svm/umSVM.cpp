@@ -79,6 +79,15 @@ float mai::umSVM::predict(Mat &data, bool bReturnDFValue)
 	return fResult;
 }
 
+float mai::umSVM::predict(Mat &data, Mat &results)
+{
+	CvMat predictionDataOld = data;
+	CvMat resultsOld = results;
+
+	float fResult = m_pSVM->predict(&predictionDataOld, &resultsOld);
+	return fResult;
+}
+
 void mai::umSVM::saveSVM(std::string &strFilename)
 {
 	m_pSVM->save(strFilename.c_str());

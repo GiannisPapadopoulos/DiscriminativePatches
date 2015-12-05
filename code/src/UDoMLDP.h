@@ -143,6 +143,7 @@ private:
 	 */
 	void predictDataSetbySVMForSinglePatchImage(DataSet* data);
 
+	void predictWholeDataSetbySVMForSinglePatchImage(DataSet* data);
 
 	// Training datasets
 	DataSet*	m_pPositiveTrain;
