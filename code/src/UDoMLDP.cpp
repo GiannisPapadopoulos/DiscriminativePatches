@@ -138,43 +138,46 @@ void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string 
 			winStride,
 			padding);
 
-	std::string strName = "positiveTrain";
-	std::string strPath = "out";
+	if(Constants::WRITE_HOG_IMAGES) {
 
-	IOUtils::writeHOGImages(m_pPositiveTrain,
-			strPath,
-			strName,
-			imageSize,
-			cellSize,
-			Constants::HOG_VIZ_SCALEFACTOR,
-			Constants::HOG_VIZ_VIZFACTOR);
+	  std::string strName = "positiveTrain";
+	  std::string strPath = "out";
 
-	strName = "positiveValid";
-	IOUtils::writeHOGImages(m_pPositiveValid,
-				strPath,
-				strName,
-				imageSize,
-				cellSize,
-				Constants::HOG_VIZ_SCALEFACTOR,
-				Constants::HOG_VIZ_VIZFACTOR);
+    IOUtils::writeHOGImages(m_pPositiveTrain,
+        strPath,
+        strName,
+        imageSize,
+        cellSize,
+        Constants::HOG_VIZ_SCALEFACTOR,
+        Constants::HOG_VIZ_VIZFACTOR);
 
-	strName = "negativeTrain";
-	IOUtils::writeHOGImages(m_pNegativeTrain,
-				strPath,
-				strName,
-				imageSize,
-				cellSize,
-				Constants::HOG_VIZ_SCALEFACTOR,
-				Constants::HOG_VIZ_VIZFACTOR);
+    strName = "positiveValid";
+    IOUtils::writeHOGImages(m_pPositiveValid,
+          strPath,
+          strName,
+          imageSize,
+          cellSize,
+          Constants::HOG_VIZ_SCALEFACTOR,
+          Constants::HOG_VIZ_VIZFACTOR);
 
-	strName = "negativeValid";
-	IOUtils::writeHOGImages(m_pNegativeValid,
-				strPath,
-				strName,
-				imageSize,
-				cellSize,
-				Constants::HOG_VIZ_SCALEFACTOR,
-				Constants::HOG_VIZ_VIZFACTOR);
+    strName = "negativeTrain";
+    IOUtils::writeHOGImages(m_pNegativeTrain,
+          strPath,
+          strName,
+          imageSize,
+          cellSize,
+          Constants::HOG_VIZ_SCALEFACTOR,
+          Constants::HOG_VIZ_VIZFACTOR);
+
+    strName = "negativeValid";
+    IOUtils::writeHOGImages(m_pNegativeValid,
+          strPath,
+          strName,
+          imageSize,
+          cellSize,
+          Constants::HOG_VIZ_SCALEFACTOR,
+          Constants::HOG_VIZ_VIZFACTOR);
+	}
 
 	trainSVMOnDataSets(m_pPositiveTrain, m_pNegativeTrain);
 
@@ -517,10 +520,10 @@ int mai::UDoMLDP::predictDataSetbySVMForSinglePatchImage(DataSet* data)
 		destroyWindow("Pos");
     destroyWindow("Neg");
 
-    cout << "SVM predict for image " << i << " is " << fResultLabel << ", DFvalue " << fResultValue << endl;
+//    cout << "SVM predict for image " << i << " is " << fResultLabel << ", DFvalue " << fResultValue << endl;
 
     const Mat* image = data->getImageAt(i);
-    ImageDisplayUtils::displayImage(winName, *image, 300);
+//    ImageDisplayUtils::displayImage(winName, *image, 50);
 
 	}
   return numPositiveMatches;
