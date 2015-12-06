@@ -32,16 +32,11 @@ mai::umPCA::~umPCA()
 
 void mai::umPCA::decreaseHOGDescriptorCellsByPCA(vector<float> &inputFeatures,
 		vector<float> &reducedFeatures,
-		int iNumReducedComponents,
 		int iNumBins)
 {
 	int iNumCells = inputFeatures.size() / iNumBins;
 	int iCellPosition = 0;
 	Mat bins(iNumCells, iNumBins, CV_32FC1);
-
-	if(Constants::DEBUG_PCA) {
-		cout << "[mai::umPCA::decreaseHOGDescriptorCellsByPCA] Reducing " << iNumCells << " cells with " << iNumBins << " bins to " << iNumReducedComponents << " cells."  << endl;
-	}
 
 	for(int i = 0; i < iNumCells; i+= iNumBins)
 	{
@@ -55,7 +50,6 @@ void mai::umPCA::decreaseHOGDescriptorCellsByPCA(vector<float> &inputFeatures,
 	Mat eigenValues, eigenVectors, mean;
 
 	decreaseFeatureSpacebyPCA(bins,
-			iNumReducedComponents,
 			eigenValues,
 			eigenVectors,
 			mean);
@@ -74,12 +68,11 @@ void mai::umPCA::decreaseHOGDescriptorCellsByPCA(vector<float> &inputFeatures,
 }
 
 void mai::umPCA::decreaseFeatureSpacebyPCA(Mat &features,
-									int iNumReducedComponents,
 									Mat &eigenValues,
 									Mat &eigenVectors,
 									Mat &mean)
 {
-	PCA pca(features, Mat(), CV_PCA_DATA_AS_ROW, iNumReducedComponents);
+	PCA pca(features, Mat(), CV_PCA_DATA_AS_ROW);
 
 	mean = pca.mean.clone();
 	eigenValues = pca.eigenvalues.clone();

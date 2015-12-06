@@ -39,14 +39,12 @@ public:
 	 */
 	static void decreaseHOGDescriptorCellsByPCA(std::vector<float> &features,
 			std::vector<float> &reducedFeatures,
-			int iNumReducedComponents,
 			int iNumBins);
 
 	/**
 	 *
 	 */
 	static void decreaseFeatureSpacebyPCA(cv::Mat &features,
-			int iNumReducedComponents,
 			cv::Mat &eigenValues,
 			cv::Mat &eigenVectors,
 			cv::Mat &mean);

@@ -35,14 +35,14 @@ class Constants {
 
 	// Image will be resized to this size !
 	// If the original size is not divideable by cellsize e.g.
-    static const int HOG_IMAGE_SIZE_X = 96;
-    static const int HOG_IMAGE_SIZE_Y = 96;
+    static const int HOG_IMAGE_SIZE_X = 32;
+    static const int HOG_IMAGE_SIZE_Y = 32;
 
     static const int HOG_VIZ_SCALEFACTOR = 4;
     static constexpr double HOG_VIZ_VIZFACTOR = 3.0;
 
-    /** Reduce features, 1 >= factor > 0 */
-    static constexpr double PCA_REDUCTION_FACTOR = 1.0;
+    /** Reduce featureset */
+    static const bool PCA_REDUCTION = false;
 
     static constexpr double SVM_C_VALUE = 0.1;
 

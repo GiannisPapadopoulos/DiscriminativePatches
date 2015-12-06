@@ -269,3 +269,14 @@ void mai::IOUtils::writeHOGImages( mai::DataSet* data,
 
 }
 
+void mai::IOUtils::writeMatToCSV(cv::Mat &data,
+				std::string &strMatName,
+				std::string &strFilename)
+{
+	cv::FileStorage file(strFilename, cv::FileStorage::WRITE);
+
+	file << strMatName << data;
+
+	file.release();
+}
+

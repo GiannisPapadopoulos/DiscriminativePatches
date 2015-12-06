@@ -251,9 +251,9 @@ void mai::UDoMLDP::computeHOGForDataSet(DataSet* data,
 
 		cvHOG::extractFeatures(descriptorsValues, resizedImage, blockSize, blockStride, cellSize, Constants::HOG_BINS, winStride, padding);
 
-    if(Constants::DEBUG_MAIN_ALG) {
-      cout << "Number of descriptors: " << descriptorsValues.size() << endl;
-    }
+		if(Constants::DEBUG_MAIN_ALG) {
+			cout << "Number of descriptors: " << descriptorsValues.size() << endl;
+		}
 
 		data->addDescriptorValuesToImageAt(i, descriptorsValues);
 	}
@@ -270,6 +270,13 @@ void mai::UDoMLDP::trainSVMOnDataSets(DataSet* positives, DataSet* negatives)
 
 	setupTrainingDataForSinglePatchImage(positives, negatives, data, labels);
 
+	std::string strDataname = "trainingdata";
+	std::string strDataFilename = "trainingdata.yml";
+	IOUtils::writeMatToCSV(data, strDataname, strDataFilename);
+	std::string strLabelname = "labeldata";
+	std::string strLabelFilename = "labeldata.yml";
+	IOUtils::writeMatToCSV(labels, strLabelname, strLabelFilename);
+
 //	cout << data.size() << " - " << labels.size() << endl;
 //	cout << data.at<float>(121103) << endl;
 //	cout << (float)labels.at<uchar>(0) << endl;
@@ -281,7 +288,7 @@ void mai::UDoMLDP::trainSVMOnDataSets(DataSet* positives, DataSet* negatives)
 
 	searchSupportVector(positives, vSupport);
 
-	cout << "Searching support vectors in positives .." << endl;
+	cout << "Searching support vectors in negatives .." << endl;
 
 	searchSupportVector(negatives, vSupport);
 
@@ -317,18 +324,18 @@ void mai::UDoMLDP::setupTrainingData(DataSet* positives,
 {
 	// Collect patches
 	vector<float> vPositives;
-	vector<float> vPositiveLabels;
+	vector<int> vPositiveLabels;
 	collectTrainingDataAndLabels(positives, vPositives, vPositiveLabels, 1.0);
 
 	vector<float> vNegatives;
-	vector<float> vNegativeLabels;
+	vector<int> vNegativeLabels;
 	collectTrainingDataAndLabels(negatives, vNegatives, vNegativeLabels, 0.0);
 
 	vector<float> vData;
 	vData.insert(std::end(vData), std::begin(vPositives), std::end(vPositives));
 	vData.insert(std::end(vData), std::begin(vNegatives), std::end(vNegatives));
 
-	vector<float> vLabels;
+	vector<int> vLabels;
 	vLabels.insert(std::end(vLabels), std::begin(vPositiveLabels), std::end(vPositiveLabels));
 	vLabels.insert(std::end(vLabels), std::begin(vNegativeLabels), std::end(vNegativeLabels));
 
@@ -350,8 +357,8 @@ void mai::UDoMLDP::setupTrainingData(DataSet* positives,
 
 void mai::UDoMLDP::collectTrainingDataAndLabels(DataSet* data,
 		std::vector<float> &vTrainingData,
-		std::vector<float> &vLabels,
-		float fLabel)
+		std::vector<int> &vLabels,
+		int iLabel)
 {
 	for(unsigned int i = 0; i < data->getImageCount(); ++i)
 	{
@@ -361,7 +368,7 @@ void mai::UDoMLDP::collectTrainingDataAndLabels(DataSet* data,
 		vTrainingData.insert(std::end(vTrainingData), std::begin(descriptorsValues), std::end(descriptorsValues));
 		for(unsigned int j = 0; j < descriptorsValues.size(); ++j)
 		{
-			vLabels.push_back(fLabel);
+			vLabels.push_back(iLabel);
 		}
 	}
 }
@@ -374,13 +381,13 @@ void mai::UDoMLDP::setupTrainingDataForSinglePatchImage(DataSet* positives,
 	// Collect patches
 	int iFeatureSizePos, iFeatureSizeNeg;
 	vector<vector<float> > vPositives;
-	vector<float> vPositiveLabels;
-	iFeatureSizePos = collectTrainingDataAndLabelsForSingelPatchImage(positives, vPositives, vPositiveLabels, 1.0);
+	vector<int> vPositiveLabels;
+	iFeatureSizePos = collectTrainingDataAndLabelsForSingelPatchImage(positives, vPositives, vPositiveLabels, 1);
 	cout << "number of features: " << iFeatureSizePos << endl;
 
 	vector<vector<float> > vNegatives;
-	vector<float> vNegativeLabels;
-	iFeatureSizeNeg = collectTrainingDataAndLabelsForSingelPatchImage(negatives, vNegatives, vNegativeLabels, 0.0);
+	vector<int> vNegativeLabels;
+	iFeatureSizeNeg = collectTrainingDataAndLabelsForSingelPatchImage(negatives, vNegatives, vNegativeLabels, 0);
 
 	if(iFeatureSizeNeg != iFeatureSizePos)
 	{
@@ -392,7 +399,7 @@ void mai::UDoMLDP::setupTrainingDataForSinglePatchImage(DataSet* positives,
 	vData.insert(std::end(vData), std::begin(vPositives), std::end(vPositives));
 	vData.insert(std::end(vData), std::begin(vNegatives), std::end(vNegatives));
 
-	vector<float> vLabels;
+	vector<int> vLabels;
 	vLabels.insert(std::end(vLabels), std::begin(vPositiveLabels), std::end(vPositiveLabels));
 	vLabels.insert(std::end(vLabels), std::begin(vNegativeLabels), std::end(vNegativeLabels));
 
@@ -411,7 +418,7 @@ void mai::UDoMLDP::setupTrainingDataForSinglePatchImage(DataSet* positives,
 		{
 			trainingData.at<float>(i, j) = vCurrentData[j];
 		}
-		labels.at<uchar>(i) = vLabels[i];
+		labels.at<int>(i) = vLabels[i];
 	}
 
 //	cout << trainingData.size() << " - " << labels.size() << endl;
@@ -422,8 +429,8 @@ void mai::UDoMLDP::setupTrainingDataForSinglePatchImage(DataSet* positives,
 
 int mai::UDoMLDP::collectTrainingDataAndLabelsForSingelPatchImage(DataSet* data,
 		std::vector<std::vector<float> > &vTrainingData,
-		std::vector<float> &vLabels,
-		float fLabel)
+		std::vector<int> &vLabels,
+		int iLabel)
 {
 	unsigned int iDescriptorValueSize = 0;
 
@@ -436,16 +443,14 @@ int mai::UDoMLDP::collectTrainingDataAndLabelsForSingelPatchImage(DataSet* data,
 		{
 			iDescriptorValueSize = descriptorsValues.size();
 		}
-		if (iDescriptorValueSize == descriptorsValues.size()) {
-
-			if(Constants::PCA_REDUCTION_FACTOR < 1.0 && Constants::PCA_REDUCTION_FACTOR > 0.0)
+		if (iDescriptorValueSize == descriptorsValues.size())
+		{
+			if(Constants::PCA_REDUCTION)
 			{
-				int iNumReducedComponents = (iDescriptorValueSize / Constants::HOG_BINS) * Constants::PCA_REDUCTION_FACTOR;
 				vector<float> reducedFeatures;
 
 				umPCA::decreaseHOGDescriptorCellsByPCA(descriptorsValues,
 						reducedFeatures,
-						iNumReducedComponents,
 						Constants::HOG_BINS);
 
 				vTrainingData.push_back(reducedFeatures);
@@ -454,7 +459,7 @@ int mai::UDoMLDP::collectTrainingDataAndLabelsForSingelPatchImage(DataSet* data,
 			{
 				vTrainingData.push_back(descriptorsValues);
 			}
-			vLabels.push_back(fLabel);
+			vLabels.push_back(iLabel);
 		}
 		else
 		{
@@ -477,14 +482,12 @@ int mai::UDoMLDP::predictDataSetbySVMForSinglePatchImage(DataSet* data)
 		vector<float> descriptorsValues;
 		data->getDescriptorValuesFromImageAt(i, descriptorsValues);
 
-		if(Constants::PCA_REDUCTION_FACTOR < 1.0 && Constants::PCA_REDUCTION_FACTOR > 0.0)
+		if(Constants::PCA_REDUCTION)
 		{
-			int iNumReducedComponents = (descriptorsValues.size() / Constants::HOG_BINS) * Constants::PCA_REDUCTION_FACTOR;
 			vector<float> reducedFeatures;
 
 			umPCA::decreaseHOGDescriptorCellsByPCA(descriptorsValues,
 					reducedFeatures,
-					iNumReducedComponents,
 					Constants::HOG_BINS);
 
 			descriptorsValues.clear();
@@ -528,8 +531,8 @@ void mai::UDoMLDP::predictWholeDataSetbySVMForSinglePatchImage(DataSet* data)
 	// Collect patches
 	int iFeatureSize;
 	vector<vector<float> > vFeatures;
-	vector<float> vLabels;
-	iFeatureSize = collectTrainingDataAndLabelsForSingelPatchImage(data, vFeatures, vLabels, 1.0);
+	vector<int> vDummy;
+	iFeatureSize = collectTrainingDataAndLabelsForSingelPatchImage(data, vFeatures, vDummy, 1);
 
 	// setup matrix
 	unsigned int iNumPatches = vFeatures.size();
@@ -553,6 +556,6 @@ void mai::UDoMLDP::predictWholeDataSetbySVMForSinglePatchImage(DataSet* data)
 
 	for(int i = 0; i < results.rows; ++i)
 	{
-		cout << "SVM predict for image " << i << " is " << (float)results.at<uchar>(i) << endl;
+		cout << "SVM predict for image " << i << " is " << results.at<int>(i) << endl;
 	}
 }

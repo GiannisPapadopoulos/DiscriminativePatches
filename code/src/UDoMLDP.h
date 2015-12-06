@@ -115,8 +115,8 @@ private:
 	 */
 	void collectTrainingDataAndLabels(DataSet* data,
 			std::vector<float> &vTrainingData,
-			std::vector<float> &vLabels,
-			float fLabel);
+			std::vector<int> &vLabels,
+			int iLabel);
 
 
 	/**
@@ -135,8 +135,8 @@ private:
 	 */
 	int collectTrainingDataAndLabelsForSingelPatchImage(DataSet* data,
 			std::vector<std::vector<float> > &vTrainingData,
-			std::vector<float> &vLabels,
-			float fLabel);
+			std::vector<int> &vLabels,
+			int iLabel);
 
 	/**
 	 * Convert each feature vector to matrix and do svm predict on that. Returns the number of positive matches

@@ -147,6 +147,13 @@ public:
 			int scaleFactor,
 			double vizFactor);
 
+	/**
+	 *
+	 */
+	static void writeMatToCSV(cv::Mat &data,
+			std::string &strMatName,
+			std::string &strFilename);
+
 private:
 	/**
 	 * Initializes object

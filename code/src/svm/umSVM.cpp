@@ -41,11 +41,15 @@ int mai::umSVM::trainSVM(Mat &data,
 {
 	// Set up SVM's parameters
 	CvSVMParams params;
+
 	params.svm_type    = CvSVM::C_SVC;
-	params.kernel_type = CvSVM::LINEAR;
 	params.C = Constants::SVM_C_VALUE;
-//	params.gamma = 3;
-//	params.degree = 3;
+
+	params.kernel_type = CvSVM::LINEAR;
+
+//	params.kernel_type = CvSVM::RBF;
+//	params.gamma = 0.1;
+
 //	params.term_crit   = TermCriteria(CV_TERMCRIT_ITER, (int)1e7, 1e-6);
 
 	cout << "[mai::umSVM::trainSVM] training svm .." << endl;
