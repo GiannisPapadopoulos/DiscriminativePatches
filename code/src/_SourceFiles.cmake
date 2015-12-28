@@ -5,10 +5,12 @@ set( RelativeSourceGroup "Source Files" )
 set( SubDirs data featureExtraction IO svm utils )
 
 set( DirFiles
+	CatalogueDetection.cpp
+	CatalogueDetection.h
+	Constants.h
 	main.cpp
 	UDoMLDP.cpp
 	UDoMLDP.h
-	Constants.h
 )
 
 set( DirFiles_SourceGroup "${RelativeSourceGroup}" )

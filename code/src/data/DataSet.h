@@ -18,6 +18,7 @@
 #include <opencv2/core/core.hpp>
 
 #include <vector>
+#include <iostream>
 
 namespace mai{
 
@@ -33,6 +34,7 @@ public:
 	DataSet()
 		: m_iMaxHeight(0)
 		, m_iMaxWidth(0)
+		, m_bImageSizesUniform(true)
 		, m_iDescriptorSize(0)
 	{};
 
@@ -73,8 +75,20 @@ public:
 	{
 		if(m_vData[iIndex] != NULL)
 		{
-			m_vData[iIndex]->setDescriptorValues(vDescriptorValues);
-			return true;
+			if(m_iDescriptorSize == 0)
+			{
+				m_iDescriptorSize = vDescriptorValues.size();
+			}
+			if (m_iDescriptorSize == vDescriptorValues.size())
+			{
+				m_vData[iIndex]->setDescriptorValues(vDescriptorValues);
+				return true;
+			}
+			else
+			{
+				std::cout << "[DataSet::addDescriptorValuesToImageAt] ERROR! Descriptor values have to be of same size : "
+						<< m_iDescriptorSize  << "; But index " << iIndex << " has " << vDescriptorValues.size() << std::endl;
+			}
 		}
 		return false;
 	};
@@ -98,15 +112,35 @@ public:
 		return m_vData.size();
 	};
 
-	void getMaxDImensions(int &iMaxWidth, int &iMaxHeight)
+	void getMaxDImensions(int &iMaxWidth, int &iMaxHeight) const
 	{
 		iMaxHeight = m_iMaxHeight;
 		iMaxWidth = m_iMaxWidth;
 	};
 
+	bool getImageSizesUniform() const
+	{
+		return m_bImageSizesUniform;
+	};
+
 	int getDescriptorValueSize() const
 	{
 		return m_iDescriptorSize;
+	};
+
+	void getDescriptorsSeparated(int iDivider, std::vector<std::vector<float> > &vFirstPart, std::vector<std::vector<float> > &vSecondPart)
+	{
+		int iPercentageValidationImages = m_vData.size()/iDivider > 1 ? m_vData.size()/iDivider : 1;
+
+		for(std::vector<ImageWithDescriptors*>::const_iterator it = m_vData.begin(); it != m_vData.begin() + iPercentageValidationImages; it++)
+		{
+			vFirstPart.push_back((*it)->getDescriptorValues());
+		}
+
+		for(std::vector<ImageWithDescriptors*>::const_iterator it = m_vData.begin() + iPercentageValidationImages; it != m_vData.end(); it++)
+		{
+			vSecondPart.push_back((*it)->getDescriptorValues());
+		}
 	};
 
 private:
@@ -153,16 +187,21 @@ private:
 		int iW = s.width;
 		int iH = s.height;
 
+		if((m_iMaxHeight != 0 && m_iMaxHeight != iH) || (m_iMaxWidth != 0 && m_iMaxWidth != iW))
+		{
+			m_bImageSizesUniform = false;
+		}
 		m_iMaxWidth = std::max(m_iMaxWidth, iW);
 		m_iMaxHeight = std::max(m_iMaxHeight, iH);
 	};
 
 	std::vector<ImageWithDescriptors*>	m_vData;
 
-	int	m_iMaxHeight;
-	int	m_iMaxWidth;
+	int		m_iMaxHeight;
+	int		m_iMaxWidth;
+	bool	m_bImageSizesUniform;
 
-	int m_iDescriptorSize;
+	int		m_iDescriptorSize;
 
 };
 

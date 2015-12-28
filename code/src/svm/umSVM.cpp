@@ -35,8 +35,8 @@ mai::umSVM::~umSVM()
 	delete m_pSVM;
 }
 
-int mai::umSVM::trainSVM(Mat &data,
-		Mat &labels,
+int mai::umSVM::trainSVM(const Mat &data,
+		const Mat &labels,
 		std::vector<std::vector<float> > &vSupport)
 {
 	// Set up SVM's parameters
@@ -94,10 +94,21 @@ float mai::umSVM::predict(Mat &data, Mat &results)
 
 void mai::umSVM::saveSVM(std::string &strFilename)
 {
-	m_pSVM->save(strFilename.c_str());
+	std::stringstream sstm;
+	sstm << strFilename << ".xml";
+
+//#ifdef linux
+	m_pSVM->save(sstm.str().c_str());
+//#else
+//	m_pSVM->save(sstm.str().string());
+//#endif
 }
 
 void mai::umSVM::loadSVM(std::string &strFilename)
 {
+//#ifdef linux
 	m_pSVM->load(strFilename.c_str());
+//#else
+//	m_pSVM->load(strFilename.string());
+//#endif
 }

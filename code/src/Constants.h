@@ -13,7 +13,7 @@ class Constants {
  public:
 
   /** Whether to export the hog visualization as image files */
-  static const bool WRITE_HOG_IMAGES = false;
+  static const bool WRITE_HOG_IMAGES = true;
 
   /** Whether to show debug information for loading images */
     static const bool DEBUG_IMAGE_LOADING = false;
@@ -26,7 +26,8 @@ class Constants {
     static const bool DEBUG_MAIN_ALG = false;
 
     /** Whether to show debug information for the svm */
-    static const bool DEBUG_SVM= true;
+    static const bool DEBUG_SVM = true;
+    static const bool DEBUG_MAIN_SVM = false;
 
 	// OpenCV Documentation says that blocksize has to be 16x16 and cellsize 8x8. Other values are not supported.
 	// Experiments say otherwise !?
@@ -34,7 +35,7 @@ class Constants {
 	// image size has to be multiple of blocksize
     static const int HOG_CELLSIZE = 8;
     static const int HOG_BLOCKSTRIDE = 8;
-    static const int HOG_BLOCKSIZE = 16;
+    static const int HOG_BLOCKSIZE = 32;
     static const int HOG_BINS = 9;
 
 	// Image will be resized to this size !
@@ -43,14 +44,17 @@ class Constants {
     static const int HOG_IMAGE_SIZE_Y = 32;
 
     static const int HOG_VIZ_SCALEFACTOR = 4;
-    static constexpr double HOG_VIZ_VIZFACTOR = 3.0;
+    static constexpr double HOG_VIZ_VIZFACTOR = 2.0;
 
     /** Reduce featureset */
     static const bool PCA_REDUCTION = false;
 
+    static const int SVM_POSITIVE_LABEL = 1;
+    static const int SVM_NEGATIVE_LABEL = 0;
+
     static constexpr double SVM_C_VALUE = 0.1;
 
     /** Part of validation data */
-    static const int DATESET_DIVIDER = 10;
+    static const int DATESET_DIVIDER = 4;
 
 };

@@ -34,6 +34,113 @@ mai::IOUtils::IOUtils()
 mai::IOUtils::~IOUtils()
 {}
 
+bool mai::IOUtils::loadCatalogue( std::map<std::string, DataSet* > &mCatalogue,
+				int iCVLoadMode,
+				const std::string &strDirectory,
+				bool bAddFlipped,
+				bool bEqualize )
+{
+	boost::filesystem::path directory( boost::filesystem::initial_path<boost::filesystem::path>() );
+	directory = boost::filesystem::system_complete( boost::filesystem::path( strDirectory ) );
+
+	if ( !exists( directory ) )
+	{
+		cout << "[mai::IOUtils::loadCatalogue] ERROR loading images. Path does not exist: " << directory << endl;
+		return false;
+	}
+
+	boost::filesystem::directory_iterator end_itr; // default construction yields past-the-end
+
+	for ( boost::filesystem::directory_iterator itr( directory ); itr != end_itr; ++itr )
+	{
+		if ( is_directory(itr->status()) )
+		{
+#ifdef linux
+			std::string strLabelPath = itr->path().c_str();
+#else
+			std::string strLabelPath = itr->path().string();
+#endif
+
+			std::vector<Mat*> images;
+
+			if(loadImagesOrdered(images, iCVLoadMode, strLabelPath, bEqualize))
+			{
+				if(bAddFlipped)
+				{
+					addFlippedImages(images, 1);
+				}
+
+				DataSet* pData = new DataSet();
+				pData->setImages(images);
+
+#ifdef linux
+				string strLabel = itr->path().leaf().c_str();
+#else
+				string strLabel = itr->path().leaf().string();
+#endif
+
+				mCatalogue.insert(std::pair<std::string, DataSet*>(strLabel, pData));
+			}
+		}
+	}
+
+	return true;
+}
+
+bool mai::IOUtils::loadImagesOrdered( std::vector<Mat*> &vImages,
+		int iMode,
+		const std::string &strDirectory,
+		bool bEqualize )
+{
+	boost::filesystem::path directory( boost::filesystem::initial_path<boost::filesystem::path>() );
+	directory = boost::filesystem::system_complete( boost::filesystem::path( strDirectory ) );
+
+	if ( !exists( directory ) )
+	{
+		cout << "[mai::IOUtils::loadImagesOrdered] ERROR loading images. Path does not exist: " << directory << endl;
+		return false;
+	}
+	if(Constants::DEBUG_IMAGE_LOADING) {
+		cout << "[mai::IOUtils::loadImagesOrdered] Loading images from " << directory << endl;
+	}
+
+	std::vector<boost::filesystem::path>  v;                                // so we can sort them later
+
+	std::copy(boost::filesystem::directory_iterator(directory), boost::filesystem::directory_iterator(), std::back_inserter(v));
+	std::sort(v.begin(), v.end());
+
+    for (std::vector<boost::filesystem::path>::const_iterator itr (v.begin()); itr != v.end(); ++itr)
+    {
+    	if ( !is_directory(*itr) )
+    	{
+#ifdef linux
+    		Mat image = imread( itr->c_str(), iMode );
+#else
+    		Mat image = imread( itr->string(), iMode );
+#endif
+    		if( !image.empty() )// Check for valid input
+    		{
+    			if(Constants::DEBUG_IMAGE_LOADING) {
+    				cout << "[mai::IOUtils::loadImagesOrdered] Image loaded successfully: " << *itr << endl;
+    			}
+
+    			Mat* pImage;
+    			if (bEqualize) {
+    				cvtColor(image, image, CV_BGR2GRAY);
+    				equalizeHist(image, image);
+    			}
+    			pImage = new Mat(image);
+    			vImages.push_back(pImage);
+    		}
+    		else
+    		{
+    			cout << "[mai::IOUtils::loadImagesOrdered] ERROR loading Image: " << *itr << endl;
+    		}
+    	}
+    }
+	return true;
+}
+
 bool mai::IOUtils::loadImages( std::vector<Mat*> &vImages, int iMode, const string &strDirectory, bool bEqualize )
 {
 	boost::filesystem::path directory( boost::filesystem::initial_path<boost::filesystem::path>() );
@@ -48,9 +155,15 @@ bool mai::IOUtils::loadImages( std::vector<Mat*> &vImages, int iMode, const stri
 	  cout << "Loading images from " << directory << endl;
 	}
 
+//	std::vector<boost::filesystem::path>  v;                                // so we can sort them later
+//
+//	std::copy(boost::filesystem::directory_iterator(directory), boost::filesystem::directory_iterator(), std::back_inserter(v));
+//	std::sort(v.begin(), v.end());
+
 	boost::filesystem::directory_iterator end_itr; // default construction yields past-the-end
 
 	for ( boost::filesystem::directory_iterator itr( directory ); itr != end_itr; ++itr )
+//	for ( std::vector<boost::filesystem::path>::const_iterator itr (v.begin()); itr != v.end(); ++itr )
 	{
 		if ( !is_directory(itr->status()) )
 		{
@@ -216,6 +329,12 @@ void mai::IOUtils::showImage( Mat &image )
 	waitKey(0);
 }
 
+void mai::IOUtils::showImage( const Mat* image )
+{
+	imshow("Image", *image);
+	waitKey(0);
+}
+
 void mai::IOUtils::writeImages( std::vector<cv::Mat*> &vImages, std::string &strPath, std::string &strFileNameBase )
 {
 	for( unsigned int i = 0; i < vImages.size(); ++i)
@@ -260,20 +379,34 @@ void mai::IOUtils::writeHOGImages( mai::DataSet* data,
 				scaleFactor,
 				vizFactor);
 
+
 		std::stringstream sstm;
-		sstm << strPath << "/" << strFileNameBase << "_" << i << ".jpg";
+		sstm << strPath << "/" << strFileNameBase;
+		std::string strPathName = sstm.str();
+
+		boost::filesystem::path dir(strPathName);
+		if (!exists(dir))
+		{
+			if (!boost::filesystem::create_directory(dir))
+			{
+				cout << "[mai::IOUtils::writeHOGImages] ERROR creating directory: " << strPathName << endl;
+			}
+		}
+
+		sstm << "/" << strFileNameBase << "_" << i << ".jpg";
 		std::string strFileName = sstm.str();
 
 		imwrite(strFileName, outImage);
 	}
-
 }
 
-void mai::IOUtils::writeMatToCSV(cv::Mat &data,
-				std::string &strMatName,
-				std::string &strFilename)
+void mai::IOUtils::writeMatToCSV(const cv::Mat &data,
+				std::string &strMatName)
 {
-	cv::FileStorage file(strFilename, cv::FileStorage::WRITE);
+	std::stringstream sstm;
+	sstm << strMatName << ".yml";
+
+	cv::FileStorage file(sstm.str(), cv::FileStorage::WRITE);
 
 	file << strMatName << data;
 

@@ -47,8 +47,8 @@ public:
 	 * @param[out] vSupport	support vectors
 	 * @return			number of support vectors
 	 */
-	int trainSVM(cv::Mat &data,
-			cv::Mat &labels,
+	int trainSVM(const cv::Mat &data,
+			const cv::Mat &labels,
 			std::vector<std::vector<float> > &vSupport);
 
 	/**

@@ -17,6 +17,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include <opencv2/core/core.hpp>
 
@@ -36,6 +37,17 @@ public:
 	 */
 	virtual ~IOUtils();
 
+	static bool loadCatalogue( std::map<std::string, DataSet*> &mImages,
+				int iCVLoadMode,
+				const std::string &strDirectory,
+				bool bAddFlipped = true,
+				bool bEqualize = true );
+
+	static bool loadImagesOrdered( std::vector<cv::Mat*> &vImages,
+			int iMode,
+			const std::string &strDirectory,
+			bool bEqualize );
+
 	/**
 	 * Load all images from given directory
 	 * OpenCV loading modes:
@@ -50,7 +62,10 @@ public:
 	 * @param iMode			OpenCV loading mode
 	 * @param directory		file path to laod from
 	 */
-	static bool loadImages( std::vector<cv::Mat*> &vImages, int iMode, const std::string &strDirectory, bool bEqualize = true );
+	static bool loadImages( std::vector<cv::Mat*> &vImages,
+			int iMode,
+			const std::string &strDirectory,
+			bool bEqualize = true );
 
 	/**
 	 * Double the images by adding flipped versions
@@ -58,7 +73,8 @@ public:
 	 * @param [out] vImages		image vector
 	 * @param		iFlipmode	horizontally: > 0
 	 */
-	static void addFlippedImages( std::vector<cv::Mat*> &vImages, int iFlipMode );
+	static void addFlippedImages( std::vector<cv::Mat*> &vImages,
+			int iFlipMode );
 
 	/**
 	 * Convert given images
@@ -72,7 +88,9 @@ public:
 	 * @param[out] vConvertedImages	converted results
 	 * @param iMode					OpenCV conversion mode
 	 */
-	static void convertImages( std::vector<cv::Mat*> &vImages, std::vector<cv::Mat*> &vConvertedImages, int iMode );
+	static void convertImages( std::vector<cv::Mat*> &vImages,
+			std::vector<cv::Mat*> &vConvertedImages,
+			int iMode );
 
 	/**
 	 * Apply histogram equalization on the input images
@@ -80,7 +98,8 @@ public:
 	 * @param[in] vImages			to be converted
 	 * @param[out] vConvertedImages	converted results
 	 */
-	static void equalizeImages( std::vector<cv::Mat*> &vImages, std::vector<cv::Mat*> &vConvertedImages );
+	static void equalizeImages( std::vector<cv::Mat*> &vImages,
+			std::vector<cv::Mat*> &vConvertedImages );
 
 	/**
 	 * Calculate max dimension of given images
@@ -89,7 +108,9 @@ public:
 	 * @param iMaxHeight	max height
 	 * @param iMaxWidth		max width
 	 */
-	static void getMaxImageDimensions( std::vector<cv::Mat> &vImages, int &iMaxHeight, int &iMaxWidth );
+	static void getMaxImageDimensions( std::vector<cv::Mat> &vImages,
+			int &iMaxHeight,
+			int &iMaxWidth );
 
 	/**
 	 * Sample image to given size
@@ -99,7 +120,10 @@ public:
 	 * @param iHeight				sample height
 	 * @param iWidth				sample width
 	 */
-	static void sampleImage( cv::Mat &image, cv::Mat &sampledImage, int iHeight, int iWidth );
+	static void sampleImage( cv::Mat &image,
+			cv::Mat &sampledImage,
+			int iHeight,
+			int iWidth );
 
 	/**
 	 * Sample images to given size
@@ -109,7 +133,10 @@ public:
 	 * @param iHeight				sample height
 	 * @param iWidth				sample width
 	 */
-	static void sampleImages( std::vector<cv::Mat> &vImages, std::vector<cv::Mat> &vSampledImages, int iHeight, int iWidth );
+	static void sampleImages( std::vector<cv::Mat> &vImages,
+			std::vector<cv::Mat> &vSampledImages,
+			int iHeight,
+			int iWidth );
 
 	/**
 	 * Show given images and wait for keystroke between each.
@@ -120,6 +147,7 @@ public:
 	 * Show given image and wait for keystroke between each.
 	 */
 	static void showImage( cv::Mat &image );
+	static void showImage( const cv::Mat* image );
 
 	/**
 	 * Write images as jpgs to a folder with indexed filename strFileNameBase_Index.jpg
@@ -150,9 +178,8 @@ public:
 	/**
 	 *
 	 */
-	static void writeMatToCSV(cv::Mat &data,
-			std::string &strMatName,
-			std::string &strFilename);
+	static void writeMatToCSV(const cv::Mat &data,
+			std::string &strMatName);
 
 private:
 	/**

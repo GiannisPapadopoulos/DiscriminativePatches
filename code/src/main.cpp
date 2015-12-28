@@ -16,6 +16,7 @@
 #include <string>
 
 #include "UDoMLDP.h"
+#include "CatalogueDetection.h"
 #include "svm/svmtest.h"
 
 using namespace std;
@@ -31,16 +32,38 @@ int main(int argc, char** argv )
 		cerr << "Usage:" << endl
 			<< argv[0] << " [options]" << endl
 			<< "options:" << endl
+			<< "\t-catalogue <file path>\tTrain svms on categorized data catalogue. File path is base for subfolders containing data. Folder names are trained categories."
 			<< "\t-pos <file path>" << endl
 			<< "\t-neg <file path>" << endl;
 		return -1;
 	}
+
+	string strFilepath;
 
 	string strFilepathPositives;
 	string strFilepathNegatives;
 
 	for(int i = 0; i < argc; ++i)
 	{
+		if(string(argv[i]) == "-catalogue")
+		{
+			if(i+1 < argc)
+			{
+				strFilepath = string(argv[i+1]);
+
+				CatalogueDetection* main = new CatalogueDetection();
+				main->catalogueDetection(strFilepath);
+				delete main;
+
+				return 0;
+			}
+			else
+			{
+				cerr << "ERROR: Option -catalogue given without filepath." << endl;
+				return -1;
+			}
+		}
+
 		if(string(argv[i]) == "-pos")
 		{
 			if(i+1 < argc)
