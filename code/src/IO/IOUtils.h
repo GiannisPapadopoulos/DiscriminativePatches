@@ -157,8 +157,8 @@ public:
 	 * @param strFileNameBase	base part of filename
 	 */
 	static void writeImages( std::vector<cv::Mat*> &vImages,
-			std::string &strPath,
-			std::string &strFileNameBase );
+			const std::string &strPath,
+			const std::string &strFileNameBase );
 
 	/**
 	 * Write gradiented image as jpgs to a folder with indexed filename strFileNameBase_Index.jpg
@@ -168,8 +168,8 @@ public:
 	 * @param strFileNameBase	base part of filename
 	 */
 	static void writeHOGImages( DataSet* data,
-			std::string &strPath,
-			std::string &strFileNameBase,
+			const std::string &strPath,
+			const std::string &strFileNameBase,
 			cv::Size imageSize,
 			cv::Size cellSize,
 			int scaleFactor,
@@ -179,7 +179,7 @@ public:
 	 *
 	 */
 	static void writeMatToCSV(const cv::Mat &data,
-			std::string &strMatName);
+			const std::string &strMatName);
 
 private:
 	/**

@@ -13,6 +13,7 @@
  *****************************************************************************/
 
 #include "umSVM.h"
+#include "../data/DataSet.h"
 #include "../Constants.h"
 
 #include <opencv2/core/core.hpp>
@@ -37,7 +38,7 @@ mai::umSVM::~umSVM()
 
 int mai::umSVM::trainSVM(const Mat &data,
 		const Mat &labels,
-		std::vector<std::vector<float> > &vSupport)
+		vector<vector<float> > &vSupport)
 {
 	// Set up SVM's parameters
 	CvSVMParams params;
@@ -52,7 +53,8 @@ int mai::umSVM::trainSVM(const Mat &data,
 
 //	params.term_crit   = TermCriteria(CV_TERMCRIT_ITER, (int)1e7, 1e-6);
 
-	cout << "[mai::umSVM::trainSVM] training svm .." << endl;
+	if(Constants::DEBUG_SVM)
+		cout << "[mai::umSVM::trainSVM] training svm .." << endl;
 
 	// Train the SVM
 	m_pSVM->train(data, labels, Mat(), Mat(), params);
@@ -65,36 +67,33 @@ int mai::umSVM::trainSVM(const Mat &data,
 	{
 		const float* supportVector = m_pSVM->get_support_vector(i);
 
-		std::vector<float> temp;
+		vector<float> temp;
 		for (int j = 0; j < featureSize; ++j) {
 			temp.push_back(supportVector[j]);
 		}
 		vSupport.push_back(temp);
 	}
 
-	cout << "[mai::umSVM::trainSVM] svm trained, support vector count: " << numSupportVectors << " with feature size " << featureSize << endl;
+	if(Constants::DEBUG_SVM)
+		cout << "[mai::umSVM::trainSVM] svm trained, support vector count: " << numSupportVectors << " with feature size " << featureSize << endl;
 
 	return numSupportVectors;
 }
 
-float mai::umSVM::predict(Mat &data, bool bReturnDFValue)
+float mai::umSVM::predict(const Mat &data, bool bReturnDFValue)
 {
 	float fResult = m_pSVM->predict(data, bReturnDFValue);
 	return fResult;
 }
 
-float mai::umSVM::predict(Mat &data, Mat &results)
+void mai::umSVM::predict(const Mat &data, Mat &results)
 {
-	CvMat predictionDataOld = data;
-	CvMat resultsOld = results;
-
-	float fResult = m_pSVM->predict(&predictionDataOld, &resultsOld);
-	return fResult;
+	m_pSVM->predict(data, results);
 }
 
-void mai::umSVM::saveSVM(std::string &strFilename)
+void mai::umSVM::saveSVM(const string &strFilename)
 {
-	std::stringstream sstm;
+	stringstream sstm;
 	sstm << strFilename << ".xml";
 
 //#ifdef linux
@@ -104,11 +103,62 @@ void mai::umSVM::saveSVM(std::string &strFilename)
 //#endif
 }
 
-void mai::umSVM::loadSVM(std::string &strFilename)
+void mai::umSVM::loadSVM(const string &strFilename)
 {
 //#ifdef linux
 	m_pSVM->load(strFilename.c_str());
 //#else
 //	m_pSVM->load(strFilename.string());
 //#endif
+}
+
+void mai::umSVM::searchSupportVector(vector<vector<float> > &vData,
+			vector<vector<float> > &vSupport,
+			bool bSort)
+{
+	for(unsigned int i = 0; i < vSupport.size(); ++i)
+	{
+		vector<float> temp = vSupport[i];
+		if(bSort)
+			sort(temp.begin(), temp.end());
+
+		for(unsigned int j = 0; j < vData.size(); ++j)
+		{
+			vector<float> desc = vData.at(j);
+
+			if(bSort)
+				sort(desc.begin(), desc.end());
+
+			if(desc == temp)
+			{
+				cout << "[mai::umSVM::searchSupportVector] Support Vector match at DateSet index " << j << endl;
+			}
+		}
+	}
+}
+
+void mai::umSVM::searchSupportVector(DataSet* data,
+			vector<vector<float> > &vSupport,
+			bool bSort)
+{
+	for(unsigned int i = 0; i < vSupport.size(); ++i)
+	{
+		vector<float> temp = vSupport[i];
+		if(bSort)
+			sort(temp.begin(), temp.end());
+
+		for(unsigned int j = 0; j < data->getImageCount(); ++j)
+		{
+			vector<float> desc;
+			data->getDescriptorValuesFromImageAt(j, desc);
+
+			if(bSort)
+				sort(desc.begin(), desc.end());
+
+			if(desc == temp)
+			{
+				cout << "[mai::umSVM::searchSupportVector] Support Vector match at DateSet index " << j << endl;
+			}
+		}
+	}
 }

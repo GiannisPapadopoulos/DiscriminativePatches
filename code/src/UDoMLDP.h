@@ -23,6 +23,7 @@
 namespace mai{
 
 class DataSet;
+class TrainingData;
 class umSVM;
 
 /**
@@ -62,22 +63,6 @@ public:
 private:
 
 	/**
-	 * Computes features for all images in data.
-	 * Adds them as DescriptorValues to the corresponding image in the DataSet.
-	 * @see class DataSet::ImageWithDescriptors
-	 *
-	 * Method used:
-	 * @see featureExtraction/cvHOG::extractFeatures
-	 */
-	void computeHOGForDataSet(DataSet* data,
-			cv::Size imageSize,
-			cv::Size blockSize,
-			cv::Size blockStride,
-			cv::Size cellSize,
-			cv::Size winStride,
-			cv::Size padding);
-
-	/**
 	 * Predict dataset
 	 * @see svm/umSVM::predict
 	 */
@@ -93,9 +78,6 @@ private:
 	 */
 	void trainSVMOnDataSets(DataSet* positives,
 			DataSet* negatives);
-
-	void searchSupportVector(DataSet* data,
-			std::vector<std::vector<float> > vSupport);
 
 	/**
 	 * Contruct Mat for trainingdata and labels used by svm.
@@ -154,7 +136,6 @@ private:
 
 	// trainable svm
 	umSVM*		m_pSVM;
-
 };
 
 }// namespace mai

@@ -51,8 +51,8 @@ int main(int argc, char** argv )
 			{
 				strFilepath = string(argv[i+1]);
 
-				CatalogueDetection* main = new CatalogueDetection();
-				main->catalogueDetection(strFilepath);
+				CatalogueDetection* main = new CatalogueDetection(strFilepath);
+				main->processPipeline();
 				delete main;
 
 				return 0;

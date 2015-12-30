@@ -17,6 +17,7 @@ class Constants {
 
   /** Whether to show debug information for loading images */
     static const bool DEBUG_IMAGE_LOADING = false;
+    static const bool DEBUG_DATA_SETUP = false;
 
     /** Whether to show debug information for the HOG feature extractor */
     static const bool DEBUG_HOG = false;
@@ -26,8 +27,9 @@ class Constants {
     static const bool DEBUG_MAIN_ALG = false;
 
     /** Whether to show debug information for the svm */
-    static const bool DEBUG_SVM = true;
-    static const bool DEBUG_MAIN_SVM = false;
+    static const bool DEBUG_SVM = false;
+    static const bool DEBUG_SVM_PREDICTION = false;
+   static const bool DEBUG_MAIN_SVM = false;
 
 	// OpenCV Documentation says that blocksize has to be 16x16 and cellsize 8x8. Other values are not supported.
 	// Experiments say otherwise !?

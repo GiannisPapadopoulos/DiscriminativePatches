@@ -13,8 +13,10 @@
  *****************************************************************************/
 
 
-#include "cvHOG.h"
+#include "umHOG.h"
+#include "../data/DataSet.h"
 #include "../Constants.h"
+#include "umPCA.h"
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/ml/ml.hpp>
@@ -29,13 +31,44 @@ using namespace cv;
 
 using namespace std;
 
-mai::cvHOG::cvHOG()
+mai::umHOG::umHOG()
 //	: m_pHOG(new HOGDescriptor)
 {}
-mai::cvHOG::~cvHOG()
+mai::umHOG::~umHOG()
 {}
 
-void mai::cvHOG::extractFeatures(vector<float> &descriptorsValues,
+void mai::umHOG::computeHOGForDataSet(DataSet* data,
+		Size imageSize,
+		Size blockSize,
+		Size blockStride,
+		Size cellSize,
+		int iNumBins,
+		Size winStride,
+		Size padding)
+{
+	for(unsigned int i = 0; i < data->getImageCount(); ++i)
+	{
+		const Mat* image = data->getImageAt(i);
+
+		if(Constants::DEBUG_HOG) {
+		  cout << "[mai::cvHOG::computeHOGForDataSet] resizing image to " << imageSize << endl;
+		}
+		Mat resizedImage;
+		resize(*image, resizedImage, imageSize);
+
+		vector<float> descriptorsValues;
+
+		umHOG::extractFeatures(descriptorsValues, resizedImage, blockSize, blockStride, cellSize, iNumBins, winStride, padding);
+
+		if(Constants::DEBUG_HOG) {
+			cout << "[mai::cvHOG::computeHOGForDataSet] Number of descriptors: " << descriptorsValues.size() << endl;
+		}
+
+		data->addDescriptorValuesToImageAt(i, descriptorsValues);
+	}
+}
+
+void mai::umHOG::extractFeatures(vector<float> &descriptorsValues,
 								Mat &image,
 								Size blockSize,
 								Size blockStride,
@@ -52,15 +85,24 @@ void mai::cvHOG::extractFeatures(vector<float> &descriptorsValues,
 
 	HOGDescriptor hog( sizeImage, blockSize, blockStride, cellSize, iNumBins);
 
+//	vector<float> reducedFeatures;
 	vector< Point> locations;
+//	hog.compute( image, reducedFeatures, winStride, padding, locations);
 	hog.compute( image, descriptorsValues, winStride, padding, locations);
+
+
+//	umPCA::decreaseHOGDescriptorCellsByPCA(
+//			reducedFeatures,
+//			descriptorsValues,
+//			Constants::HOG_BINS);
+
 
 	if(Constants::DEBUG_HOG) {
 		cout << "[mai::cvHOG::extractFeatures] descriptor size: " << descriptorsValues.size() << endl;
 	}
 }
 
-void mai::cvHOG::getHOGDescriptorVisualImage(Mat &outImage,
+void mai::umHOG::getHOGDescriptorVisualImage(Mat &outImage,
 							   Mat &origImg,
                                vector<float> &descriptorValues,
                                Size winSize,
@@ -213,7 +255,7 @@ void mai::cvHOG::getHOGDescriptorVisualImage(Mat &outImage,
                 line(outImage,
                      Point(x1*scaleFactor,y1*scaleFactor),
                      Point(x2*scaleFactor,y2*scaleFactor),
-                     CV_RGB(0,0,255),
+                     CV_RGB(0,255,0),
                      1);
 
                 cellGradient += currentGradStrength;

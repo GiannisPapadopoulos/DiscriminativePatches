@@ -19,7 +19,6 @@
 #include "data/DataSet.h"
 #include "data/TrainingData.h"
 #include "IO/IOUtils.h"
-#include "featureExtraction/cvHOG.h"
 #include "featureExtraction/umPCA.h"
 #include "utils/ImageDisplayUtils.h"
 
@@ -31,6 +30,7 @@
 #include <opencv2/opencv.hpp>
 
 #include <iostream>
+#include "featureExtraction/umHOG.h"
 
 
 using namespace cv;
@@ -63,6 +63,10 @@ void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string 
 	IOUtils::loadImages ( images, IMREAD_COLOR, strFilePathPositives );
 	cout << "Num positive images " << images.size() << endl;
 	int iPercentageValidationImages = images.size()/Constants::DATESET_DIVIDER > 1 ? images.size()/Constants::DATESET_DIVIDER : 1;
+
+	std::string p = "equal";
+	std::string f = "p";
+	IOUtils::writeImages(images, p, f);
 
 	std::vector<Mat*> images2Half(std::make_move_iterator(images.begin() + iPercentageValidationImages), std::make_move_iterator(images.end()));
 	images.erase(images.begin() + iPercentageValidationImages, images.end());
@@ -109,32 +113,36 @@ void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string 
 	Size padding = Size(0,0);
 
 
-	this->computeHOGForDataSet(m_pPositiveTrain,
+	umHOG::computeHOGForDataSet(m_pPositiveTrain,
 			imageSize,
 			blockSize,
 			blockStride,
 			cellSize,
+			Constants::HOG_BINS,
 			winStride,
 			padding);
-	this->computeHOGForDataSet(m_pNegativeTrain,
+	umHOG::computeHOGForDataSet(m_pNegativeTrain,
 			imageSize,
 			blockSize,
 			blockStride,
 			cellSize,
+			Constants::HOG_BINS,
 			winStride,
 			padding);
-	this->computeHOGForDataSet(m_pPositiveValid,
+	umHOG::computeHOGForDataSet(m_pPositiveValid,
 			imageSize,
 			blockSize,
 			blockStride,
 			cellSize,
+			Constants::HOG_BINS,
 			winStride,
 			padding);
-	this->computeHOGForDataSet(m_pNegativeValid,
+	umHOG::computeHOGForDataSet(m_pNegativeValid,
 			imageSize,
 			blockSize,
 			blockStride,
 			cellSize,
+			Constants::HOG_BINS,
 			winStride,
 			padding);
 
@@ -191,14 +199,14 @@ void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string 
 	cout << "Positives prediction" << endl;
 	//predictWholeDataSetbySVMForSinglePatchImage(m_pPositiveValid);
 
-	int numTruePositives = predictDataSetbySVMForSinglePatchImage(m_pPositiveValid);
+	int numTruePositives = predictDataSetbySVMForSinglePatchImage(m_pPositiveTrain);
 
-	cout << "correctly predicted positives: " << numTruePositives << " out of " << m_pPositiveValid->getImageCount() << endl;
+	cout << "correctly predicted positives: " << numTruePositives << " out of " << m_pPositiveTrain->getImageCount() << endl;
 
-	int numFalsePositives =	predictDataSetbySVMForSinglePatchImage(m_pNegativeValid);
-	int correctlyPredictedNegatives = m_pNegativeValid->getImageCount() - numFalsePositives;
+	int numFalsePositives =	predictDataSetbySVMForSinglePatchImage(m_pNegativeTrain);
+	int correctlyPredictedNegatives = m_pNegativeTrain->getImageCount() - numFalsePositives;
 
-	cout << "correctly predicted negatives: " << correctlyPredictedNegatives << " out of " << m_pNegativeValid->getImageCount() << endl;
+	cout << "correctly predicted negatives: " << correctlyPredictedNegatives << " out of " << m_pNegativeTrain->getImageCount() << endl;
 }
 
 void mai::UDoMLDP::predictDataSetbySVM(DataSet* data)
@@ -232,36 +240,6 @@ void mai::UDoMLDP::predictDataSetbySVM(DataSet* data)
 
 }
 
-void mai::UDoMLDP::computeHOGForDataSet(DataSet* data,
-		Size imageSize,
-		Size blockSize,
-		Size blockStride,
-		Size cellSize,
-		Size winStride,
-		Size padding)
-{
-	for(unsigned int i = 0; i < data->getImageCount(); ++i)
-	{
-		const Mat* image = data->getImageAt(i);
-
-		if(Constants::DEBUG_MAIN_ALG) {
-		  cout << "[mai::UDoMLDP::computeHOGForDataSet] resizing image to " << imageSize << endl;
-		}
-		Mat resizedImage;
-		cv::resize(*image, resizedImage, imageSize);
-
-		vector< float> descriptorsValues;
-
-		cvHOG::extractFeatures(descriptorsValues, resizedImage, blockSize, blockStride, cellSize, Constants::HOG_BINS, winStride, padding);
-
-		if(Constants::DEBUG_MAIN_ALG) {
-			cout << "Number of descriptors: " << descriptorsValues.size() << endl;
-		}
-
-		data->addDescriptorValuesToImageAt(i, descriptorsValues);
-	}
-}
-
 void mai::UDoMLDP::trainSVMOnDataSets(DataSet* positives, DataSet* negatives)
 {
 	Mat data(0, 0, CV_32FC1);;
@@ -274,11 +252,9 @@ void mai::UDoMLDP::trainSVMOnDataSets(DataSet* positives, DataSet* negatives)
 	setupTrainingDataForSinglePatchImage(positives, negatives, data, labels);
 
 	std::string strDataname = "trainingdata";
-	std::string strDataFilename = "trainingdata.yml";
-	IOUtils::writeMatToCSV(data, strDataname, strDataFilename);
+	IOUtils::writeMatToCSV(data, strDataname);
 	std::string strLabelname = "labeldata";
-	std::string strLabelFilename = "labeldata.yml";
-	IOUtils::writeMatToCSV(labels, strLabelname, strLabelFilename);
+	IOUtils::writeMatToCSV(labels, strLabelname);
 
 //	cout << data.size() << " - " << labels.size() << endl;
 //	cout << data.at<float>(121103) << endl;
@@ -287,37 +263,18 @@ void mai::UDoMLDP::trainSVMOnDataSets(DataSet* positives, DataSet* negatives)
 	std::vector<std::vector<float> > vSupport;
 	m_pSVM->trainSVM(data, labels, vSupport);
 
-	cout << "Searching support vectors in positives .." << endl;
+	std::string strSVMFilename = "trainedsvm.xml";
+	m_pSVM->saveSVM(strSVMFilename);
 
-	searchSupportVector(positives, vSupport);
-
-	cout << "Searching support vectors in negatives .." << endl;
-
-	searchSupportVector(negatives, vSupport);
-
-	cout << "Searching support vectors done." << endl;
-}
-
-void mai::UDoMLDP::searchSupportVector(DataSet* data,
-			std::vector<std::vector<float> > vSupport)
-{
-	for(unsigned int i = 0; i < vSupport.size(); ++i)
-	{
-		std::vector<float> temp = vSupport[i];
-		std::sort(temp.begin(), temp.end());
-
-		for(unsigned int j = 0; j < data->getImageCount(); ++j)
-		{
-			std::vector<float> desc;
-			data->getDescriptorValuesFromImageAt(j, desc);
-
-			std::sort(desc.begin(), desc.end());
-			if(desc == temp)
-			{
-				cout << "Support Vector match at DateSet index " << j << endl;
-			}
-		}
-	}
+//	cout << "Searching support vectors in positives .." << endl;
+//
+//	umSVM::searchSupportVector(positives, vSupport);
+//
+//	cout << "Searching support vectors in negatives .." << endl;
+//
+//	umSVM::searchSupportVector(negatives, vSupport);
+//
+//	cout << "Searching support vectors done." << endl;
 }
 
 void mai::UDoMLDP::setupTrainingData(DataSet* positives,
@@ -386,7 +343,6 @@ void mai::UDoMLDP::setupTrainingDataForSinglePatchImage(DataSet* positives,
 	vector<vector<float> > vPositives;
 	vector<int> vPositiveLabels;
 	iFeatureSizePos = collectTrainingDataAndLabelsForSingelPatchImage(positives, vPositives, vPositiveLabels, 1);
-	cout << "number of features: " << iFeatureSizePos << endl;
 
 	vector<vector<float> > vNegatives;
 	vector<int> vNegativeLabels;
@@ -406,13 +362,15 @@ void mai::UDoMLDP::setupTrainingDataForSinglePatchImage(DataSet* positives,
 	vLabels.insert(std::end(vLabels), std::begin(vPositiveLabels), std::end(vPositiveLabels));
 	vLabels.insert(std::end(vLabels), std::begin(vNegativeLabels), std::end(vNegativeLabels));
 
-	cout << "vdata " << vData.size() << "x" << vData[0].size() << " " << vData[50].size() << endl;
+	cout << "[setupTrainingDataForSinglePatchImage]  number of features: " << iFeatureSizePos << endl;
 
 	// setup training matrices
 	unsigned int iNumPatches = vPositives.size() + vNegatives.size();
 
 	trainingData.create(iNumPatches, iFeatureSizePos, CV_32FC1);
 	labels.create(iNumPatches, 1, CV_32SC1);
+	cout << "[setupTrainingDataForSinglePatchImage]  Training matrix " << trainingData.rows << "x" << trainingData.cols << endl;
+	cout << "[setupTrainingDataForSinglePatchImage]  label matrix " << labels.rows << "x" << labels.cols << endl;
 
 	for(unsigned int i = 0; i < iNumPatches ; ++i)
 	{
@@ -500,7 +458,10 @@ int mai::UDoMLDP::predictDataSetbySVMForSinglePatchImage(DataSet* data)
 		// setup matrix
 		Mat predictionData(1, descriptorsValues.size(), CV_32FC1, &descriptorsValues[0]);;
 
-		cout << "predictionData " << predictionData.rows << "x" << predictionData.cols << endl;
+		if(Constants::DEBUG_MAIN_SVM)
+		{
+			cout << "[predictDataSetbySVMForSinglePatchImage]  prediction matrix " << predictionData.rows << "x" << predictionData.cols << endl;
+		}
 
 //		for(unsigned int j = 0; j < descriptorsValues.size(); ++j)
 //		{
@@ -509,6 +470,11 @@ int mai::UDoMLDP::predictDataSetbySVMForSinglePatchImage(DataSet* data)
 
 		float fResultLabel = m_pSVM->predict(predictionData, false);
 		float fResultValue = m_pSVM->predict(predictionData, true);
+
+		if(Constants::DEBUG_MAIN_SVM)
+		{
+		    cout << "[predictDataSetbySVMForSinglePatchImage] SVM predict for image " << i << " is " << fResultLabel << ", DFvalue " << fResultValue << endl;
+		}
 
 		if(isPositivePrediction(fResultLabel))
 		  numPositiveMatches++;
@@ -519,8 +485,6 @@ int mai::UDoMLDP::predictDataSetbySVMForSinglePatchImage(DataSet* data)
 
 		destroyWindow("Pos");
     destroyWindow("Neg");
-
-//    cout << "SVM predict for image " << i << " is " << fResultLabel << ", DFvalue " << fResultValue << endl;
 
     const Mat* image = data->getImageAt(i);
 //    ImageDisplayUtils::displayImage(winName, *image, 50);
@@ -550,15 +514,16 @@ void mai::UDoMLDP::predictWholeDataSetbySVMForSinglePatchImage(DataSet* data)
 			predictionData.at<float>(i, j) = vCurrentData[j];
 		}
 	}
+	cout << "[predictWholeDataSetbySVMForSinglePatchImage]  prediction matrix " << predictionData.rows << "x" << predictionData.cols << endl;
 
 	Mat results(iNumPatches, 1, CV_32SC1);
 
-	float fResultValue = m_pSVM->predict(predictionData, results);
+	m_pSVM->predict(predictionData, results);
 
-	cout << "SVM predict result has  " << results.rows << " rows and " << results.cols << " columns. Return value: " << fResultValue << endl;
+	cout << "[predictWholeDataSetbySVMForSinglePatchImage]SVM predict result has  " << results.rows << " rows." << endl;
 
 	for(int i = 0; i < results.rows; ++i)
 	{
-		cout << "SVM predict for image " << i << " is " << results.at<int>(i) << endl;
+		cout << "[predictWholeDataSetbySVMForSinglePatchImage]SVM predict for image " << i << " is " << results.at<int>(i) << endl;
 	}
 }

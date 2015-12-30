@@ -23,6 +23,8 @@
 
 namespace mai{
 
+class DataSet;
+
 /**
  * Doxygen comments
  * Class description
@@ -57,19 +59,30 @@ public:
 	 * @param bReturnfDFValue	return DFValue or label (@see OpenCV documentation)
 	 * @return	label(false) or value depending on bReturnfDFValue
 	 */
-	float predict(cv::Mat &data, bool bReturnfDFValue = false);
+	float predict(const cv::Mat &data, bool bReturnfDFValue = false);
 
-	float predict(cv::Mat &data, cv::Mat &results);
-
-	/**
-	 *
-	 */
-	void saveSVM(std::string &strFilename);
+	void predict(const cv::Mat &data, cv::Mat &results);
 
 	/**
 	 *
 	 */
-	void loadSVM(std::string &strFilename);
+	void saveSVM(const std::string &strFilename);
+
+	/**
+	 *
+	 */
+	void loadSVM(const std::string &strFilename);
+
+	/**
+	 * @param bSort		should the vectors be sorted before comparison ?
+	 */
+	static void searchSupportVector(std::vector<std::vector<float> > &vData,
+				std::vector<std::vector<float> > &vSupport,
+				bool bSort = false);
+
+	static void searchSupportVector(DataSet* data,
+			std::vector<std::vector<float> > &vSupport,
+			bool bSort = false);
 
 private:
 

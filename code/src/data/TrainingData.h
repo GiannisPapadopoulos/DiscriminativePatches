@@ -16,8 +16,6 @@
 #define SRC_DATA_TRAININGDATA_H_
 
 #include <opencv2/core/core.hpp>
-//#include <opencv2/highgui/highgui.hpp>
-//#include <opencv2/imgproc/imgproc.hpp>
 
 #include <string>
 #include <vector>
@@ -35,48 +33,7 @@ public:
 	 * Initializes object
 	 */
 	TrainingData(std::vector<std::vector<float> > &vPositiveFeatures,
-			std::vector<std::vector<float> > &vNegativeFeatures)
-	:	m_Data(0, 0, CV_32FC1)
-	,	m_Labels(0, 0, CV_32SC1)
-	{
-		int iFeatureSize = 0;
-		if(vPositiveFeatures.size() > 0 && vNegativeFeatures.size() > 0 && vPositiveFeatures.at(0).size() != vNegativeFeatures.at(0).size())
-		{
-			std::cout << "[mai::UDoMLDP::setupTrainingData] ERROR! Feature size for positive and negative do not match" << std::endl;
-			return;
-		}
-
-		iFeatureSize = vPositiveFeatures.at(0).size();
-		std::cout << "[mai::UDoMLDP::setupTrainingData] Number of features: " << iFeatureSize << std::endl;
-
-		std::vector<std::vector<float> > vData;
-		vData.insert(std::end(vData), std::begin(vPositiveFeatures), std::end(vPositiveFeatures));
-		vData.insert(std::end(vData), std::begin(vNegativeFeatures), std::end(vNegativeFeatures));
-
-		// setup training matrices
-		unsigned int iNumPatches = vData.size();
-
-		m_Data.create(iNumPatches, iFeatureSize, CV_32FC1);
-		m_Labels.create(iNumPatches, 1, CV_32SC1);
-		std::cout << "[mai::UDoMLDP::setupTrainingData] Training matrix " << m_Data.rows << "x" << m_Data.cols << std::endl;
-		std::cout << "[mai::UDoMLDP::setupTrainingData] Label matrix " << m_Labels.rows << "x" << m_Labels.cols << std::endl;
-
-		for(unsigned int i = 0; i < iNumPatches ; ++i)
-		{
-			std::vector<float> vCurrentData = vData[i];
-			for(unsigned int j = 0; j < vCurrentData.size(); ++j)
-			{
-				m_Data.at<float>(i, j) = vCurrentData[j];
-			}
-
-			int iLabel = Constants::SVM_NEGATIVE_LABEL;
-			if(i < vPositiveFeatures.size())
-			{
-				iLabel = Constants::SVM_POSITIVE_LABEL;
-			}
-			m_Labels.at<int>(i) = iLabel;
-		}
-	};
+			std::vector<std::vector<float> > &vNegativeFeatures);
 
 	/**
 	 * Clears data

@@ -15,8 +15,6 @@
 #include "IOUtils.h"
 #include "../Constants.h"
 #include "../data/DataSet.h"
-#include "../featureExtraction/cvHOG.h"
-
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/ml/ml.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -24,6 +22,7 @@
 #include <boost/filesystem.hpp>
 
 #include <iostream>
+#include "../featureExtraction/umHOG.h"
 
 using namespace cv;
 
@@ -34,9 +33,9 @@ mai::IOUtils::IOUtils()
 mai::IOUtils::~IOUtils()
 {}
 
-bool mai::IOUtils::loadCatalogue( std::map<std::string, DataSet* > &mCatalogue,
+bool mai::IOUtils::loadCatalogue(map<string, DataSet* > &mCatalogue,
 				int iCVLoadMode,
-				const std::string &strDirectory,
+				const string &strDirectory,
 				bool bAddFlipped,
 				bool bEqualize )
 {
@@ -56,12 +55,12 @@ bool mai::IOUtils::loadCatalogue( std::map<std::string, DataSet* > &mCatalogue,
 		if ( is_directory(itr->status()) )
 		{
 #ifdef linux
-			std::string strLabelPath = itr->path().c_str();
+			string strLabelPath = itr->path().c_str();
 #else
-			std::string strLabelPath = itr->path().string();
+			string strLabelPath = itr->path().string();
 #endif
 
-			std::vector<Mat*> images;
+			vector<Mat*> images;
 
 			if(loadImagesOrdered(images, iCVLoadMode, strLabelPath, bEqualize))
 			{
@@ -79,7 +78,7 @@ bool mai::IOUtils::loadCatalogue( std::map<std::string, DataSet* > &mCatalogue,
 				string strLabel = itr->path().leaf().string();
 #endif
 
-				mCatalogue.insert(std::pair<std::string, DataSet*>(strLabel, pData));
+				mCatalogue.insert(pair<string, DataSet*>(strLabel, pData));
 			}
 		}
 	}
@@ -87,10 +86,10 @@ bool mai::IOUtils::loadCatalogue( std::map<std::string, DataSet* > &mCatalogue,
 	return true;
 }
 
-bool mai::IOUtils::loadImagesOrdered( std::vector<Mat*> &vImages,
+bool mai::IOUtils::loadImagesOrdered(vector<Mat*> &vImages,
 		int iMode,
-		const std::string &strDirectory,
-		bool bEqualize )
+		const string &strDirectory,
+		bool bEqualize)
 {
 	boost::filesystem::path directory( boost::filesystem::initial_path<boost::filesystem::path>() );
 	directory = boost::filesystem::system_complete( boost::filesystem::path( strDirectory ) );
@@ -104,12 +103,12 @@ bool mai::IOUtils::loadImagesOrdered( std::vector<Mat*> &vImages,
 		cout << "[mai::IOUtils::loadImagesOrdered] Loading images from " << directory << endl;
 	}
 
-	std::vector<boost::filesystem::path>  v;                                // so we can sort them later
+	vector<boost::filesystem::path>  v;                                // so we can sort them later
 
-	std::copy(boost::filesystem::directory_iterator(directory), boost::filesystem::directory_iterator(), std::back_inserter(v));
-	std::sort(v.begin(), v.end());
+	copy(boost::filesystem::directory_iterator(directory), boost::filesystem::directory_iterator(), back_inserter(v));
+	sort(v.begin(), v.end());
 
-    for (std::vector<boost::filesystem::path>::const_iterator itr (v.begin()); itr != v.end(); ++itr)
+    for (vector<boost::filesystem::path>::const_iterator itr (v.begin()); itr != v.end(); ++itr)
     {
     	if ( !is_directory(*itr) )
     	{
@@ -141,7 +140,10 @@ bool mai::IOUtils::loadImagesOrdered( std::vector<Mat*> &vImages,
 	return true;
 }
 
-bool mai::IOUtils::loadImages( std::vector<Mat*> &vImages, int iMode, const string &strDirectory, bool bEqualize )
+bool mai::IOUtils::loadImages(vector<Mat*> &vImages,
+		int iMode,
+		const string &strDirectory,
+		bool bEqualize )
 {
 	boost::filesystem::path directory( boost::filesystem::initial_path<boost::filesystem::path>() );
 	directory = boost::filesystem::system_complete( boost::filesystem::path( strDirectory ) );
@@ -196,9 +198,10 @@ bool mai::IOUtils::loadImages( std::vector<Mat*> &vImages, int iMode, const stri
 	return true;
 }
 
-void mai::IOUtils::addFlippedImages( std::vector<Mat*> &vImages, int iFlipMode )
+void mai::IOUtils::addFlippedImages(vector<Mat*> &vImages,
+		int iFlipMode)
 {
-	std::vector<Mat*> vDoubledImages;
+	vector<Mat*> vDoubledImages;
 
 	for( Mat* image : vImages)
 	{
@@ -212,10 +215,12 @@ void mai::IOUtils::addFlippedImages( std::vector<Mat*> &vImages, int iFlipMode )
 		}
 	}
 
-	vImages.insert(std::end(vImages), std::begin(vDoubledImages), std::end(vDoubledImages));
+	vImages.insert(end(vImages), begin(vDoubledImages), end(vDoubledImages));
 }
 
-void mai::IOUtils::convertImages( std::vector<Mat*> &vImages, std::vector<Mat*> &vConvertedImages, int iMode )
+void mai::IOUtils::convertImages(vector<Mat*> &vImages,
+		vector<Mat*> &vConvertedImages,
+		int iMode )
 {
 	for( Mat* image : vImages)
 	{
@@ -230,7 +235,8 @@ void mai::IOUtils::convertImages( std::vector<Mat*> &vImages, std::vector<Mat*> 
 	}
 }
 
-void mai::IOUtils::equalizeImages( std::vector<Mat*> &vImages, std::vector<Mat*> &vConvertedImages )
+void mai::IOUtils::equalizeImages(vector<Mat*> &vImages,
+		vector<Mat*> &vConvertedImages )
 {
 	for( Mat* image : vImages)
 	{
@@ -245,7 +251,9 @@ void mai::IOUtils::equalizeImages( std::vector<Mat*> &vImages, std::vector<Mat*>
 	}
 }
 
-void mai::IOUtils::getMaxImageDimensions( std::vector<Mat> &vImages, int &iMaxHeight, int &iMaxWidth )
+void mai::IOUtils::getMaxImageDimensions(vector<Mat> &vImages,
+		int &iMaxHeight,
+		int &iMaxWidth)
 {
 	iMaxHeight = 0;
 	iMaxWidth = 0;
@@ -256,14 +264,17 @@ void mai::IOUtils::getMaxImageDimensions( std::vector<Mat> &vImages, int &iMaxHe
 		int iW = s.width;
 		int iH = s.height;
 
-		iMaxWidth = std::max(iMaxWidth, iW);
-		iMaxHeight = std::max(iMaxHeight, iH);
+		iMaxWidth = max(iMaxWidth, iW);
+		iMaxHeight = max(iMaxHeight, iH);
 	}
 }
 
-void mai::IOUtils::sampleImage( Mat &image, Mat &sampledImage, int iHeight, int iWidth )
+void mai::IOUtils::sampleImage(Mat &image,
+		Mat &sampledImage,
+		int iHeight,
+		int iWidth )
 {
-	cv::Size s = image.size();
+	Size s = image.size();
 	int iW = s.width;
 	int iH = s.height;
 
@@ -284,7 +295,10 @@ void mai::IOUtils::sampleImage( Mat &image, Mat &sampledImage, int iHeight, int 
 	assert( !sampledImage.empty() );
 }
 
-void mai::IOUtils::sampleImages( std::vector<Mat> &vImages, std::vector<Mat> &vSampledImages, int iHeight, int iWidth )
+void mai::IOUtils::sampleImages(vector<Mat> &vImages,
+		vector<Mat> &vSampledImages,
+		int iHeight,
+		int iWidth )
 {
 	for( Mat image : vImages)
 	{
@@ -315,7 +329,7 @@ void mai::IOUtils::sampleImages( std::vector<Mat> &vImages, std::vector<Mat> &vS
 	}
 }
 
-void mai::IOUtils::showImages( std::vector<Mat> &vImages )
+void mai::IOUtils::showImages(vector<Mat> &vImages)
 {
 	for( Mat image : vImages)
 	{
@@ -323,44 +337,46 @@ void mai::IOUtils::showImages( std::vector<Mat> &vImages )
 	}
 }
 
-void mai::IOUtils::showImage( Mat &image )
+void mai::IOUtils::showImage(Mat &image)
 {
 	imshow("Image", image);
 	waitKey(0);
 }
 
-void mai::IOUtils::showImage( const Mat* image )
+void mai::IOUtils::showImage(const Mat* image)
 {
 	imshow("Image", *image);
 	waitKey(0);
 }
 
-void mai::IOUtils::writeImages( std::vector<cv::Mat*> &vImages, std::string &strPath, std::string &strFileNameBase )
+void mai::IOUtils::writeImages(vector<Mat*> &vImages,
+		const string &strPath,
+		const string &strFileNameBase)
 {
 	for( unsigned int i = 0; i < vImages.size(); ++i)
 	{
 		Mat image = *vImages[i];
 
-		std::stringstream sstm;
+		stringstream sstm;
 		sstm << strPath << "/" << strFileNameBase << "_" << i << ".jpg";
-		std::string strFileName = sstm.str();
+		string strFileName = sstm.str();
 
 		imwrite(strFileName, image);
 	}
 }
 
-void mai::IOUtils::writeHOGImages( mai::DataSet* data,
-			std::string &strPath,
-			std::string &strFileNameBase,
-			cv::Size imageSize,
-			cv::Size cellSize,
+void mai::IOUtils::writeHOGImages(mai::DataSet* data,
+			const string &strPath,
+			const string &strFileNameBase,
+			Size imageSize,
+			Size cellSize,
 			int scaleFactor,
 			double vizFactor)
 {
 	for ( unsigned int i = 0; i < data->getImageCount(); ++i )
 	{
 		const Mat* image = data->getImageAt(i);
-		std::vector<float> vDescriptorValues;
+		vector<float> vDescriptorValues;
 		data->getDescriptorValuesFromImageAt(i, vDescriptorValues);
 
 		if (vDescriptorValues.size() <= 0 || image == NULL) {
@@ -371,7 +387,7 @@ void mai::IOUtils::writeHOGImages( mai::DataSet* data,
 		resize(*image, resizedImage, imageSize);
 		cvtColor(resizedImage, resizedImage, CV_GRAY2BGR);
 
-		cvHOG::getHOGDescriptorVisualImage(outImage,
+		umHOG::getHOGDescriptorVisualImage(outImage,
 				resizedImage,
 				vDescriptorValues,
 				imageSize,
@@ -380,9 +396,9 @@ void mai::IOUtils::writeHOGImages( mai::DataSet* data,
 				vizFactor);
 
 
-		std::stringstream sstm;
+		stringstream sstm;
 		sstm << strPath << "/" << strFileNameBase;
-		std::string strPathName = sstm.str();
+		string strPathName = sstm.str();
 
 		boost::filesystem::path dir(strPathName);
 		if (!exists(dir))
@@ -394,19 +410,19 @@ void mai::IOUtils::writeHOGImages( mai::DataSet* data,
 		}
 
 		sstm << "/" << strFileNameBase << "_" << i << ".jpg";
-		std::string strFileName = sstm.str();
+		string strFileName = sstm.str();
 
 		imwrite(strFileName, outImage);
 	}
 }
 
-void mai::IOUtils::writeMatToCSV(const cv::Mat &data,
-				std::string &strMatName)
+void mai::IOUtils::writeMatToCSV(const Mat &data,
+				const string &strMatName)
 {
-	std::stringstream sstm;
+	stringstream sstm;
 	sstm << strMatName << ".yml";
 
-	cv::FileStorage file(sstm.str(), cv::FileStorage::WRITE);
+	FileStorage file(sstm.str(), FileStorage::WRITE);
 
 	file << strMatName << data;
 

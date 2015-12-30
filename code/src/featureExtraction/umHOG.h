@@ -12,8 +12,8 @@
  * NO CASE SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY DAMAGES.
  *****************************************************************************/
 
-#ifndef SRC_FEATUREEXTRACTION_CVHOG_H_
-#define SRC_FEATUREEXTRACTION_CVHOG_H_
+#ifndef SRC_FEATUREEXTRACTION_UMHOG_H_
+#define SRC_FEATUREEXTRACTION_UMHOG_H_
 
 #include <string>
 #include <vector>
@@ -22,17 +22,44 @@
 
 namespace mai{
 
+class DataSet;
+
 /**
  * Input and output tools
  */
-class cvHOG
+class umHOG
 {
 public:
 
 	/**
 	 * Clears data
 	 */
-	virtual ~cvHOG();
+	virtual ~umHOG();
+
+	/**
+	 * Computes features for all images in data.
+	 * Adds them as DescriptorValues to the corresponding image in the DataSet.
+	 * @see class DataSet::ImageWithDescriptors
+	 *
+	 * Method used:
+	 * @see featureExtraction/cvHOG::extractFeatures
+	 *
+	 * @param data			from which features are extracted
+	 * @param blockSize
+	 * @param blockStride
+	 * @param cellSize
+	 * @param iNumBins
+	 * @param winStride		?
+	 * @param padding		?
+	 */
+	static void computeHOGForDataSet(DataSet* data,
+			cv::Size imageSize,
+			cv::Size blockSize = cv::Size(16,16),
+			cv::Size blockStride = cv::Size(8,8),
+			cv::Size cellSize = cv::Size(8,8),
+			int iNumBins = 9,
+			cv::Size winStride = cv::Size(0,0),
+			cv::Size padding = cv::Size(0,0));
 
 	/**
 	 * Cell and block size have to divide image size.
@@ -77,10 +104,10 @@ private:
 	/**
 	 * Initializes object
 	 */
-	cvHOG();
+	umHOG();
 
 };
 
 }// namespace mai
 
-#endif /* SRC_FEATUREEXTRACTION_CVHOG_H_ */
+#endif /* SRC_FEATUREEXTRACTION_UMHOG_H_ */

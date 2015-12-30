@@ -36,7 +36,7 @@ public:
 	/**
 	 * Initializes object
 	 */
-	CatalogueDetection();
+	CatalogueDetection(std::string &strFilePath);
 
 	/**
 	 * Deletes something
@@ -46,53 +46,59 @@ public:
 	/**
 	 *
 	 */
-	void catalogueDetection(std::string &strFilePath);
+	void processPipeline();
 
 private:
 
 	/**
-	 *
+	 * Computes HOG descriptors for all Datasets in catalogue.
+	 * @see featureExtraction/umHOG::computeHOGForDataSet
 	 */
-	void computeHOGForCatalogue(std::map<std::string, DataSet*> &mCatalogue,
-				cv::Size imageSize,
+	void computeHOG(cv::Size imageSize,
 				cv::Size blockSize,
 				cv::Size blockStride,
 				cv::Size cellSize,
+				int iNumBins,
 				cv::Size winStride,
 				cv::Size padding);
 
 	/**
-	 * Computes features for all images in data.
-	 * Adds them as DescriptorValues to the corresponding image in the DataSet.
-	 * @see class DataSet::ImageWithDescriptors
-	 *
-	 * Method used:
-	 * @see featureExtraction/cvHOG::extractFeatures
-	 */
-	void computeHOGForDataSet(DataSet* data,
-			cv::Size imageSize,
-			cv::Size blockSize,
-			cv::Size blockStride,
-			cv::Size cellSize,
-			cv::Size winStride,
-			cv::Size padding);
-
-	/**
 	 * @see svm/umSVM::train
 	 */
-	void trainSVMsForCatalogue(std::map<std::string, DataSet*> &mCatalogue);
+	void trainSVMs(int iDataSetDivider = 1,
+			bool bSearchSupportVectors = false);
 
-	void collectPositivesFromCatalogue(std::map<std::string, DataSet*> &mCatalogue,
-			std::map<std::string, std::vector<std::vector<float> > > &mTrain,
-			std::map<std::string, std::vector<std::vector<float> > > &mValidate);
+	/**
+	 * Assigns part of the descriptor vectors for each dataset for validation purpose, the rest for training.
+	 *
+	 * @param iDataSetDivider	divider of dataset size defining validation part, e.g. 4 -> 1/4 of patches will be in validation set.
+	 */
+	void divideDataSets(std::map<std::string, std::vector<std::vector<float> > > &mTrain,
+			std::map<std::string, std::vector<std::vector<float> > > &mValidate,
+			int iDataSetDivider);
 
+	/**
+	 * Collects random samples for each positive descriptor set from all other descriptor sets at equal part.
+	 * Size of the sampled descriptor sets are the same as the positive one to have an equal amount of positive and negative training samples.
+	 * (Almost the same at least, as division rest is not taken into account.)
+	 *
+	 * @TODO what if other set is too small ?
+	 */
 	void collectRandomNegatives(std::map<std::string, std::vector<std::vector<float> > > &mPositives,
 			std::map<std::string, std::vector<std::vector<float> > > &mNegatives);
 
-	void setupTrainingData(std::map<std::string, TrainingData*> &m_mTrain,
-			std::map<std::string, DataSet*> &mCatalogue,
+	/**
+	 * Creates training data from positive and negative samples.
+	 * @see data/TrainingData
+	 */
+	void setupTrainingData(std::map<std::string, TrainingData*> &mTrain,
 			std::map<std::string, std::vector<std::vector<float> > > &mPositives,
 			std::map<std::string, std::vector<std::vector<float> > > &mNegatives);
+
+	/**
+	 * Predicts validation data divided from datasets for each expression svm.
+	 */
+	void predict();
 
 
 	std::map<std::string, DataSet*> m_mCatalogue;

@@ -19,8 +19,6 @@
 #include "data/DataSet.h"
 #include "data/TrainingData.h"
 #include "IO/IOUtils.h"
-#include "featureExtraction/cvHOG.h"
-
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/ml/ml.hpp>
@@ -28,6 +26,7 @@
 #include <opencv2/opencv.hpp>
 
 #include <iostream>
+#include "featureExtraction/umHOG.h"
 
 
 using namespace cv;
@@ -35,39 +34,46 @@ using namespace cv;
 using namespace std;
 
 
-mai::CatalogueDetection::CatalogueDetection()
-{}
+mai::CatalogueDetection::CatalogueDetection(std::string &strFilePath)
+{
+	IOUtils::loadCatalogue(m_mCatalogue, IMREAD_COLOR, strFilePath, true);
+
+	cout << "[mai::CatalogueDetection::catalogueDetection] Number of labels: " << m_mCatalogue.size() << endl;
+	for (map<string, DataSet*>::const_iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); ++it)
+	{
+		cout << "[mai::CatalogueDetection::catalogueDetection] Label: " << it->first << ", number of images: " << it->second->getImageCount() << endl;
+	}
+}
 
 mai::CatalogueDetection::~CatalogueDetection()
 {
-	for(std::map<std::string, DataSet*>::iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); it++)
+	for(map<string, DataSet*>::iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); it++)
 	{
 		delete it->second;
 	}
 	m_mCatalogue.clear();
 
-	for(std::map<std::string, TrainingData*>::iterator it = m_mTrain.begin(); it != m_mTrain.end(); it++)
+	for(map<string, TrainingData*>::iterator it = m_mTrain.begin(); it != m_mTrain.end(); it++)
 	{
 		delete it->second;
 	}
 	m_mTrain.clear();
 
-	for(std::map<std::string, TrainingData*>::iterator it = m_mValidate.begin(); it != m_mValidate.end(); it++)
+	for(map<string, TrainingData*>::iterator it = m_mValidate.begin(); it != m_mValidate.end(); it++)
 	{
 		delete it->second;
 	}
 	m_mValidate.clear();
+
+	for(map<string, umSVM*>::iterator it = m_mSVMs.begin(); it != m_mSVMs.end(); it++)
+	{
+		delete it->second;
+	}
+	m_mSVMs.clear();
 }
 
-void mai::CatalogueDetection::catalogueDetection(std::string &strFilePath)
+void mai::CatalogueDetection::processPipeline()
 {
-	IOUtils::loadCatalogue(m_mCatalogue, IMREAD_COLOR, strFilePath, true);
-
-	cout << "[mai::UDoMLDP::CatalogueDetecion] Number of labels: " << m_mCatalogue.size() << endl;
-	for (std::map<std::string, DataSet*>::const_iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); ++it)
-	{
-		cout << "[mai::UDoMLDP::CatalogueDetecion] Label: " << it->first << ", number of images: " << it->second->getImageCount() << endl;
-	}
 
 	Size cellSize = Size(Constants::HOG_CELLSIZE, Constants::HOG_CELLSIZE);
 	Size blockStride = Size(Constants::HOG_BLOCKSTRIDE, Constants::HOG_BLOCKSTRIDE);
@@ -78,40 +84,49 @@ void mai::CatalogueDetection::catalogueDetection(std::string &strFilePath)
 	Size winStride = Size(0,0);
 	Size padding = Size(0,0);
 
+	int iNumBins = Constants::HOG_BINS;
 
-	this->computeHOGForCatalogue(m_mCatalogue,
-			imageSize,
+	int iDataSetDivider = Constants::DATESET_DIVIDER;
+
+	computeHOG(imageSize,
 			blockSize,
 			blockStride,
 			cellSize,
+			iNumBins,
 			winStride,
 			padding);
 
-	this->trainSVMsForCatalogue(m_mCatalogue);
+	trainSVMs(iDataSetDivider);
+
+	if(iDataSetDivider > 1)
+	{
+		predict();
+	}
 }
 
-void mai::CatalogueDetection::computeHOGForCatalogue(std::map<std::string, DataSet*> &mCatalogue,
-		Size imageSize,
+void mai::CatalogueDetection::computeHOG(Size imageSize,
 		Size blockSize,
 		Size blockStride,
 		Size cellSize,
+		int iNumBins,
 		Size winStride,
 		Size padding)
 {
-	for(std::map<std::string, DataSet*>::iterator it = mCatalogue.begin(); it != mCatalogue.end(); it++)
+	for(map<string, DataSet*>::iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); it++)
 	{
-		this->computeHOGForDataSet(it->second,
+		umHOG::computeHOGForDataSet(it->second,
 					imageSize,
 					blockSize,
 					blockStride,
 					cellSize,
+					iNumBins,
 					winStride,
 					padding);
 
 		if(Constants::WRITE_HOG_IMAGES)
 		{
-			std::string strName = it->first;
-			std::string strPath = "out";
+			string strName = it->first;
+			string strPath = "out";
 
 			IOUtils::writeHOGImages(it->second,
 					strPath,
@@ -125,64 +140,35 @@ void mai::CatalogueDetection::computeHOGForCatalogue(std::map<std::string, DataS
 
 }
 
-void mai::CatalogueDetection::computeHOGForDataSet(DataSet* data,
-		Size imageSize,
-		Size blockSize,
-		Size blockStride,
-		Size cellSize,
-		Size winStride,
-		Size padding)
+void mai::CatalogueDetection::trainSVMs(int iDataSetDivider,
+		bool bSearchSupportVectors)
 {
-	for(unsigned int i = 0; i < data->getImageCount(); ++i)
-	{
-		const Mat* image = data->getImageAt(i);
+	map<string, vector<vector<float> > > mPositiveTrain;
+	map<string, vector<vector<float> > > mPositiveValidate;
 
-		if(Constants::DEBUG_MAIN_ALG) {
-		  cout << "[mai::UDoMLDP::computeHOGForDataSet] resizing image to " << imageSize << endl;
-		}
-		Mat resizedImage;
-		cv::resize(*image, resizedImage, imageSize);
-
-		vector< float> descriptorsValues;
-
-		cvHOG::extractFeatures(descriptorsValues, resizedImage, blockSize, blockStride, cellSize, Constants::HOG_BINS, winStride, padding);
-
-		if(Constants::DEBUG_MAIN_ALG) {
-			cout << "[mai::UDoMLDP::computeHOGForDataSet] Number of descriptors: " << descriptorsValues.size() << endl;
-		}
-
-		data->addDescriptorValuesToImageAt(i, descriptorsValues);
-	}
-}
-
-void mai::CatalogueDetection::trainSVMsForCatalogue(std::map<std::string, DataSet*> &mCatalogue)
-{
-	std::map<std::string, std::vector<std::vector<float> > > mPositiveTrain;
-	std::map<std::string, std::vector<std::vector<float> > > mPositiveValidate;
-
-	this->collectPositivesFromCatalogue(mCatalogue, mPositiveTrain, mPositiveValidate);
+	divideDataSets(mPositiveTrain, mPositiveValidate, iDataSetDivider);
 
 	if(mPositiveTrain.size() < 2)
 	{
-		std::cout << "[mai::UDoMLDP::trainSVMsForCatalogue] ERROR! At least 2 categories needed." << std::endl;
+		cout << "[mai::CatalogueDetection::trainSVMs] ERROR! At least 2 categories needed." << endl;
 		return;
 	}
 
-	std::map<std::string, std::vector<std::vector<float> > > mNegativeTrain;
-	std::map<std::string, std::vector<std::vector<float> > > mNegativeValidate;
+	map<string, vector<vector<float> > > mNegativeTrain;
+	map<string, vector<vector<float> > > mNegativeValidate;
 
-	this->collectRandomNegatives(mPositiveTrain, mNegativeTrain);
-	this->collectRandomNegatives(mPositiveValidate, mNegativeValidate);
+	collectRandomNegatives(mPositiveTrain, mNegativeTrain);
+	collectRandomNegatives(mPositiveValidate, mNegativeValidate);
 
-	this->setupTrainingData(m_mTrain, m_mCatalogue, mPositiveTrain, mNegativeTrain);
-	this->setupTrainingData(m_mValidate, m_mCatalogue, mPositiveValidate, mNegativeValidate);
+	setupTrainingData(m_mTrain, mPositiveTrain, mNegativeTrain);
+	setupTrainingData(m_mValidate, mPositiveValidate, mNegativeValidate);
 
-	for(std::map<std::string, TrainingData*>::const_iterator it = m_mTrain.begin(); it != m_mTrain.end(); it++)
+	for(map<string, TrainingData*>::const_iterator it = m_mTrain.begin(); it != m_mTrain.end(); it++)
 	{
-		std::string strName = it->first;
+		string strName = it->first;
 		TrainingData* data = it->second;
 		umSVM* svm = new umSVM();
-		std::vector<std::vector<float> > vSupport;
+		vector<vector<float> > vSupport;
 
 //		std::string strDataname = "trainingdata";
 //		IOUtils::writeMatToCSV(data->getData(), strDataname);
@@ -191,75 +177,102 @@ void mai::CatalogueDetection::trainSVMsForCatalogue(std::map<std::string, DataSe
 
 		svm->trainSVM(data->getData(), data->getLabels(), vSupport);
 
-		m_mSVMs.insert(std::pair<std::string, umSVM*>(strName, svm));
+		m_mSVMs.insert(pair<string, umSVM*>(strName, svm));
 
 		svm->saveSVM(strName);
+
+		if(bSearchSupportVectors)
+		{
+			cout << "[mai::CatalogueDetection::trainSVMs] Searching support vectors in positives .." << endl;
+
+			umSVM::searchSupportVector(mPositiveTrain.at(strName), vSupport);
+
+			cout << "[mai::CatalogueDetection::trainSVMs] Searching support vectors in negatives .." << endl;
+
+			umSVM::searchSupportVector(mNegativeTrain.at(strName), vSupport);
+
+			cout << "[mai::CatalogueDetection::trainSVMs] Searching support vectors done." << endl;
+		}
 	}
-
-
-	//	cout << "Searching support vectors in positives .." << endl;
-	//
-	//	searchSupportVector(positives, vSupport);
-	//
-	//	cout << "Searching support vectors in negatives .." << endl;
-	//
-	//	searchSupportVector(negatives, vSupport);
-	//
-	//	cout << "Searching support vectors done." << endl;
-//		std::vector<Mat*> images = it->second->
-//		int iPercentageValidationImages = images.size()/Constants::DATESET_DIVIDER > 1 ? images.size()/Constants::DATESET_DIVIDER : 1;
-//
-//		std::vector<Mat*> images2HalfNeg(std::make_move_iterator(images.begin() + iPercentageValidationImages), std::make_move_iterator(images.end()));
-//		images.erase(images.begin() + iPercentageValidationImages, images.end());
-//
-//		m_pNegativeTrain->setImages(images2HalfNeg);
-//		m_pNegativeValid->setImages(images);
-
-
 }
 
-void mai::CatalogueDetection::collectPositivesFromCatalogue(std::map<std::string, DataSet*> &mCatalogue,
-			std::map<std::string, std::vector<std::vector<float> > > &mTrain,
-			std::map<std::string, std::vector<std::vector<float> > > &mValidate)
+void mai::CatalogueDetection::predict()
 {
-	for(std::map<std::string, DataSet*>::const_iterator it = mCatalogue.begin(); it != mCatalogue.end(); it++)
+	map<string, Mat> mResults;
+
+	for(std::map<std::string, TrainingData*>::const_iterator it = m_mValidate.begin();
+			it != m_mValidate.end(); it++)
 	{
-		std::vector<std::vector<float> > vTrain, vValidate;
+		string strName = it->first;
+		umSVM* svm = m_mSVMs.at(strName);
+		Mat results(it->second->getData().rows, 1, CV_32SC1);
 
-		it->second->getDescriptorsSeparated(Constants::DATESET_DIVIDER, vValidate, vTrain);
+		svm->predict(it->second->getData(), results);
 
-		mTrain.insert(std::pair<std::string, std::vector<std::vector<float> > >(it->first, vTrain));
-		mValidate.insert(std::pair<std::string, std::vector<std::vector<float> > >(it->first, vValidate));
+		int iResultsRows = results.rows;
+		int iCorrectDetection = 0;
+
+		cout << "[mai::CatalogueDetection::predict] SVM prediction result for label " << strName << " has " << iResultsRows << " rows." << endl;
+
+		for(int i = 0; i < iResultsRows; ++i)
+		{
+			int iResultLabel = results.at<float>(i);
+			int iDataLabel = it->second->getLabels().at<int>(i);
+
+			if(iResultLabel == iDataLabel)
+				iCorrectDetection++;
+
+			if(Constants::DEBUG_SVM_PREDICTION)
+				cout << "[mai::CatalogueDetection::predict] SVM predict for image " << i << " is " << iResultLabel << ". Label was : " << iDataLabel << endl;
+		}
+
+		double dCorrectDetectionRatio = (double)iCorrectDetection / iResultsRows;
+		cout << "[mai::CatalogueDetection::predict] Ratio of correct detections for label " << strName << " : " << dCorrectDetectionRatio << endl;
+
+		mResults.insert(pair<string, Mat>(strName, results));
 	}
 }
 
-void mai::CatalogueDetection::collectRandomNegatives(std::map<std::string, std::vector<std::vector<float> > > &mPositives,
-		std::map<std::string, std::vector<std::vector<float> > > &mNegatives)
+void mai::CatalogueDetection::divideDataSets(map<string, vector<vector<float> > > &mTrain,
+			map<string, vector<vector<float> > > &mValidate,
+			int iDataSetDivider)
 {
-	for(std::map<std::string, std::vector<std::vector<float> > >::const_iterator itTrainCategory = mPositives.begin();
+	for(map<string, DataSet*>::const_iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); it++)
+	{
+		vector<vector<float> > vTrain, vValidate;
+
+		it->second->getDescriptorsSeparated(iDataSetDivider, vValidate, vTrain);
+
+		mTrain.insert(pair<string, vector<vector<float> > >(it->first, vTrain));
+		mValidate.insert(pair<string, vector<vector<float> > >(it->first, vValidate));
+	}
+}
+
+void mai::CatalogueDetection::collectRandomNegatives(map<string, vector<vector<float> > > &mPositives,
+		map<string, vector<vector<float> > > &mNegatives)
+{
+	for(map<string,vector<vector<float> > >::const_iterator itTrainCategory = mPositives.begin();
 			itTrainCategory != mPositives.end(); itTrainCategory++)
 	{
 		int iPosSampleSize = itTrainCategory->second.size();
 		int iSamplesPerCategory = iPosSampleSize / (mPositives.size() - 1);
 		string strKey = itTrainCategory->first;
 
-		std::cout << "sampling " << itTrainCategory->first << ", size " << iPosSampleSize << ", per category " << iSamplesPerCategory << std::endl;
-
-		for(std::map<std::string, std::vector<std::vector<float> > >::const_iterator itTrainOthers = mPositives.begin();
+		for(map<string, vector<vector<float> > >::const_iterator itTrainOthers = mPositives.begin();
 				itTrainOthers != mPositives.end(); itTrainOthers++)
 		{
 			if(itTrainCategory != itTrainOthers)
 			{
 				int iCurrentSampleSize = itTrainOthers->second.size();
-				std::vector<int> vIndices;
+				vector<int> vIndices;
 
 				for(int i = 0; i < iCurrentSampleSize; ++i)
 				{
 					vIndices.push_back(i);
 				}
-				std::random_shuffle(vIndices.begin(), vIndices.end());
+				random_shuffle(vIndices.begin(), vIndices.end());
 
-				std::vector<std::vector<float> > vNegative;
+				vector<vector<float> > vNegative;
 
 				for(int i = 0; i < iSamplesPerCategory; ++i)
 				{
@@ -279,20 +292,19 @@ void mai::CatalogueDetection::collectRandomNegatives(std::map<std::string, std::
 	}
 }
 
-void mai::CatalogueDetection::setupTrainingData(std::map<std::string, TrainingData*> &mTrainingData,
-			std::map<std::string, DataSet*> &mCatalogue,
-			std::map<std::string, std::vector<std::vector<float> > > &mPositives,
-			std::map<std::string, std::vector<std::vector<float> > > &mNegatives)
+void mai::CatalogueDetection::setupTrainingData(map<string, TrainingData*> &mTrainingData,
+			map<string, vector<vector<float> > > &mPositives,
+			map<string, vector<vector<float> > > &mNegatives)
 {
-	for(std::map<std::string, DataSet*>::const_iterator it = mCatalogue.begin(); it != mCatalogue.end(); it++)
+	for(map<string, DataSet*>::const_iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); it++)
 	{
 		string strKey = it->first;
-		std::vector<std::vector<float> > vPositives, vNegatives;
+		vector<vector<float> > vPositives, vNegatives;
 		vPositives = mPositives.at(strKey);
 		vNegatives = mNegatives.at(strKey);
 
 		TrainingData* td = new TrainingData(vPositives, vNegatives);
 
-		mTrainingData.insert(std::pair<std::string, TrainingData*>(strKey, td));
+		mTrainingData.insert(pair<string, TrainingData*>(strKey, td));
 	}
 }
