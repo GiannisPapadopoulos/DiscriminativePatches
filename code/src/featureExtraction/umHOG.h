@@ -66,7 +66,7 @@ public:
 	 * Image size has to be multiple of block size.
 	 * Bins are 1, 3, 5, 7, 9, .. with 9 as optimum.
 	 * descriptorsValues.size = bins * number of cells per block * number of blocks per image
-	 * Blocks per image = ((img.width / blockStride) - (bock.width / blockStride - 1)) * ((img.height / blockStride) - (bock.height / blockStride - 1))
+	 * Blocks per image = ((img.width / blockStride) - (block.width / blockStride - 1)) * ((img.height / blockStride) - (block.height / blockStride - 1))
 	 * Descriptor values are column major.
 	 *
 	 * @param[out] descriptorsValues	extracted features

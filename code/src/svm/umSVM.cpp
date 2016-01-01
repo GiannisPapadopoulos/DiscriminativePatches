@@ -27,8 +27,9 @@ using namespace cv;
 using namespace std;
 
 
-mai::umSVM::umSVM()
+mai::umSVM::umSVM(double dCValue)
 	: m_pSVM(new CvSVM())
+	, m_dCValue(dCValue)
 {}
 
 mai::umSVM::~umSVM()
@@ -43,8 +44,8 @@ int mai::umSVM::trainSVM(const Mat &data,
 	// Set up SVM's parameters
 	CvSVMParams params;
 
-	params.svm_type    = CvSVM::C_SVC;
-	params.C = Constants::SVM_C_VALUE;
+	params.svm_type = CvSVM::C_SVC;
+	params.C = m_dCValue;
 
 	params.kernel_type = CvSVM::LINEAR;
 

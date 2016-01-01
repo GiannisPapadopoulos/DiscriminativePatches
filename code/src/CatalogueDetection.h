@@ -22,6 +22,7 @@
 
 namespace mai{
 
+class Configuration;
 class DataSet;
 class TrainingData;
 class umSVM;
@@ -36,7 +37,7 @@ public:
 	/**
 	 * Initializes object
 	 */
-	CatalogueDetection(std::string &strFilePath);
+	CatalogueDetection(Configuration* config);
 
 	/**
 	 * Deletes something
@@ -108,6 +109,7 @@ private:
 
 	std::map<std::string, umSVM*> m_mSVMs;
 
+	Configuration*	m_Config;
 };
 
 }// namespace mai

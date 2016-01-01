@@ -16,6 +16,7 @@
 #include <string>
 
 #include "UDoMLDP.h"
+#include "Configuration.h"
 #include "CatalogueDetection.h"
 #include "svm/svmtest.h"
 
@@ -38,7 +39,7 @@ int main(int argc, char** argv )
 		return -1;
 	}
 
-	string strFilepath;
+	string strConfigFile;
 
 	string strFilepathPositives;
 	string strFilepathNegatives;
@@ -49,9 +50,10 @@ int main(int argc, char** argv )
 		{
 			if(i+1 < argc)
 			{
-				strFilepath = string(argv[i+1]);
+				strConfigFile = string(argv[i+1]);
 
-				CatalogueDetection* main = new CatalogueDetection(strFilepath);
+				Configuration* config = new Configuration(strConfigFile);
+				CatalogueDetection* main = new CatalogueDetection(config);
 				main->processPipeline();
 				delete main;
 

@@ -35,7 +35,7 @@ public:
 	/**
 	 * Initializes object
 	 */
-	umSVM();
+	umSVM(double dCValue = 0.1);
 
 	/**
 	 * Deletes something
@@ -87,6 +87,7 @@ public:
 private:
 
 	CvSVM*	m_pSVM;
+	double	m_dCValue;
 
 };
 

@@ -7,6 +7,8 @@ set( SubDirs data featureExtraction IO svm utils )
 set( DirFiles
 	CatalogueDetection.cpp
 	CatalogueDetection.h
+	Configuration.cpp
+	Configuration.h
 	Constants.h
 	main.cpp
 	UDoMLDP.cpp

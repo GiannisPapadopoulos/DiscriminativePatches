@@ -14,6 +14,7 @@
 
 #include "CatalogueDetection.h"
 #include "Constants.h"
+#include "Configuration.h"
 
 #include "svm/umSVM.h"
 #include "data/DataSet.h"
@@ -34,9 +35,10 @@ using namespace cv;
 using namespace std;
 
 
-mai::CatalogueDetection::CatalogueDetection(std::string &strFilePath)
+mai::CatalogueDetection::CatalogueDetection(Configuration* config)
+:	m_Config(config)
 {
-	IOUtils::loadCatalogue(m_mCatalogue, IMREAD_COLOR, strFilePath, true);
+	IOUtils::loadCatalogue(m_mCatalogue, IMREAD_COLOR, m_Config->getDataFilepath(), true);
 
 	cout << "[mai::CatalogueDetection::catalogueDetection] Number of labels: " << m_mCatalogue.size() << endl;
 	for (map<string, DataSet*>::const_iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); ++it)
@@ -70,23 +72,25 @@ mai::CatalogueDetection::~CatalogueDetection()
 		delete it->second;
 	}
 	m_mSVMs.clear();
+
+	delete m_Config;
 }
 
 void mai::CatalogueDetection::processPipeline()
 {
 
-	Size cellSize = Size(Constants::HOG_CELLSIZE, Constants::HOG_CELLSIZE);
-	Size blockStride = Size(Constants::HOG_BLOCKSTRIDE, Constants::HOG_BLOCKSTRIDE);
-	Size blockSize = Size(Constants::HOG_BLOCKSIZE, Constants::HOG_BLOCKSIZE);
-	Size imageSize = Size(Constants::HOG_IMAGE_SIZE_X, Constants::HOG_IMAGE_SIZE_Y);
+	Size cellSize = m_Config->getCellSize();
+	Size blockStride = m_Config->getBlockStride();
+	Size blockSize = m_Config->getBlockSize();
+	Size imageSize = m_Config->getImageSize();
 
 	// Not sure about these
 	Size winStride = Size(0,0);
 	Size padding = Size(0,0);
 
-	int iNumBins = Constants::HOG_BINS;
+	int iNumBins = m_Config->getNumBins();
 
-	int iDataSetDivider = Constants::DATESET_DIVIDER;
+	int iDataSetDivider = m_Config->getDataSetDivider();
 
 	computeHOG(imageSize,
 			blockSize,
@@ -136,8 +140,8 @@ void mai::CatalogueDetection::computeHOG(Size imageSize,
 					blockSize,
 					blockStride,
 					iNumBins,
-					Constants::HOG_VIZ_SCALEFACTOR,
-					Constants::HOG_VIZ_VIZFACTOR);
+					m_Config->getHogVizImageScalefactor(),
+					m_Config->getHogVizBinScalefactor());
 		}
 	}
 
@@ -170,7 +174,7 @@ void mai::CatalogueDetection::trainSVMs(int iDataSetDivider,
 	{
 		string strName = it->first;
 		TrainingData* data = it->second;
-		umSVM* svm = new umSVM();
+		umSVM* svm = new umSVM(m_Config->getSvmCValue());
 		vector<vector<float> > vSupport;
 
 //		std::string strDataname = "trainingdata";

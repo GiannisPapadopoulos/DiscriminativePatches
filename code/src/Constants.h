@@ -45,7 +45,7 @@ class Constants {
     static const int HOG_IMAGE_SIZE_X = 32;
     static const int HOG_IMAGE_SIZE_Y = 32;
 
-    static const int HOG_VIZ_SCALEFACTOR = 4;
+    static const int HOG_VIZ_SCALEFACTOR = 16;
     static constexpr double HOG_VIZ_VIZFACTOR = 2.0;
 
     /** Reduce featureset */
