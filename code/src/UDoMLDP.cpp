@@ -156,6 +156,9 @@ void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string 
         strName,
         imageSize,
         cellSize,
+		blockSize,
+		blockStride,
+		Constants::HOG_BINS,
         Constants::HOG_VIZ_SCALEFACTOR,
         Constants::HOG_VIZ_VIZFACTOR);
 
@@ -165,6 +168,9 @@ void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string 
           strName,
           imageSize,
           cellSize,
+		  blockSize,
+		  blockStride,
+		  Constants::HOG_BINS,
           Constants::HOG_VIZ_SCALEFACTOR,
           Constants::HOG_VIZ_VIZFACTOR);
 
@@ -174,6 +180,9 @@ void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string 
           strName,
           imageSize,
           cellSize,
+		  blockSize,
+		  blockStride,
+		  Constants::HOG_BINS,
           Constants::HOG_VIZ_SCALEFACTOR,
           Constants::HOG_VIZ_VIZFACTOR);
 
@@ -183,6 +192,9 @@ void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string 
           strName,
           imageSize,
           cellSize,
+		  blockSize,
+		  blockStride,
+		  Constants::HOG_BINS,
           Constants::HOG_VIZ_SCALEFACTOR,
           Constants::HOG_VIZ_VIZFACTOR);
 	}

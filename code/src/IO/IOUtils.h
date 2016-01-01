@@ -172,8 +172,12 @@ public:
 			const std::string &strFileNameBase,
 			cv::Size imageSize,
 			cv::Size cellSize,
+			cv::Size blockSize,
+			cv::Size blockStride,
+			int iNumBins,
 			int scaleFactor,
-			double vizFactor);
+			double vizFactor,
+			bool printValue = false);
 
 	/**
 	 *

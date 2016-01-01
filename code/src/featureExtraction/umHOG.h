@@ -62,10 +62,12 @@ public:
 			cv::Size padding = cv::Size(0,0));
 
 	/**
-	 * Cell and block size have to divide image size.
-	 * Cell size has to divide block size.
-	 * Block stride has to be multiple of cell size.
-	 * descriptorsValues.size = ((img.width / cellsize) - 1) * ((img.height/cellsize) - 1 ) * bins (9) * number of cells per block
+	 * Block size and block stride have to multiples of cell size.
+	 * Image size has to be multiple of block size.
+	 * Bins are 1, 3, 5, 7, 9, .. with 9 as optimum.
+	 * descriptorsValues.size = bins * number of cells per block * number of blocks per image
+	 * Blocks per image = ((img.width / blockStride) - (bock.width / blockStride - 1)) * ((img.height / blockStride) - (bock.height / blockStride - 1))
+	 * Descriptor values are column major.
 	 *
 	 * @param[out] descriptorsValues	extracted features
 	 * @param[in] image			from which features are extracted
@@ -94,10 +96,12 @@ public:
 			std::vector<float> &descriptorValues,
 			cv::Size winSize,
 			cv::Size cellSize,
+			cv::Size blockSize,
+			cv::Size blockStride,
+			int iNumBins,
 			int scaleFactor,
 			double vizFactor,
-			int iNumCellsPerBlock = 4,
-			int iNumBins = 9);
+			bool printValue = false);
 
 private:
 

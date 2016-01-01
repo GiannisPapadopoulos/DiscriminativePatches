@@ -370,8 +370,12 @@ void mai::IOUtils::writeHOGImages(mai::DataSet* data,
 			const string &strFileNameBase,
 			Size imageSize,
 			Size cellSize,
+			Size blockSize,
+			Size blockStride,
+			int iNumBins,
 			int scaleFactor,
-			double vizFactor)
+			double vizFactor,
+			bool printValue)
 {
 	for ( unsigned int i = 0; i < data->getImageCount(); ++i )
 	{
@@ -392,8 +396,12 @@ void mai::IOUtils::writeHOGImages(mai::DataSet* data,
 				vDescriptorValues,
 				imageSize,
 				cellSize,
+				blockSize,
+				blockStride,
+				iNumBins,
 				scaleFactor,
-				vizFactor);
+				vizFactor,
+				printValue);
 
 
 		stringstream sstm;

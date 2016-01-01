@@ -133,6 +133,9 @@ void mai::CatalogueDetection::computeHOG(Size imageSize,
 					strName,
 					imageSize,
 					cellSize,
+					blockSize,
+					blockStride,
+					iNumBins,
 					Constants::HOG_VIZ_SCALEFACTOR,
 					Constants::HOG_VIZ_VIZFACTOR);
 		}
