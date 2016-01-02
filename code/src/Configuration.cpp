@@ -64,7 +64,7 @@ mai::Configuration::Configuration(string &strFilename)
 	m_iNumBins = pt.get<int>("HOG.BINS", trInt);
 
 	m_iHOGVizImageScalefactor = pt.get<int>("HOG.VIZ_IMAGE_SCALEFACTOR", trInt);
-	m_dHOGVizBinScalefactor = pt.get<double>("HOG.VIZ_BIN_SCALE_FACTOR", trDouble);
+	m_dHOGVizBinScalefactor = pt.get<double>("HOG.VIZ_BIN_SCALEFACTOR", trDouble);
 
 	m_iDataSetDivider = pt.get<int>("DATA.DATESET_DIVIDER", trInt);
 	m_strFilepath = pt.get<std::string>("DATA.FILEPATH");

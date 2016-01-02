@@ -33,9 +33,7 @@ int main(int argc, char** argv )
 		cerr << "Usage:" << endl
 			<< argv[0] << " [options]" << endl
 			<< "options:" << endl
-			<< "\t-catalogue <file path>\tTrain svms on categorized data catalogue. File path is base for subfolders containing data. Folder names are trained categories."
-			<< "\t-pos <file path>" << endl
-			<< "\t-neg <file path>" << endl;
+			<< "\t-config <config file>\tTrain svms on categorized data catalogue. Expects name and path to a configuration file defining application settings." << endl;
 		return -1;
 	}
 
@@ -46,7 +44,7 @@ int main(int argc, char** argv )
 
 	for(int i = 0; i < argc; ++i)
 	{
-		if(string(argv[i]) == "-catalogue")
+		if(string(argv[i]) == "-config")
 		{
 			if(i+1 < argc)
 			{
