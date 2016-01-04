@@ -1,4 +1,4 @@
-#pragma once
+//#pragma once
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
@@ -7,7 +7,7 @@ class facedetection
 {
 public:
 	facedetection(void);
-	~facedetection(void);
-	static void faceDetec(vector<Mat*> &vImages);
+	virtual~facedetection(void);
+	static void faceDetec(std::vector<cv::Mat*> &vImages);
 };
 }

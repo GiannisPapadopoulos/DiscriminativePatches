@@ -29,7 +29,8 @@ facedetection::~facedetection(void)
 
 void mai::facedetection::faceDetec(vector<Mat*> &vImages)
 {
-	for( Mat* image : vImages)//images)
+	std::vector<Mat*> images;
+	for( Mat* image : images)//images)
 	{
 
  cascade_name = "C:/Users/apple/Desktop/Sophia/AI/Project/opencv/sources/data/haarcascades_cuda/haarcascade_frontalface_alt2.xml"; 
