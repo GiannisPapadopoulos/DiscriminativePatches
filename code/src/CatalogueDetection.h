@@ -71,9 +71,14 @@ private:
 				bool bApplyPCA = false);
 
 	/**
+	 * Setup training data and train svms
 	 * @see svm/umSVM::train
+	 *
+	 * @param iDataSetDivider	divider of dataset size defining validation part, e.g. 4 -> 1/4 of patches will be in validation set.
+	 * @param bSearchSupportVectors verify support vector existance in training data.
+	 * @return	successful training ?
 	 */
-	void trainSVMs(int iDataSetDivider = 1,
+	bool trainSVMs(int iDataSetDivider = 1,
 			bool bSearchSupportVectors = false);
 
 	/**

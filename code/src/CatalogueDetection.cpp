@@ -108,28 +108,29 @@ void mai::CatalogueDetection::processPipeline()
 			bWriteHOGImages,
 			bApplyPCA);
 
-	trainSVMs(iDataSetDivider);
-
-	if(bPredictTrainingData)
+	if(trainSVMs(iDataSetDivider))
 	{
-		cout << "#-------------------------------------------------------------------------------#" << endl;
-		cout << "[mai::CatalogueDetection::processPipeline] SVM prediction on training data." << endl;
+		if(bPredictTrainingData)
+		{
+			cout << "#-------------------------------------------------------------------------------#" << endl;
+			cout << "[mai::CatalogueDetection::processPipeline] SVM prediction on training data." << endl;
 
-		map<string, Mat> mTrainingResults;
-		predict(m_mTrain, mTrainingResults);
+			map<string, Mat> mTrainingResults;
+			predict(m_mTrain, mTrainingResults);
 
-		cout << "#-------------------------------------------------------------------------------#" << endl;
-	}
+			cout << "#-------------------------------------------------------------------------------#" << endl;
+		}
 
-	if(iDataSetDivider > 1)
-	{
-		cout << "#-------------------------------------------------------------------------------#" << endl;
-		cout << "[mai::CatalogueDetection::processPipeline] SVM prediction on validation data." << endl;
+		if(iDataSetDivider > 1)
+		{
+			cout << "#-------------------------------------------------------------------------------#" << endl;
+			cout << "[mai::CatalogueDetection::processPipeline] SVM prediction on validation data." << endl;
 
-		map<string, Mat> mValidationResults;
-		predict(m_mValidate, mValidationResults);
+			map<string, Mat> mValidationResults;
+			predict(m_mValidate, mValidationResults);
 
-		cout << "#-------------------------------------------------------------------------------#" << endl;
+			cout << "#-------------------------------------------------------------------------------#" << endl;
+		}
 	}
 }
 
@@ -175,7 +176,7 @@ void mai::CatalogueDetection::computeHOG(Size imageSize,
 
 }
 
-void mai::CatalogueDetection::trainSVMs(int iDataSetDivider,
+bool mai::CatalogueDetection::trainSVMs(int iDataSetDivider,
 		bool bSearchSupportVectors)
 {
 	map<string, vector<vector<float> > > mPositiveTrain;
@@ -186,7 +187,7 @@ void mai::CatalogueDetection::trainSVMs(int iDataSetDivider,
 	if(mPositiveTrain.size() < 2)
 	{
 		cout << "[mai::CatalogueDetection::trainSVMs] ERROR! At least 2 categories needed." << endl;
-		return;
+		return false;
 	}
 
 	map<string, vector<vector<float> > > mNegativeTrain;
@@ -229,6 +230,8 @@ void mai::CatalogueDetection::trainSVMs(int iDataSetDivider,
 			cout << "[mai::CatalogueDetection::trainSVMs] Searching support vectors done." << endl;
 		}
 	}
+
+	return true;
 }
 
 void mai::CatalogueDetection::predict(map<string, TrainingData*> &mData,
