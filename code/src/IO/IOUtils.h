@@ -49,15 +49,39 @@ public:
 	 * @param bAddFlipped	add horizontally flipped version of each image
 	 * @param bEqualize		apply histogram equalization on images
 	 */
-	static bool loadCatalogue( std::map<std::string, DataSet*> &mImages,
+	static bool loadCatalogue(std::map<std::string, DataSet*> &mImages,
 				int iCVLoadMode,
 				const std::string &strDirectory,
 				bool bAddFlipped = true,
-				bool bEqualize = true );
+				bool bEqualize = true);
 
 	/**
 	 * Load all images from given directory in alphabetical order.
 	 *
+	 * Uses IO/IOUtils::loadAndAddImage
+	 *
+	 * @param[out] vImages	loaded images
+	 * @param iMode			OpenCV loading mode
+	 * @param directory		file path to load from
+	 * @param bEqualize		apply histogram equalization on images
+	 */
+	static bool loadImagesOrdered(std::vector<cv::Mat*> &vImages,
+			std::vector<std::string> &vImageNames,
+			int iMode,
+			const std::string &strDirectory,
+			bool bEqualize);
+
+	/**
+	 * Uses IO/IOUtils::loadImage
+	 */
+	static void loadAndAddImage(std::vector<cv::Mat*> &vImages,
+			std::vector<std::string> &vImageNames,
+			int iMode,
+			const std::string &strDirectoryItem,
+			bool bEqualize);
+
+	/**
+	 * Load image
 	 * OpenCV loading modes:
 	 * IMREAD_UNCHANGED  = -1, //!< If set, return the loaded image as is (with alpha channel, otherwise it gets cropped).
 	 * IMREAD_GRAYSCALE  = 0,  //!< If set, always convert image to the single channel grayscale image.
@@ -66,15 +90,16 @@ public:
 	 * IMREAD_ANYCOLOR   = 4,  //!< If set, the image is read in any possible color format.
 	 * IMREAD_LOAD_GDAL  = 8   //!< If set, use the gdal driver for loading the image.
 	 *
-	 * @param[out] vImages	loaded images
+	 * @param[out] image	loaded image
 	 * @param iMode			OpenCV loading mode
-	 * @param directory		file path to load from
-	 * @param bEqualize		apply histogram equalization on images
+	 * @param strFileName	file path to load from
+	 * @param bEqualize		apply histogram equalization on image
+	 *
 	 */
-	static bool loadImagesOrdered( std::vector<cv::Mat*> &vImages,
+	static bool loadImage(cv::Mat &image,
 			int iMode,
-			const std::string &strDirectory,
-			bool bEqualize );
+			const std::string &strFileName,
+			bool bEqualize = true);
 
 	/**
 	 * Load all images from given directory
@@ -102,6 +127,7 @@ public:
 	 * @param		iFlipmode	horizontally: > 0
 	 */
 	static void addFlippedImages( std::vector<cv::Mat*> &vImages,
+			std::vector<std::string> &vImageNames,
 			int iFlipMode );
 
 	/**

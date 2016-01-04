@@ -3,6 +3,7 @@ set( RelativeDir "src/data" )
 set( RelativeSourceGroup "Source Files\\data" )
 
 set( DirFiles
+	DataSet.cpp
 	DataSet.h
 	GenerateTestData.cpp
 	GenerateTestData.h

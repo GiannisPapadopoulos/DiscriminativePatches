@@ -15,14 +15,16 @@
 #include "IOUtils.h"
 #include "../Constants.h"
 #include "../data/DataSet.h"
+#include "../featureExtraction/umHOG.h"
+
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/ml/ml.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <iostream>
-#include "../featureExtraction/umHOG.h"
 
 using namespace cv;
 
@@ -60,17 +62,18 @@ bool mai::IOUtils::loadCatalogue(map<string, DataSet* > &mCatalogue,
 			string strLabelPath = itr->path().string();
 #endif
 
-			vector<Mat*> images;
+			vector<Mat*> vImages;
+			vector<string> vImageNames;
 
-			if(loadImagesOrdered(images, iCVLoadMode, strLabelPath, bEqualize))
+			if(loadImagesOrdered(vImages, vImageNames, iCVLoadMode, strLabelPath, bEqualize))
 			{
 				if(bAddFlipped)
 				{
-					addFlippedImages(images, 1);
+					addFlippedImages(vImages, vImageNames, 1);
 				}
 
 				DataSet* pData = new DataSet();
-				pData->setImages(images);
+				pData->setImages(vImages, vImageNames);
 
 #ifdef linux
 				string strLabel = itr->path().leaf().c_str();
@@ -87,6 +90,7 @@ bool mai::IOUtils::loadCatalogue(map<string, DataSet* > &mCatalogue,
 }
 
 bool mai::IOUtils::loadImagesOrdered(vector<Mat*> &vImages,
+		vector<string> &vImageNames,
 		int iMode,
 		const string &strDirectory,
 		bool bEqualize)
@@ -103,41 +107,121 @@ bool mai::IOUtils::loadImagesOrdered(vector<Mat*> &vImages,
 		cout << "[mai::IOUtils::loadImagesOrdered] Loading images from " << directory << endl;
 	}
 
-	vector<boost::filesystem::path>  v;                                // so we can sort them later
+	// so we can sort them later
+	vector<boost::filesystem::path> catalogueRoot;
 
-	copy(boost::filesystem::directory_iterator(directory), boost::filesystem::directory_iterator(), back_inserter(v));
-	sort(v.begin(), v.end());
+	copy(boost::filesystem::directory_iterator(directory), boost::filesystem::directory_iterator(), back_inserter(catalogueRoot));
+	sort(catalogueRoot.begin(), catalogueRoot.end());
 
-    for (vector<boost::filesystem::path>::const_iterator itr (v.begin()); itr != v.end(); ++itr)
+    for (vector<boost::filesystem::path>::const_iterator itrCR (catalogueRoot.begin()); itrCR != catalogueRoot.end(); ++itrCR)
     {
-    	if ( !is_directory(*itr) )
-    	{
-#ifdef linux
-    		Mat image = imread( itr->c_str(), iMode );
-#else
-    		Mat image = imread( itr->string(), iMode );
-#endif
-    		if( !image.empty() )// Check for valid input
-    		{
-    			if(Constants::DEBUG_IMAGE_LOADING) {
-    				cout << "[mai::IOUtils::loadImagesOrdered] Image loaded successfully: " << *itr << endl;
-    			}
+    	boost::filesystem::path directoryItem = *itrCR;
 
-    			Mat* pImage;
-    			if (bEqualize) {
-    				cvtColor(image, image, CV_BGR2GRAY);
-    				equalizeHist(image, image);
-    			}
-    			pImage = new Mat(image);
-    			vImages.push_back(pImage);
-    		}
-    		else
+    	if (!is_directory(directoryItem))
+    	{
+
+#ifdef linux
+    		string strDirectoryItem = directoryItem.c_str();
+#else
+    		string strDirectoryItem = directoryItem.string();
+#endif
+
+    		loadAndAddImage(vImages,
+    				vImageNames,
+					iMode,
+					strDirectoryItem,
+					bEqualize);
+    	}
+    	else
+    	{
+    		boost::filesystem::path subDirectory( boost::filesystem::initial_path<boost::filesystem::path>() );
+    		subDirectory = boost::filesystem::system_complete(directoryItem);
+
+    		// so we can sort them later
+    		vector<boost::filesystem::path> subDirectories;
+
+    		copy(boost::filesystem::directory_iterator(subDirectory), boost::filesystem::directory_iterator(), back_inserter(subDirectories));
+    		sort(subDirectories.begin(), subDirectories.end());
+
+    		for (vector<boost::filesystem::path>::const_iterator itrSD (subDirectories.begin()); itrSD != subDirectories.end(); ++itrSD)
     		{
-    			cout << "[mai::IOUtils::loadImagesOrdered] ERROR loading Image: " << *itr << endl;
+    			boost::filesystem::path subDirectoryItem = *itrSD;
+
+    			if (!is_directory(subDirectoryItem))
+    	    	{
+
+#ifdef linux
+    				string strDirectoryItem = directoryItem.c_str();
+#else
+    				string strDirectoryItem = directoryItem.string();
+#endif
+
+    				loadAndAddImage(vImages,
+    						vImageNames,
+							iMode,
+							strDirectoryItem,
+							bEqualize);
+    	    	}
     		}
     	}
     }
 	return true;
+}
+
+void mai::IOUtils::loadAndAddImage(vector<Mat*> &vImages,
+			vector<string> &vImageNames,
+			int iMode,
+			const string &strDirectoryItem,
+			bool bEqualize)
+{
+	boost::filesystem::path directory( boost::filesystem::initial_path<boost::filesystem::path>() );
+	directory = boost::filesystem::system_complete( boost::filesystem::path(strDirectoryItem) );
+
+#ifdef linux
+	string strFullFileName = directory.c_str();
+	string strFilename = directory.leaf().c_str();
+#else
+	string strFullFileName = directory.string();
+	string strFilename = directory.leaf().string();
+#endif
+
+	Mat image;
+
+	if(loadImage(image, iMode, strFullFileName, bEqualize))
+	{
+		Mat* pImage = new Mat(image);
+		vImages.push_back(pImage);
+		vImageNames.push_back(strFilename);
+	}
+}
+
+bool mai::IOUtils::loadImage(Mat &image,
+			int iMode,
+			const string &strFileName,
+			bool bEqualize)
+{
+
+	image = imread(strFileName, iMode);
+
+	if(!image.empty())// Check for valid input
+	{
+		if(Constants::DEBUG_IMAGE_LOADING) {
+			cout << "[mai::IOUtils::loadImagesOrdered] Image loaded successfully: " << strFileName << endl;
+		}
+
+		Mat* pImage;
+		if (bEqualize) {
+			cvtColor(image, image, CV_BGR2GRAY);
+			equalizeHist(image, image);
+		}
+
+		return true;
+	}
+	else
+	{
+		cout << "[mai::IOUtils::loadImagesOrdered] ERROR loading Image: " << strFileName << endl;
+		return false;
+	}
 }
 
 bool mai::IOUtils::loadImages(vector<Mat*> &vImages,
@@ -199,12 +283,14 @@ bool mai::IOUtils::loadImages(vector<Mat*> &vImages,
 }
 
 void mai::IOUtils::addFlippedImages(vector<Mat*> &vImages,
+		std::vector<std::string> &vImageNames,
 		int iFlipMode)
 {
 	vector<Mat*> vDoubledImages;
 
-	for( Mat* image : vImages)
+	for(int i = 0; i < vImages.size(); ++i)
 	{
+		Mat* image = vImages.at(i);
 		Mat flippedImage;
 		flip(*image, flippedImage, iFlipMode);
 
@@ -212,6 +298,24 @@ void mai::IOUtils::addFlippedImages(vector<Mat*> &vImages,
 		{
 			Mat* pImage = new Mat(flippedImage);
 			vDoubledImages.push_back(pImage);
+
+			// Add new name for new image
+			std::vector<std::string> strs;
+			boost::split(strs, vImageNames.at(i), boost::is_any_of("."));
+
+			std::stringstream ss;
+			for(int j = 0; j < strs.size(); ++j)
+			{
+				if(j == strs.size() - 1)
+				{
+					ss << "_flipped." << strs.at(j);
+				}
+				else
+				{
+					ss << strs.at(j);
+				}
+			}
+			vImageNames.push_back(ss.str());
 		}
 	}
 

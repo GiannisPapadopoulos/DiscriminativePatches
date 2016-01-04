@@ -18,7 +18,6 @@
 #include <opencv2/core/core.hpp>
 
 #include <vector>
-#include <iostream>
 
 namespace mai{
 
@@ -50,9 +49,10 @@ public:
 		m_vData.clear();
 	};
 
-	unsigned int addImage(cv::Mat* image)
+	unsigned int addImage(cv::Mat* image,
+			std::string &strImageName)
 	{
-		m_vData.push_back(new ImageWithDescriptors(image));
+		m_vData.push_back(new ImageWithDescriptors(image, strImageName));
 		setMaxImageDimensions(image);
 		return m_vData.size() - 1;
 	};
@@ -71,29 +71,20 @@ public:
 		return NULL;
 	};
 
-	bool addDescriptorValuesToImageAt(int iIndex, const std::vector<float> &vDescriptorValues)
-	{
-		if(m_vData[iIndex] != NULL)
+	std::string getImageNameAt(int iIndex) const
 		{
-			if(m_iDescriptorSize == 0)
+			if(m_vData[iIndex] != NULL)
 			{
-				m_iDescriptorSize = vDescriptorValues.size();
+				return m_vData[iIndex]->getImageName();
 			}
-			if (m_iDescriptorSize == vDescriptorValues.size())
-			{
-				m_vData[iIndex]->setDescriptorValues(vDescriptorValues);
-				return true;
-			}
-			else
-			{
-				std::cout << "[DataSet::addDescriptorValuesToImageAt] ERROR! Descriptor values have to be of same size : "
-						<< m_iDescriptorSize  << "; But index " << iIndex << " has " << vDescriptorValues.size() << std::endl;
-			}
-		}
-		return false;
-	};
+			return "";
+		};
 
-	bool getDescriptorValuesFromImageAt(int iIndex, std::vector<float> &vDescriptorValues)
+	bool addDescriptorValuesToImageAt(int iIndex,
+			const std::vector<float> &vDescriptorValues);
+
+	bool getDescriptorValuesFromImageAt(int iIndex,
+			std::vector<float> &vDescriptorValues)
 	{
 		if(m_vData[iIndex] != NULL)
 		{
@@ -103,14 +94,8 @@ public:
 		return false;
 	};
 
-	int setImages(std::vector<cv::Mat*> &vImages)
-	{
-		for( cv::Mat* image : vImages)
-		{
-			addImage(image);
-		}
-		return m_vData.size();
-	};
+	int setImages(std::vector<cv::Mat*> &vImages,
+			std::vector<std::string> &vImageNames);
 
 	void getMaxDImensions(int &iMaxWidth, int &iMaxHeight) const
 	{
@@ -128,20 +113,9 @@ public:
 		return m_iDescriptorSize;
 	};
 
-	void getDescriptorsSeparated(int iDivider, std::vector<std::vector<float> > &vFirstPart, std::vector<std::vector<float> > &vSecondPart)
-	{
-		int iPercentageValidationImages = m_vData.size()/iDivider > 1 ? m_vData.size()/iDivider : 1;
-
-		for(std::vector<ImageWithDescriptors*>::const_iterator it = m_vData.begin(); it != m_vData.begin() + iPercentageValidationImages; it++)
-		{
-			vFirstPart.push_back((*it)->getDescriptorValues());
-		}
-
-		for(std::vector<ImageWithDescriptors*>::const_iterator it = m_vData.begin() + iPercentageValidationImages; it != m_vData.end(); it++)
-		{
-			vSecondPart.push_back((*it)->getDescriptorValues());
-		}
-	};
+	void getDescriptorsSeparated(int iDivider,
+			std::vector<std::vector<float> > &vFirstPart,
+			std::vector<std::vector<float> > &vSecondPart);
 
 private:
 
@@ -151,8 +125,10 @@ private:
 	class ImageWithDescriptors
 	{
 	public:
-		ImageWithDescriptors(cv::Mat* pImage)
+		ImageWithDescriptors(cv::Mat* pImage,
+				std::string strImageName)
 			: m_pImage(pImage)
+			, m_strImageName(strImageName)
 		{};
 
 		virtual ~ImageWithDescriptors()
@@ -164,8 +140,8 @@ private:
 			return m_pImage;
 		};
 
-		void setImage(cv::Mat* pImage) {
-			m_pImage = pImage;
+		std::string getImageName() const {
+			return m_strImageName;
 		};
 
 		const std::vector<float>& getDescriptorValues() const {
@@ -179,21 +155,12 @@ private:
 	private:
 		cv::Mat*			m_pImage;
 		std::vector<float>	m_vDescriptorValues;
+		std::string			m_strImageName;
 	};
 
-	void setMaxImageDimensions(cv::Mat* image)
-	{
-		cv::Size s = image->size();
-		int iW = s.width;
-		int iH = s.height;
+	void setMaxImageDimensions(cv::Mat* image);
 
-		if((m_iMaxHeight != 0 && m_iMaxHeight != iH) || (m_iMaxWidth != 0 && m_iMaxWidth != iW))
-		{
-			m_bImageSizesUniform = false;
-		}
-		m_iMaxWidth = std::max(m_iMaxWidth, iW);
-		m_iMaxHeight = std::max(m_iMaxHeight, iH);
-	};
+	std::string getFirstSplitBy(const std::string &strToSplit, const std::string &strDelimiter);
 
 	std::vector<ImageWithDescriptors*>	m_vData;
 
