@@ -32,6 +32,7 @@
 #include <iostream>
 #include "featureExtraction/umHOG.h"
 
+
 using namespace cv;
 
 using namespace std;
@@ -58,6 +59,7 @@ mai::UDoMLDP::~UDoMLDP()
 void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string &strFilePathNegatives)
 {
 	std::vector<Mat*> images;
+	std::vector<std::string> imageNames;
 
 	IOUtils::loadImages ( images, IMREAD_COLOR, strFilePathPositives );
 	cout << "Num positive images " << images.size() << endl;
@@ -70,11 +72,11 @@ void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string 
 	std::vector<Mat*> images2Half(std::make_move_iterator(images.begin() + iPercentageValidationImages), std::make_move_iterator(images.end()));
 	images.erase(images.begin() + iPercentageValidationImages, images.end());
 
-	IOUtils::addFlippedImages( images2Half, 1 );
-	IOUtils::addFlippedImages( images, 1 );
+	IOUtils::addFlippedImages( images2Half, imageNames, 1 );
+	IOUtils::addFlippedImages( images, imageNames, 1 );
 
-	m_pPositiveTrain->setImages(images2Half);
-	m_pPositiveValid->setImages(images);
+	m_pPositiveTrain->setImages(images2Half, imageNames);
+	m_pPositiveValid->setImages(images, imageNames);
 
 	int iMH, iMW;
 	m_pPositiveTrain->getMaxDImensions(iMW, iMH);
@@ -91,11 +93,11 @@ void mai::UDoMLDP::basicDetecion(std::string &strFilePathPositives, std::string 
 	std::vector<Mat*> images2HalfNeg(std::make_move_iterator(images.begin() + iPercentageValidationImages), std::make_move_iterator(images.end()));
 	images.erase(images.begin() + iPercentageValidationImages, images.end());
 
-	IOUtils::addFlippedImages( images2HalfNeg, 1 );
-	IOUtils::addFlippedImages( images, 1 );
+	IOUtils::addFlippedImages( images2HalfNeg, imageNames, 1 );
+	IOUtils::addFlippedImages( images, imageNames, 1 );
 
-	m_pNegativeTrain->setImages(images2HalfNeg);
-	m_pNegativeValid->setImages(images);
+	m_pNegativeTrain->setImages(images2HalfNeg, imageNames);
+	m_pNegativeValid->setImages(images, imageNames);
 
 	m_pNegativeTrain->getMaxDImensions(iMW, iMH);
 	cout << "Num negative training images: " << m_pNegativeTrain->getImageCount() << ", Max dimensions: " << iMW << "x" << iMH << endl;
