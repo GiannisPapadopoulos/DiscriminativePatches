@@ -35,7 +35,7 @@ class CatalogueDetection
 {
 public:
 	/**
-	 * Initializes object
+	 * Load image catalogue according to configuration
 	 */
 	CatalogueDetection(Configuration* config);
 
@@ -45,7 +45,10 @@ public:
 	virtual ~CatalogueDetection();
 
 	/**
-	 *
+	 * Compute HOG features
+	 * Setup training and validation data
+	 * Train SVM
+	 * Predict data
 	 */
 	void processPipeline();
 
@@ -54,6 +57,8 @@ private:
 	/**
 	 * Computes HOG descriptors for all Datasets in catalogue.
 	 * @see featureExtraction/umHOG::computeHOGForDataSet
+	 *
+	 * param bWriteHOGImages	write HOG visualization to local folder "out"
 	 */
 	void computeHOG(cv::Size imageSize,
 				cv::Size blockSize,
@@ -61,7 +66,9 @@ private:
 				cv::Size cellSize,
 				int iNumBins,
 				cv::Size winStride,
-				cv::Size padding);
+				cv::Size padding,
+				bool bWriteHOGImages = false,
+				bool bApplyPCA = false);
 
 	/**
 	 * @see svm/umSVM::train
@@ -99,7 +106,8 @@ private:
 	/**
 	 * Predicts validation data divided from datasets for each expression svm.
 	 */
-	void predict();
+	void predict(std::map<std::string, TrainingData*> &mData,
+			std::map<std::string, cv::Mat> &mResults);
 
 
 	std::map<std::string, DataSet*> m_mCatalogue;

@@ -92,19 +92,44 @@ void mai::CatalogueDetection::processPipeline()
 
 	int iDataSetDivider = m_Config->getDataSetDivider();
 
+	bool bPredictTrainingData = m_Config->getPredictTrainingData();
+
+	bool bWriteHOGImages= m_Config->getWriteHogImages();
+
+	bool bApplyPCA = m_Config->getApplyPCA();
+
 	computeHOG(imageSize,
 			blockSize,
 			blockStride,
 			cellSize,
 			iNumBins,
 			winStride,
-			padding);
+			padding,
+			bWriteHOGImages,
+			bApplyPCA);
 
 	trainSVMs(iDataSetDivider);
 
+	if(bPredictTrainingData)
+	{
+		cout << "#-------------------------------------------------------------------------------#" << endl;
+		cout << "[mai::CatalogueDetection::processPipeline] SVM prediction on training data." << endl;
+
+		map<string, Mat> mTrainingResults;
+		predict(m_mTrain, mTrainingResults);
+
+		cout << "#-------------------------------------------------------------------------------#" << endl;
+	}
+
 	if(iDataSetDivider > 1)
 	{
-		predict();
+		cout << "#-------------------------------------------------------------------------------#" << endl;
+		cout << "[mai::CatalogueDetection::processPipeline] SVM prediction on validation data." << endl;
+
+		map<string, Mat> mValidationResults;
+		predict(m_mValidate, mValidationResults);
+
+		cout << "#-------------------------------------------------------------------------------#" << endl;
 	}
 }
 
@@ -114,7 +139,9 @@ void mai::CatalogueDetection::computeHOG(Size imageSize,
 		Size cellSize,
 		int iNumBins,
 		Size winStride,
-		Size padding)
+		Size padding,
+		bool bWriteHOGImages,
+		bool bApplyPCA)
 {
 	for(map<string, DataSet*>::iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); it++)
 	{
@@ -125,9 +152,10 @@ void mai::CatalogueDetection::computeHOG(Size imageSize,
 					cellSize,
 					iNumBins,
 					winStride,
-					padding);
+					padding,
+					bApplyPCA);
 
-		if(Constants::WRITE_HOG_IMAGES)
+		if(bWriteHOGImages)
 		{
 			string strName = it->first;
 			string strPath = "out";
@@ -203,12 +231,11 @@ void mai::CatalogueDetection::trainSVMs(int iDataSetDivider,
 	}
 }
 
-void mai::CatalogueDetection::predict()
+void mai::CatalogueDetection::predict(map<string, TrainingData*> &mData,
+		map<string, Mat> &mResults)
 {
-	map<string, Mat> mResults;
-
-	for(std::map<std::string, TrainingData*>::const_iterator it = m_mValidate.begin();
-			it != m_mValidate.end(); it++)
+	for(map<string, TrainingData*>::const_iterator it = mData.begin();
+			it != mData.end(); it++)
 	{
 		string strName = it->first;
 		umSVM* svm = m_mSVMs.at(strName);

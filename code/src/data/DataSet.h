@@ -23,7 +23,7 @@
 namespace mai{
 
 /**
- * Dataset with images and features
+ * Dataset with images and corresponding feature vectors
  */
 class DataSet
 {

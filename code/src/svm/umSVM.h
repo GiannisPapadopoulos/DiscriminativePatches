@@ -26,24 +26,28 @@ namespace mai{
 class DataSet;
 
 /**
- * Doxygen comments
- * Class description
+ * OpenCV Support Vector MAchine application
+ *
+ * @see http://docs.opencv.org/2.4/modules/ml/doc/support_vector_machines.html#
  */
 class umSVM
 {
 public:
 	/**
 	 * Initializes object
+	 *
+	 * @param dCValue	penalty multiplier for outliers on imperfect separation.
 	 */
 	umSVM(double dCValue = 0.1);
 
 	/**
-	 * Deletes something
+	 * Deletes CvSVM
 	 */
 	virtual ~umSVM();
 
 	/**
-	 * Train with standard parameters
+	 * Train linear SVM with standard parameters
+	 *
 	 * @param data		training data
 	 * @param labels	labels
 	 * @param[out] vSupport	support vectors
@@ -55,12 +59,19 @@ public:
 
 	/**
 	 * Predict the given image
+	 *
 	 * @param data		input image
 	 * @param bReturnfDFValue	return DFValue or label (@see OpenCV documentation)
 	 * @return	label(false) or value depending on bReturnfDFValue
 	 */
 	float predict(const cv::Mat &data, bool bReturnfDFValue = false);
 
+	/**
+	 * Predict the given data
+	 *
+	 * @param data		input matrix, images row-wise
+	 * @param results	prediction results corresponding row-wise ( labels of type float )
+	 */
 	void predict(const cv::Mat &data, cv::Mat &results);
 
 	/**
@@ -74,12 +85,23 @@ public:
 	void loadSVM(const std::string &strFilename);
 
 	/**
+	 * Search vectors of vSupport in input data vData
+	 *
+	 * @param vData		svm training data
+	 * @param vSupport	svm support vectors
 	 * @param bSort		should the vectors be sorted before comparison ?
 	 */
 	static void searchSupportVector(std::vector<std::vector<float> > &vData,
 				std::vector<std::vector<float> > &vSupport,
 				bool bSort = false);
 
+	/**
+	 * Search vectors of vSupport in input data data
+	 *
+	 * @param data		svm training data
+	 * @param vSupport	svm support vectors
+	 * @param bSort		should the vectors be sorted before comparison ?
+	 */
 	static void searchSupportVector(DataSet* data,
 			std::vector<std::vector<float> > &vSupport,
 			bool bSort = false);

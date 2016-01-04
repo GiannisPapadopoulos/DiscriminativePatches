@@ -51,30 +51,7 @@ public:
 		return m_Labels;
 	};
 
-//	void setNegatives(std::vector<std::vector<float> > &vFeatures);
-//
-//	/**
-//	 * Create training data matrix from positive and negative images with corresponding label matrix.
-//	 * Images are sampled according to max dimensions if not set otherwise.
-//	 * @param[out] data		positive and negative images, toye of CV_32FC1
-//	 * @param[out] labels	1, -1, type of CV_32SC1
-//	 */
-//	void getUniformTrainingData( cv::Mat &data, cv::Mat &labels );
-//
-//	/**
-//	 * Set dimensions for sampling.
-//	 * Default is max dimension of all images in positives and negatives.
-//	 */
-//	void setUniformImageDimensions( int iHeight, int iWidth );
-
-
 private:
-
-//	void setMaxImageDimensions( cv::Mat image );
-//
-//	void sampleImage( cv::Mat &vimage, cv::Mat &sampledImages );
-//
-//	void addImageToData( cv::Mat data, cv::Mat image, int iPos);
 
 	cv::Mat	m_Data;
 	cv::Mat	m_Labels;

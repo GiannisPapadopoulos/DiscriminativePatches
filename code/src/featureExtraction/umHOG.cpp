@@ -44,7 +44,8 @@ void mai::umHOG::computeHOGForDataSet(DataSet* data,
 		Size cellSize,
 		int iNumBins,
 		Size winStride,
-		Size padding)
+		Size padding,
+		bool bApplyPCA)
 {
 	for(unsigned int i = 0; i < data->getImageCount(); ++i)
 	{
@@ -58,7 +59,15 @@ void mai::umHOG::computeHOGForDataSet(DataSet* data,
 
 		vector<float> descriptorsValues;
 
-		umHOG::extractFeatures(descriptorsValues, resizedImage, blockSize, blockStride, cellSize, iNumBins, winStride, padding);
+		umHOG::extractFeatures(descriptorsValues,
+				resizedImage,
+				blockSize,
+				blockStride,
+				cellSize,
+				iNumBins,
+				winStride,
+				padding,
+				bApplyPCA);
 
 		data->addDescriptorValuesToImageAt(i, descriptorsValues);
 	}
@@ -71,7 +80,8 @@ void mai::umHOG::extractFeatures(vector<float> &descriptorsValues,
 								Size cellSize,
 								int iNumBins,
 								Size winStride,
-								Size padding)
+								Size padding,
+								bool bApplyPCA)
 {
 	Size sizeImage = image.size();
 
@@ -81,17 +91,26 @@ void mai::umHOG::extractFeatures(vector<float> &descriptorsValues,
 
 	HOGDescriptor hog( sizeImage, blockSize, blockStride, cellSize, iNumBins);
 
-//	vector<float> reducedFeatures;
 	vector< Point> locations;
-//	hog.compute( image, reducedFeatures, winStride, padding, locations);
-	hog.compute( image, descriptorsValues, winStride, padding, locations);
 
+	if(bApplyPCA)
+	{
+		vector<float> unreducedFeatures;
+		hog.compute( image, unreducedFeatures, winStride, padding, locations);
 
-//	umPCA::decreaseHOGDescriptorCellsByPCA(
-//			reducedFeatures,
-//			descriptorsValues,
-//			Constants::HOG_BINS);
+		umPCA::decreaseHOGDescriptorCellsByPCA(
+				unreducedFeatures,
+				descriptorsValues,
+				iNumBins);
 
+		if(Constants::DEBUG_HOG) {
+			cout << "[mai::cvHOG::extractFeatures] Applied PCA reduction, original feature size: " << unreducedFeatures.size() << endl;
+		}
+	}
+	else
+	{
+		hog.compute( image, descriptorsValues, winStride, padding, locations);
+	}
 
 	if(Constants::DEBUG_HOG) {
 		cout << "[mai::cvHOG::extractFeatures] descriptor size: " << descriptorsValues.size() << endl;

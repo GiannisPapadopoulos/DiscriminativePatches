@@ -25,7 +25,7 @@ namespace mai{
 class DataSet;
 
 /**
- * Input and output tools
+ * OpenCV Histogram of Oriented Gradients
  */
 class umHOG
 {
@@ -42,7 +42,7 @@ public:
 	 * @see class DataSet::ImageWithDescriptors
 	 *
 	 * Method used:
-	 * @see featureExtraction/cvHOG::extractFeatures
+	 * @see featureExtraction/umHOG::extractFeatures
 	 *
 	 * @param data			from which features are extracted
 	 * @param blockSize
@@ -59,7 +59,8 @@ public:
 			cv::Size cellSize = cv::Size(8,8),
 			int iNumBins = 9,
 			cv::Size winStride = cv::Size(0,0),
-			cv::Size padding = cv::Size(0,0));
+			cv::Size padding = cv::Size(0,0),
+			bool bApplyPCA = false);
 
 	/**
 	 * Block size and block stride have to multiples of cell size.
@@ -69,14 +70,17 @@ public:
 	 * Blocks per image = ((img.width / blockStride) - (block.width / blockStride - 1)) * ((img.height / blockStride) - (block.height / blockStride - 1))
 	 * Descriptor values are column major.
 	 *
+	 * @see http://docs.opencv.org/ref/2.4/d5/d33/structcv_1_1HOGDescriptor.html
+	 *
 	 * @param[out] descriptorsValues	extracted features
-	 * @param[in] image			from which features are extracted
+	 * @param[in] image		from which features are extracted
 	 * @param blockSize
 	 * @param blockStride
 	 * @param cellSize
 	 * @param iNumBins
 	 * @param winStride		?
 	 * @param padding		?
+	 * @param bApplyPCA		reduce features by applying PCA. @see featureExtraction/umPCA::decreaseHOGDescriptorCellsByPCA
 	 */
 	static void extractFeatures(std::vector<float> &descriptorsValues,
 			cv::Mat &image,
@@ -85,7 +89,8 @@ public:
 			cv::Size cellSize = cv::Size(8,8),
 			int iNumBins = 9,
 			cv::Size winStride = cv::Size(0,0),
-			cv::Size padding = cv::Size(0,0));
+			cv::Size padding = cv::Size(0,0),
+			bool bApplyPCA = false);
 
 	/**
 	 * Visualize HOG descriptor on image

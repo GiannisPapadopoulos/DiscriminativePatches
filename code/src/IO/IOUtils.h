@@ -37,12 +37,40 @@ public:
 	 */
 	virtual ~IOUtils();
 
+	/**
+	 * Load all images from given directory containing labeled image catalogue.
+	 * Subfolders define label separation, their names define the labels themselves.
+	 *
+	 * Uses IO/IOUtils::loadImagesOrdered
+	 *
+	 * @param[out] vImages	loaded images
+	 * @param iMode			OpenCV loading mode
+	 * @param directory		file path to load from
+	 * @param bAddFlipped	add horizontally flipped version of each image
+	 * @param bEqualize		apply histogram equalization on images
+	 */
 	static bool loadCatalogue( std::map<std::string, DataSet*> &mImages,
 				int iCVLoadMode,
 				const std::string &strDirectory,
 				bool bAddFlipped = true,
 				bool bEqualize = true );
 
+	/**
+	 * Load all images from given directory in alphabetical order.
+	 *
+	 * OpenCV loading modes:
+	 * IMREAD_UNCHANGED  = -1, //!< If set, return the loaded image as is (with alpha channel, otherwise it gets cropped).
+	 * IMREAD_GRAYSCALE  = 0,  //!< If set, always convert image to the single channel grayscale image.
+	 * IMREAD_COLOR      = 1,  //!< If set, always convert image to the 3 channel BGR color image.
+	 * IMREAD_ANYDEPTH   = 2,  //!< If set, return 16-bit/32-bit image when the input has the corresponding depth, otherwise convert it to 8-bit.
+	 * IMREAD_ANYCOLOR   = 4,  //!< If set, the image is read in any possible color format.
+	 * IMREAD_LOAD_GDAL  = 8   //!< If set, use the gdal driver for loading the image.
+	 *
+	 * @param[out] vImages	loaded images
+	 * @param iMode			OpenCV loading mode
+	 * @param directory		file path to load from
+	 * @param bEqualize		apply histogram equalization on images
+	 */
 	static bool loadImagesOrdered( std::vector<cv::Mat*> &vImages,
 			int iMode,
 			const std::string &strDirectory,
@@ -60,7 +88,7 @@ public:
 	 *
 	 * @param[out] vImages	loaded images
 	 * @param iMode			OpenCV loading mode
-	 * @param directory		file path to laod from
+	 * @param directory		file path to load from
 	 */
 	static bool loadImages( std::vector<cv::Mat*> &vImages,
 			int iMode,
@@ -162,6 +190,8 @@ public:
 
 	/**
 	 * Write gradiented image as jpgs to a folder with indexed filename strFileNameBase_Index.jpg
+	 *
+	 * Uses featureExtraction/umHOG::getHOGDescriptorVisualImage
 	 *
 	 * @param[in] data		images and descriptorvalues to write
 	 * @param strPath		existing filesystem folder without trailing slash

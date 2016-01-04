@@ -16,46 +16,21 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
-#include <boost/optional.hpp>
 
 #include <iostream>
 
 using namespace std;
 using namespace cv;
 
-struct string_to_int_translator
-{
-	typedef std::string internal_type;
-	typedef int external_type;
-
-	boost::optional<int> get_value(const std::string &s)
-	{
-		char *c;
-		long l = std::strtol(s.c_str(), &c, 10);
-		return boost::make_optional(c != s.c_str(), static_cast<int>(l));
-	}
-};
-
-struct string_to_double_translator
-{
-	typedef std::string internal_type;
-	typedef double external_type;
-
-	boost::optional<double> get_value(const std::string &s)
-	{
-		char *c;
-		double d = std::strtod(s.c_str(), &c);
-		return boost::make_optional(c != s.c_str(), static_cast<double>(d));
-	}
-};
 
 mai::Configuration::Configuration(string &strFilename)
 {
 	boost::property_tree::ptree pt;
 	boost::property_tree::ini_parser::read_ini("config.ini", pt);
 
-	string_to_int_translator trInt;
-	string_to_double_translator trDouble;
+	StringToIntTranslator trInt;
+	StringToDoubleTranslator trDouble;
+	StringToBoolTranslator trBool;
 
 	m_CellSize = Size(pt.get<int>("HOG.CELLSIZE_X", trInt), pt.get<int>("HOG.CELLSIZE_Y", trInt));
 	m_BlockStride = Size(pt.get<int>("HOG.BLOCKSTRIDE_X", trInt), pt.get<int>("HOG.BLOCKSTRIDE_Y", trInt));
@@ -63,6 +38,9 @@ mai::Configuration::Configuration(string &strFilename)
 	m_ImageSize = Size(pt.get<int>("HOG.IMAGE_SIZE_X", trInt), pt.get<int>("HOG.IMAGE_SIZE_Y", trInt));
 	m_iNumBins = pt.get<int>("HOG.BINS", trInt);
 
+	m_bApplyPCA = pt.get<bool>("HOG.APPLY_PCA", trBool);
+
+	m_bWriteHOGImages = pt.get<bool>("HOG.WRITE_HOGIMAGES", trBool);
 	m_iHOGVizImageScalefactor = pt.get<int>("HOG.VIZ_IMAGE_SCALEFACTOR", trInt);
 	m_dHOGVizBinScalefactor = pt.get<double>("HOG.VIZ_BIN_SCALEFACTOR", trDouble);
 
@@ -71,4 +49,14 @@ mai::Configuration::Configuration(string &strFilename)
 
 	m_dSVMCValue = pt.get<double>("SVM.C_VALUE", trDouble);
 
+	m_bPredictTrainingData = pt.get<bool>("SVM.PREDICT_TRAININGDATA", trBool);
+
 }
+
+bool mai::Configuration::convertStringToBool(std::string str) {
+	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+	std::istringstream is(str);
+	bool b;
+	is >> std::boolalpha >> b;
+	return b;
+};
