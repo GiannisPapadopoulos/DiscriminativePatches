@@ -3,8 +3,8 @@ set( RelativeDir "src/featureExtraction" )
 set( RelativeSourceGroup "Source Files\\featureExtraction" )
 
 set( DirFiles
-	cvHOG.cpp
-	cvHOG.h
+	umHOG.cpp
+	umHOG.h
 	umPCA.cpp
 	umPCA.h
 )
