@@ -26,7 +26,7 @@ namespace mai{
 class DataSet;
 
 /**
- * OpenCV Support Vector MAchine application
+ * OpenCV Support Vector Machine application
  *
  * @see http://docs.opencv.org/2.4/modules/ml/doc/support_vector_machines.html#
  */

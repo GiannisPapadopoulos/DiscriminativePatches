@@ -32,7 +32,6 @@ using namespace cv;
 using namespace std;
 
 mai::umHOG::umHOG()
-//	: m_pHOG(new HOGDescriptor)
 {}
 mai::umHOG::~umHOG()
 {}
@@ -47,6 +46,7 @@ void mai::umHOG::computeHOGForDataSet(DataSet* data,
 		Size padding,
 		bool bApplyPCA)
 {
+	// Extract features from all images in dataset.
 	for(unsigned int i = 0; i < data->getImageCount(); ++i)
 	{
 		const Mat* image = data->getImageAt(i);
@@ -86,7 +86,8 @@ void mai::umHOG::extractFeatures(vector<float> &descriptorsValues,
 	Size sizeImage = image.size();
 
 	if(Constants::DEBUG_HOG) {
-		cout << "[mai::cvHOG::extractFeatures] computing HOG with blocksize " << blockSize << ", blockstride " << blockStride << ", cellSize " << cellSize << ", num Bins " << iNumBins << endl;
+		cout << "[mai::cvHOG::extractFeatures] computing HOG with blocksize " << blockSize
+				<< ", blockstride " << blockStride << ", cellSize " << cellSize << ", num Bins " << iNumBins << endl;
 	}
 
 	HOGDescriptor hog( sizeImage, blockSize, blockStride, cellSize, iNumBins);

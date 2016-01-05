@@ -30,17 +30,15 @@ int main(int argc, char** argv )
 {
 	if(argc < 2)
 	{
-		cerr << "Usage:" << endl
+		cerr << "Train svms on categorized image catalogue." << endl
+			<< "Usage:" << endl
 			<< argv[0] << " [options]" << endl
 			<< "options:" << endl
-			<< "\t-config <config file>\tTrain svms on categorized data catalogue. Expects name and path to a configuration file defining application settings." << endl;
+			<< "\t-config <config file>\tname and path to a configuration file defining application settings." << endl;
 		return -1;
 	}
 
 	string strConfigFile;
-
-	string strFilepathPositives;
-	string strFilepathNegatives;
 
 	for(int i = 0; i < argc; ++i)
 	{
@@ -50,42 +48,10 @@ int main(int argc, char** argv )
 			{
 				strConfigFile = string(argv[i+1]);
 
-				Configuration* config = new Configuration(strConfigFile);
-				CatalogueDetection* main = new CatalogueDetection(config);
-				main->processPipeline();
-				delete main;
-
-				return 0;
 			}
 			else
 			{
-				cerr << "ERROR: Option -catalogue given without filepath." << endl;
-				return -1;
-			}
-		}
-
-		if(string(argv[i]) == "-pos")
-		{
-			if(i+1 < argc)
-			{
-				strFilepathPositives = string(argv[i+1]);
-			}
-			else
-			{
-				cerr << "ERROR: Option -pos given without filepath." << endl;
-				return -1;
-			}
-		}
-
-		if(string(argv[i]) == "-neg")
-		{
-			if(i+1 < argc)
-			{
-				strFilepathNegatives = string(argv[i+1]);
-			}
-			else
-			{
-				cerr << "ERROR: Option -neg given without filepath." << endl;
+				cerr << "ERROR: Option -config given without filepath." << endl;
 				return -1;
 			}
 		}
@@ -119,17 +85,10 @@ int main(int argc, char** argv )
 		}
 	}
 
-	//strFilepathPositives = "/home/stefan/Documents/AI/project_1/bsps";
-	//strFilepathNegatives = "/home/stefan/Documents/AI/project_1/bsps";
+	Configuration* config = new Configuration(strConfigFile);
 
-
-	// Use EITHER this one for testing
-	//UDoMLDP::unsupervisedDiscovery(strFilepathPositives, strFilepathNegatives);
-
-
-	// OR this one
-	UDoMLDP* main = new UDoMLDP();
-	main->basicDetecion(strFilepathPositives, strFilepathNegatives);
+	CatalogueDetection* main = new CatalogueDetection(config);
+	main->processPipeline();
 	delete main;
 
 	return 0;

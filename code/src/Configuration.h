@@ -30,24 +30,38 @@ class Configuration
 {
 public:
 	/**
-	 * Initializes object
+	 * Loads settings from given configuration file
+	 *
+	 * @param strFilename	path and name of configuration file
 	 */
 	Configuration(std::string &strFilename);
 
 	/**
-	 * Deletes something
+	 * Nothing to delete here.
 	 */
 	virtual ~Configuration()
 	{};
 
+	/**
+	 * OpenCV Documentation says that block size has to be 16x16. Other values are not supported.
+	 * Experiments say otherwise !?
+	 * Block size has to multiple of cell size.
+	 */
 	const cv::Size& getBlockSize() const {
 		return m_BlockSize;
 	};
 
+	/**
+	 * 	Block stride has to multiple of cellsize.
+	 */
 	const cv::Size& getBlockStride() const {
 		return m_BlockStride;
 	};
 
+	/**
+	 * OpenCV Documentation says that cell size has to be 8x8. Other values are not supported.
+	 * Experiments say otherwise !?
+	 */
 	const cv::Size& getCellSize() const {
 		return m_CellSize;
 	};
@@ -56,10 +70,16 @@ public:
 		return m_dHOGVizBinScalefactor;
 	};
 
+	/**
+	 * Linear svm C value defining penalty multiplier for outliers on imperfect separation.
+	 */
 	double getSvmCValue() const {
 		return m_dSVMCValue;
 	};
 
+	/**
+	 * Divider of dataset size defining validation part, e.g. 4 -> 1/4 of patches will be in validation set.
+	 */
 	int getDataSetDivider() const {
 		return m_iDataSetDivider;
 	};
@@ -68,14 +88,25 @@ public:
 		return m_iHOGVizImageScalefactor;
 	};
 
+	/**
+	 * Image size has to be multiple of blocksize.
+	 * Image will be resized to this size, if the original size is not divideable by cellsize e.g.
+	 */
 	const cv::Size& getImageSize() const {
 		return m_ImageSize;
 	};
 
+	/**
+	 * Number of gradient orientations for HOG feature extraction.
+	 * Optimum is 9.
+	 */
 	int getNumBins() const {
 		return m_iNumBins;
 	};
 
+	/**
+	 * Path to image catalogue
+	 */
 	const std::string& getDataFilepath() const {
 		return m_strFilepath;
 	};
@@ -84,6 +115,9 @@ public:
 		return m_bPredictTrainingData;
 	};
 
+	/**
+	 * Whether to export the hog visualization as image files
+	 */
 	bool getWriteHogImages() const {
 		return m_bWriteHOGImages;
 	};
@@ -95,6 +129,7 @@ public:
 
 private:
 
+	// Helper structs for value conversion
 	struct StringToIntTranslator
 	{
 		typedef std::string internal_type;
@@ -139,6 +174,7 @@ private:
 	cv::Size	m_CellSize;
 	cv::Size	m_BlockStride;
 	cv::Size	m_BlockSize;
+
 	cv::Size	m_ImageSize;
 	int			m_iNumBins;
 

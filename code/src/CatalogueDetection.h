@@ -28,27 +28,30 @@ class TrainingData;
 class umSVM;
 
 /**
- * Unsupervised discovery of mid-level discriminative patches
+ * Train classifiers and predict sampled images on a catalogue of labeled images.
  *
  */
 class CatalogueDetection
 {
 public:
+
 	/**
 	 * Load image catalogue according to configuration
 	 */
 	CatalogueDetection(Configuration* config);
 
 	/**
-	 * Deletes something
+	 * Deletes everything
 	 */
 	virtual ~CatalogueDetection();
 
 	/**
-	 * Compute HOG features
-	 * Setup training and validation data
-	 * Train SVM
-	 * Predict data
+	 * Processing pipeline:
+	 * - Refine images though histogram equalization
+	 * - Compute HOG features
+	 * - Setup training and validation data
+	 * - Train SVMs
+	 * - Predict data
 	 */
 	void processPipeline();
 
@@ -71,18 +74,20 @@ private:
 				bool bApplyPCA = false);
 
 	/**
-	 * Setup training data and train svms
+	 * Setup training data and train svms.
 	 * @see svm/umSVM::train
+	 *
+	 * Saves trained svms by catalogue category labels.
 	 *
 	 * @param iDataSetDivider	divider of dataset size defining validation part, e.g. 4 -> 1/4 of patches will be in validation set.
 	 * @param bSearchSupportVectors verify support vector existance in training data.
-	 * @return	successful training ?
+	 * @return	training was successful.
 	 */
 	bool trainSVMs(int iDataSetDivider = 1,
 			bool bSearchSupportVectors = false);
 
 	/**
-	 * Assigns part of the descriptor vectors for each dataset for validation purpose, the rest for training.
+	 * Assigns part of the descriptor vectors of each dataset for validation purpose, the rest for training.
 	 *
 	 * @param iDataSetDivider	divider of dataset size defining validation part, e.g. 4 -> 1/4 of patches will be in validation set.
 	 */
@@ -109,19 +114,35 @@ private:
 			std::map<std::string, std::vector<std::vector<float> > > &mNegatives);
 
 	/**
-	 * Predicts validation data divided from datasets for each expression svm.
+	 * Predicts data divided for each categorized svm.
 	 */
 	void predict(std::map<std::string, TrainingData*> &mData,
 			std::map<std::string, cv::Mat> &mResults);
 
 
+	/**
+	 * Original images and extraacted feature vectors per named category
+	 */
 	std::map<std::string, DataSet*> m_mCatalogue;
 
+	/**
+	 * SVM training data, part of catalogue data excluding validation data
+	 */
 	std::map<std::string, TrainingData*> m_mTrain;
+
+	/**
+	 * SVM validation data, part of catalogue data excluding training data
+	 */
 	std::map<std::string, TrainingData*> m_mValidate;
 
+	/**
+	 * Trained SVMs per named category
+	 */
 	std::map<std::string, umSVM*> m_mSVMs;
 
+	/**
+	 * Application settings
+	 */
 	Configuration*	m_Config;
 };
 

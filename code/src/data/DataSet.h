@@ -49,6 +49,9 @@ public:
 		m_vData.clear();
 	};
 
+	/**
+	 * Add an image and its filename to the dataset.
+	 */
 	unsigned int addImage(cv::Mat* image,
 			std::string &strImageName)
 	{
@@ -57,11 +60,17 @@ public:
 		return m_vData.size() - 1;
 	};
 
+	/**
+	 * Get number of images in the dataset.
+	 */
 	unsigned int getImageCount() const
 	{
 		return m_vData.size();
 	};
 
+	/**
+	 * Get the image at position iIndex
+	 */
 	const cv::Mat* getImageAt(int iIndex) const
 	{
 		if(m_vData[iIndex] != NULL)
@@ -71,6 +80,9 @@ public:
 		return NULL;
 	};
 
+	/**
+	 * Get the name of the image at position iIndex.
+	 */
 	std::string getImageNameAt(int iIndex) const
 		{
 			if(m_vData[iIndex] != NULL)
@@ -80,9 +92,15 @@ public:
 			return "";
 		};
 
+	/**
+	 * Add feature vector for image at position iIndex,
+	 */
 	bool addDescriptorValuesToImageAt(int iIndex,
 			const std::vector<float> &vDescriptorValues);
 
+	/**
+	 * Get the feature vector from the image at position iIndex.
+	 */
 	bool getDescriptorValuesFromImageAt(int iIndex,
 			std::vector<float> &vDescriptorValues)
 	{
@@ -94,25 +112,43 @@ public:
 		return false;
 	};
 
+	/**
+	 * Add all images with their names from the input vectors.
+	 * Uses DataSet::AddImage
+	 */
 	int setImages(std::vector<cv::Mat*> &vImages,
 			std::vector<std::string> &vImageNames);
 
+	/**
+	 * Get maximum dimension of all images in the dataset
+	 */
 	void getMaxDImensions(int &iMaxWidth, int &iMaxHeight) const
 	{
 		iMaxHeight = m_iMaxHeight;
 		iMaxWidth = m_iMaxWidth;
 	};
 
+	/**
+	 * Are all the image of the same size ?
+	 */
 	bool getImageSizesUniform() const
 	{
 		return m_bImageSizesUniform;
 	};
 
+	/**
+	 * Get the size of the feature vectors.
+	 */
 	int getDescriptorValueSize() const
 	{
 		return m_iDescriptorSize;
 	};
 
+	/**
+	 * Divide the dataset into two parts according to iDivider.
+	 * The division will be adjusted for the first part of the filenames split by '_'
+	 * to make sure that images of such name are exclusively contained in first part.
+	 */
 	void getDescriptorsSeparated(int iDivider,
 			std::vector<std::vector<float> > &vFirstPart,
 			std::vector<std::vector<float> > &vSecondPart);

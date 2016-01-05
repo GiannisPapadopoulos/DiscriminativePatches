@@ -30,13 +30,13 @@ class TrainingData
 public:
 
 	/**
-	 * Initializes object
+	 * Builds the training and label matrices from the given data vectors.
 	 */
 	TrainingData(std::vector<std::vector<float> > &vPositiveFeatures,
 			std::vector<std::vector<float> > &vNegativeFeatures);
 
 	/**
-	 * Clears data
+	 * Nothing to delete here.
 	 */
 	virtual ~TrainingData()
 	{};

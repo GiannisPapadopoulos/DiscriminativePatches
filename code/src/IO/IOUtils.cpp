@@ -50,7 +50,8 @@ bool mai::IOUtils::loadCatalogue(map<string, DataSet* > &mCatalogue,
 		return false;
 	}
 
-	boost::filesystem::directory_iterator end_itr; // default construction yields past-the-end
+	// default construction yields past-the-end
+	boost::filesystem::directory_iterator end_itr;
 
 	for ( boost::filesystem::directory_iterator itr( directory ); itr != end_itr; ++itr )
 	{
@@ -203,7 +204,8 @@ bool mai::IOUtils::loadImage(Mat &image,
 
 	image = imread(strFileName, iMode);
 
-	if(!image.empty())// Check for valid input
+	// Check for valid input
+	if(!image.empty())
 	{
 		if(Constants::DEBUG_IMAGE_LOADING) {
 			cout << "[mai::IOUtils::loadImagesOrdered] Image loaded successfully: " << strFileName << endl;
@@ -224,64 +226,6 @@ bool mai::IOUtils::loadImage(Mat &image,
 	}
 }
 
-bool mai::IOUtils::loadImages(vector<Mat*> &vImages,
-		int iMode,
-		const string &strDirectory,
-		bool bEqualize )
-{
-	boost::filesystem::path directory( boost::filesystem::initial_path<boost::filesystem::path>() );
-	directory = boost::filesystem::system_complete( boost::filesystem::path( strDirectory ) );
-
-	if ( !exists( directory ) )
-	{
-		cout << "ERROR loading images. Path does not exist: " << directory << endl;
-		return false;
-	}
-	if(Constants::DEBUG_IMAGE_LOADING) {
-	  cout << "Loading images from " << directory << endl;
-	}
-
-//	std::vector<boost::filesystem::path>  v;                                // so we can sort them later
-//
-//	std::copy(boost::filesystem::directory_iterator(directory), boost::filesystem::directory_iterator(), std::back_inserter(v));
-//	std::sort(v.begin(), v.end());
-
-	boost::filesystem::directory_iterator end_itr; // default construction yields past-the-end
-
-	for ( boost::filesystem::directory_iterator itr( directory ); itr != end_itr; ++itr )
-//	for ( std::vector<boost::filesystem::path>::const_iterator itr (v.begin()); itr != v.end(); ++itr )
-	{
-		if ( !is_directory(itr->status()) )
-		{
-			//string strFilename = itr->path().leaf().string();
-#ifdef linux
-			Mat image = imread( itr->path().c_str(), iMode );
-#else
-			Mat image = imread( itr->path().string(), iMode );
-#endif
-			if( !image.empty() )// Check for valid input
-			{
-				if(Constants::DEBUG_IMAGE_LOADING) {
-					cout << "Image loaded successfully: " << itr->path() << endl;
-				}
-
-				Mat* pImage;
-				if (bEqualize) {
-					cvtColor(image, image, CV_BGR2GRAY);
-					equalizeHist(image, image);
-				}
-				pImage = new Mat(image);
-				vImages.push_back(pImage);
-			}
-			else
-			{
-				cout << "ERROR loading Image: " << itr->path() << endl;
-			}
-		}
-	}
-	return true;
-}
-
 void mai::IOUtils::addFlippedImages(vector<Mat*> &vImages,
 		std::vector<std::string> &vImageNames,
 		int iFlipMode)
@@ -294,7 +238,8 @@ void mai::IOUtils::addFlippedImages(vector<Mat*> &vImages,
 		Mat flippedImage;
 		flip(*image, flippedImage, iFlipMode);
 
-		if( !flippedImage.empty() )// Check for valid input
+		// Check for valid input
+		if( !flippedImage.empty() )
 		{
 			Mat* pImage = new Mat(flippedImage);
 			vDoubledImages.push_back(pImage);
@@ -331,7 +276,8 @@ void mai::IOUtils::convertImages(vector<Mat*> &vImages,
 		Mat convertedImage;
 		cvtColor(*image, convertedImage, iMode);
 
-		if( !convertedImage.empty() )// Check for valid input
+		// Check for valid input
+		if( !convertedImage.empty() )
 		{
 			Mat* pImage = new Mat(convertedImage);
 			vConvertedImages.push_back(pImage);
@@ -347,7 +293,8 @@ void mai::IOUtils::equalizeImages(vector<Mat*> &vImages,
 		Mat convertedImage;
 		equalizeHist(*image, convertedImage);
 
-		if( !convertedImage.empty() )// Check for valid input
+		// Check for valid input
+		if( !convertedImage.empty() )
 		{
 			Mat* pImage = new Mat(convertedImage);
 			vConvertedImages.push_back ( pImage );

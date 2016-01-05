@@ -11,8 +11,6 @@ set( DirFiles
 	Configuration.h
 	Constants.h
 	main.cpp
-	UDoMLDP.cpp
-	UDoMLDP.h
 )
 
 set( DirFiles_SourceGroup "${RelativeSourceGroup}" )

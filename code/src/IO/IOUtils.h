@@ -102,28 +102,10 @@ public:
 			bool bEqualize = true);
 
 	/**
-	 * Load all images from given directory
-	 * OpenCV loading modes:
-	 * IMREAD_UNCHANGED  = -1, //!< If set, return the loaded image as is (with alpha channel, otherwise it gets cropped).
-	 * IMREAD_GRAYSCALE  = 0,  //!< If set, always convert image to the single channel grayscale image.
-	 * IMREAD_COLOR      = 1,  //!< If set, always convert image to the 3 channel BGR color image.
-	 * IMREAD_ANYDEPTH   = 2,  //!< If set, return 16-bit/32-bit image when the input has the corresponding depth, otherwise convert it to 8-bit.
-	 * IMREAD_ANYCOLOR   = 4,  //!< If set, the image is read in any possible color format.
-	 * IMREAD_LOAD_GDAL  = 8   //!< If set, use the gdal driver for loading the image.
-	 *
-	 * @param[out] vImages	loaded images
-	 * @param iMode			OpenCV loading mode
-	 * @param directory		file path to load from
-	 */
-	static bool loadImages( std::vector<cv::Mat*> &vImages,
-			int iMode,
-			const std::string &strDirectory,
-			bool bEqualize = true );
-
-	/**
 	 * Double the images by adding flipped versions
 	 *
 	 * @param [out] vImages		image vector
+	 * @param [out] vImageNames		image names vector
 	 * @param		iFlipmode	horizontally: > 0
 	 */
 	static void addFlippedImages( std::vector<cv::Mat*> &vImages,
@@ -236,7 +218,7 @@ public:
 			bool printValue = false);
 
 	/**
-	 *
+	 * Write OpenCV mat to csv file.
 	 */
 	static void writeMatToCSV(const cv::Mat &data,
 			const std::string &strMatName);

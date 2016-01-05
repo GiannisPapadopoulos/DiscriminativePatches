@@ -13,13 +13,15 @@
  *****************************************************************************/
 
 #include "CatalogueDetection.h"
+
 #include "Constants.h"
 #include "Configuration.h"
-
 #include "svm/umSVM.h"
 #include "data/DataSet.h"
 #include "data/TrainingData.h"
 #include "IO/IOUtils.h"
+#include "featureExtraction/umHOG.h"
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/ml/ml.hpp>
@@ -27,7 +29,6 @@
 #include <opencv2/opencv.hpp>
 
 #include <iostream>
-#include "featureExtraction/umHOG.h"
 
 
 using namespace cv;
@@ -179,6 +180,7 @@ void mai::CatalogueDetection::computeHOG(Size imageSize,
 bool mai::CatalogueDetection::trainSVMs(int iDataSetDivider,
 		bool bSearchSupportVectors)
 {
+	// Positive training and validation data per named category
 	map<string, vector<vector<float> > > mPositiveTrain;
 	map<string, vector<vector<float> > > mPositiveValidate;
 
@@ -190,6 +192,7 @@ bool mai::CatalogueDetection::trainSVMs(int iDataSetDivider,
 		return false;
 	}
 
+	// Negative training and validation data per named category
 	map<string, vector<vector<float> > > mNegativeTrain;
 	map<string, vector<vector<float> > > mNegativeValidate;
 
@@ -199,6 +202,7 @@ bool mai::CatalogueDetection::trainSVMs(int iDataSetDivider,
 	setupTrainingData(m_mTrain, mPositiveTrain, mNegativeTrain);
 	setupTrainingData(m_mValidate, mPositiveValidate, mNegativeValidate);
 
+	// Train svms for each category
 	for(map<string, TrainingData*>::const_iterator it = m_mTrain.begin(); it != m_mTrain.end(); it++)
 	{
 		string strName = it->first;
@@ -237,11 +241,14 @@ bool mai::CatalogueDetection::trainSVMs(int iDataSetDivider,
 void mai::CatalogueDetection::predict(map<string, TrainingData*> &mData,
 		map<string, Mat> &mResults)
 {
+	// Predict data by trained svms for each category
 	for(map<string, TrainingData*>::const_iterator it = mData.begin();
 			it != mData.end(); it++)
 	{
 		string strName = it->first;
 		umSVM* svm = m_mSVMs.at(strName);
+
+		// result matrix containing predicted labels
 		Mat results(it->second->getData().rows, 1, CV_32SC1);
 
 		svm->predict(it->second->getData(), results);
@@ -251,6 +258,7 @@ void mai::CatalogueDetection::predict(map<string, TrainingData*> &mData,
 
 		cout << "[mai::CatalogueDetection::predict] SVM prediction result for label " << strName << " has " << iResultsRows << " rows." << endl;
 
+		// Compare predicted labels with original ones
 		for(int i = 0; i < iResultsRows; ++i)
 		{
 			int iResultLabel = results.at<float>(i);
@@ -274,6 +282,7 @@ void mai::CatalogueDetection::divideDataSets(map<string, vector<vector<float> > 
 			map<string, vector<vector<float> > > &mValidate,
 			int iDataSetDivider)
 {
+	// Divide datasets of each catefory into exclusive training and validation parts
 	for(map<string, DataSet*>::const_iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); it++)
 	{
 		vector<vector<float> > vTrain, vValidate;
@@ -291,10 +300,12 @@ void mai::CatalogueDetection::collectRandomNegatives(map<string, vector<vector<f
 	for(map<string,vector<vector<float> > >::const_iterator itTrainCategory = mPositives.begin();
 			itTrainCategory != mPositives.end(); itTrainCategory++)
 	{
+		// Find number of desired negative features according to positive ones
 		int iPosSampleSize = itTrainCategory->second.size();
 		int iSamplesPerCategory = iPosSampleSize / (mPositives.size() - 1);
 		string strKey = itTrainCategory->first;
 
+		// Collect negative samples from all other categories
 		for(map<string, vector<vector<float> > >::const_iterator itTrainOthers = mPositives.begin();
 				itTrainOthers != mPositives.end(); itTrainOthers++)
 		{
@@ -333,6 +344,7 @@ void mai::CatalogueDetection::setupTrainingData(map<string, TrainingData*> &mTra
 			map<string, vector<vector<float> > > &mPositives,
 			map<string, vector<vector<float> > > &mNegatives)
 {
+	// Setup training data for each category
 	for(map<string, DataSet*>::const_iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); it++)
 	{
 		string strKey = it->first;
