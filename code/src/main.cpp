@@ -15,7 +15,6 @@
 #include <iostream>
 #include <string>
 
-#include "UDoMLDP.h"
 #include "Configuration.h"
 #include "CatalogueDetection.h"
 #include "svm/svmtest.h"
