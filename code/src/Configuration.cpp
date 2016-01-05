@@ -26,7 +26,7 @@ using namespace cv;
 mai::Configuration::Configuration(string &strFilename)
 {
 	boost::property_tree::ptree pt;
-	boost::property_tree::ini_parser::read_ini("config.ini", pt);
+	boost::property_tree::ini_parser::read_ini(strFilename, pt);
 
 	StringToIntTranslator trInt;
 	StringToDoubleTranslator trDouble;
