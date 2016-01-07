@@ -16,6 +16,7 @@
 #include "../Constants.h"
 #include "../data/DataSet.h"
 #include "../featureExtraction/umHOG.h"
+
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/ml/ml.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -24,7 +25,6 @@
 #include <boost/algorithm/string.hpp>
 
 #include <iostream>
-#include "../utils/FaceDetection.h"
 
 using namespace cv;
 

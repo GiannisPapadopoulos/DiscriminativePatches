@@ -3,8 +3,8 @@ set( RelativeDir "src/utils" )
 set( RelativeSourceGroup "Source Files\\utils" )
 
 set( DirFiles
-	faceDetection.cpp
-	faceDetection.h
+	FaceDetection.cpp
+	FaceDetection.h
 	ImageDisplayUtils.h
 	ImageDisplayUtils.cpp
 )	

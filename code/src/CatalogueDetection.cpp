@@ -21,7 +21,7 @@
 #include "data/TrainingData.h"
 #include "IO/IOUtils.h"
 #include "featureExtraction/umHOG.h"
-#include "utils/faceDetection.h"
+#include "utils/FaceDetection.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -143,7 +143,7 @@ void mai::CatalogueDetection::processPipeline()
 
 void mai::CatalogueDetection::detectFaces()
 {
-	faceDetection* fd = new faceDetection(m_Config->getCascadeFilterFileName());
+	FaceDetection* fd = new FaceDetection(m_Config->getCascadeFilterFileName());
 	for(map<string, DataSet*>::iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); it++)
 	{
 		DataSet* faces = fd->detectFaces(it->second);
