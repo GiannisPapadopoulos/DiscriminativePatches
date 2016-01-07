@@ -34,7 +34,7 @@ public:
 	 *
 	 * @param strFilename	path and name of configuration file
 	 */
-	Configuration(std::string &strFilename);
+	Configuration(const std::string &strFilename);
 
 	/**
 	 * Nothing to delete here.
@@ -126,6 +126,14 @@ public:
 		return m_bApplyPCA;
 	};
 
+	bool getDetectFaces() const {
+		return m_bDetectFaces;
+	};
+
+	const std::string getCascadeFilterFileName() const{
+		return m_strCascadeFilterFileName;
+	}
+
 
 private:
 
@@ -190,6 +198,9 @@ private:
     double		m_dHOGVizBinScalefactor;
 
     bool		m_bPredictTrainingData;
+
+    bool		m_bDetectFaces;
+    std::string	m_strCascadeFilterFileName;
 
 };
 

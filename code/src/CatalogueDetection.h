@@ -58,6 +58,11 @@ public:
 private:
 
 	/**
+	 * @see utils/FaceDetection::detectFaces
+	 */
+	void detectFaces();
+
+	/**
 	 * Computes HOG descriptors for all Datasets in catalogue.
 	 * @see featureExtraction/umHOG::computeHOGForDataSet
 	 *

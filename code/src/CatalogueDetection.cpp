@@ -21,6 +21,7 @@
 #include "data/TrainingData.h"
 #include "IO/IOUtils.h"
 #include "featureExtraction/umHOG.h"
+#include "utils/faceDetection.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -79,6 +80,11 @@ mai::CatalogueDetection::~CatalogueDetection()
 
 void mai::CatalogueDetection::processPipeline()
 {
+	if(m_Config->getDetectFaces())
+	{
+		// TODO finish implementation before usage
+		detectFaces();
+	}
 
 	Size cellSize = m_Config->getCellSize();
 	Size blockStride = m_Config->getBlockStride();
@@ -133,6 +139,19 @@ void mai::CatalogueDetection::processPipeline()
 			cout << "#-------------------------------------------------------------------------------#" << endl;
 		}
 	}
+}
+
+void mai::CatalogueDetection::detectFaces()
+{
+	faceDetection* fd = new faceDetection(m_Config->getCascadeFilterFileName());
+	for(map<string, DataSet*>::iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); it++)
+	{
+		DataSet* faces = fd->detectFaces(it->second);
+
+		// TODO: remove old datasets from catalogue and replace them by face datasets
+	}
+
+	delete fd;
 }
 
 void mai::CatalogueDetection::computeHOG(Size imageSize,

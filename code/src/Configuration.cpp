@@ -23,7 +23,7 @@ using namespace std;
 using namespace cv;
 
 
-mai::Configuration::Configuration(string &strFilename)
+mai::Configuration::Configuration(const string &strFilename)
 {
 	boost::property_tree::ptree pt;
 	boost::property_tree::ini_parser::read_ini(strFilename, pt);
@@ -51,6 +51,8 @@ mai::Configuration::Configuration(string &strFilename)
 
 	m_bPredictTrainingData = pt.get<bool>("SVM.PREDICT_TRAININGDATA", trBool);
 
+	m_bDetectFaces = pt.get<bool>("FACE_DETECTION.DETECT_FACES", trBool);
+	m_strCascadeFilterFileName = pt.get<std::string>("FACE_DETECTION.FILENAME");
 }
 
 bool mai::Configuration::convertStringToBool(std::string str) {
