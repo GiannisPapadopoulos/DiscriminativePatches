@@ -30,6 +30,10 @@ using namespace cv;
 
 using namespace std;
 
+static CvMemStorage* storage = 0; 
+static CvHaarClassifierCascade* cascade = 0;
+const char* cascade_name = "C:/Users/apple/Desktop/Sophia/AI/Project/opencv/sources/data/haarcascades_cuda/haarcascade_frontalface_alt.xml";
+
 mai::IOUtils::IOUtils()
 {}
 mai::IOUtils::~IOUtils()
@@ -213,9 +217,48 @@ bool mai::IOUtils::loadImage(Mat &image,
 
 		Mat* pImage;
 		if (bEqualize) {
-			cvtColor(image, image, CV_BGR2GRAY);
-			equalizeHist(image, image);
+			cascade_name = "C:/Users/apple/Desktop/Sophia/AI/Project/opencv/sources/data/haarcascades_cuda/haarcascade_frontalface_alt2.xml"; 
+			cascade = (CvHaarClassifierCascade*)cvLoad( cascade_name, 0, 0, 0 ); 
+
+			IplImage* img=cvCloneImage(&(IplImage)image);
+			storage = cvCreateMemStorage(0);
+			cvNamedWindow( "result", 1 ); 
+
+			double scale=1.2; 
+			IplImage* small_img=cvCreateImage(cvSize(cvRound(img->width/scale),cvRound(img->height/scale)),8,1); 
+			IplImage* gray = cvCreateImage(cvSize(img->width,img->height),8,1); 
+
+			cvCvtColor(img,gray, CV_BGR2GRAY); 
+			cvResize(gray, small_img, CV_INTER_LINEAR);
+			cvEqualizeHist(small_img,small_img); 
+			cvClearMemStorage(storage);
+
+			double t = (double)cvGetTickCount(); 
+            CvSeq* objects = cvHaarDetectObjects(small_img, 
+                                                                    cascade, 
+                                                                    storage, 
+                                                                    1.1, 
+                                                                    2, 
+                                                                    0, 
+                                                                    cvSize(20,20));
+
+			t = (double)cvGetTickCount() - t; 
+			printf( "detection time = %gms\n", t/((double)cvGetTickFrequency()*1000.) );
+	
+			//Loop through found objects and draw boxes around them 
+			for(int i=0;i<(objects? objects->total:0);++i) 
+			{ 
+				CvRect* r=(CvRect*)cvGetSeqElem(objects,i); 
+				cvSetImageROI(img,cvRect(r->x*scale, r->y*scale, (r->x+r->width)*scale-r->x*scale,(r->y+r->height)));//(r->x+r->width*0.8), (r->y+r->height)));	
+			}
+			
+			Mat image = img;
+			waitKey(1000);
+			imshow( "result", image);
 		}
+				
+			pImage =new Mat(image);
+			vImages.push_back(pImage);
 
 		return true;
 	}
