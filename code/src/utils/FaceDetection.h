@@ -38,7 +38,7 @@ public:
 	DataSet* detectFaces(DataSet* data);
 
 	void detectFace(const cv::Mat &image,
-			cv::Mat &face);
+			cv::Mat &face,cv::CascadeClassifier cascade);
 
 private:
 

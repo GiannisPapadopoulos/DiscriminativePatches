@@ -17,10 +17,11 @@
 #include "../data/DataSet.h"
 
 #include <opencv2/highgui/highgui.hpp>
-//#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/imgproc/imgproc_c.h>
-
+#include "opencv2/ml/ml.hpp"
 #include <iostream>
+#include <stdio.h>
 
 using namespace cv;
 using namespace std;
@@ -31,7 +32,7 @@ mai::FaceDetection::FaceDetection(const string &strFilename)
 {
 	cout << "[mai::faceDetection::faceDetection] Loading cascade filter " << strFilename << endl;
 //#ifdef linux
-	m_Cascade = (CvHaarClassifierCascade*)cvLoad(strFilename.c_str(), 0, 0, 0);
+	//m_Cascade = (CascadeClassifier)load(strFilename.c_str(), 0, 0, 0);
 //#else
 //	m_Cascade = (CvHaarClassifierCascade*)cvLoad(strFilename.string(), 0, 0, 0);
 //#endif
@@ -42,7 +43,7 @@ mai::FaceDetection::FaceDetection(const string &strFilename)
 
 mai::FaceDetection::~FaceDetection()
 {
-	delete m_Cascade;
+	//delete m_Cascade;
 }
 
 DataSet* mai::FaceDetection::detectFaces(DataSet* data)
@@ -50,6 +51,14 @@ DataSet* mai::FaceDetection::detectFaces(DataSet* data)
 	DataSet* faces = new DataSet();
 	vector<Mat*> vImages;
 	vector<string> vImageNames;
+	CascadeClassifier cascade;
+	string cascadeName = "C:/Users/apple/Desktop/Sophia/AI/Project/opencv/sources/data/haarcascades_cuda/haarcascade_frontalface_alt2.xml" ;
+
+	if( !cascade.load(cascadeName))//从指定的文件目录中加载级联分类器
+    {
+        cerr << "ERROR: Could not load classifier cascade" << endl;
+		//return 0;
+	}
 
 	// Extract faces from all images in dataset.
 	for(unsigned int i = 0; i < data->getImageCount(); ++i)
@@ -57,11 +66,14 @@ DataSet* mai::FaceDetection::detectFaces(DataSet* data)
 		const Mat* image = data->getImageAt(i);
 		Mat face;
 
-		detectFace(*image, face);
+		detectFace(*image, face,cascade);
 
 		Mat* pImage = new Mat(face);
 		vImages.push_back(pImage);
 		vImageNames.push_back(data->getImageNameAt(i));
+
+		waitKey(50);
+		imshow( "result", face);
 
 	}
 
@@ -71,46 +83,32 @@ DataSet* mai::FaceDetection::detectFaces(DataSet* data)
 }
 
 void mai::FaceDetection::detectFace(const Mat &image,
-		Mat &face)
+		Mat &face,CascadeClassifier cascade)
 {
-	IplImage img = image;
-	CvMemStorage* storage = cvCreateMemStorage(0);
+	
+		int i = 0;
+		double scale=1.2;
+		vector<Rect> facess;
+		double t = (double)cvGetTickCount();
+		
+		Mat gray,smallImg( cvRound (image.rows/scale), cvRound(image.cols/scale), CV_8UC1 );//make the speed of detection fast
+		//cvtColor( face, face, CV_BGR2GRAY );
+		resize( image, smallImg, smallImg.size(),0,0,INTER_LINEAR );
+		equalizeHist( smallImg, smallImg );
 
-	double scale=1.2;
-	IplImage* small_img=cvCreateImage(cvSize(cvRound(image.cols/scale),cvRound(image.rows/scale)),8,1);
-	IplImage* gray = cvCreateImage(cvSize(image.cols,image.rows),8,1);
+		cascade.detectMultiScale( smallImg, facess,1.1, 5, 0 | CV_HAAR_SCALE_IMAGE, Size(150, 150) );
 
-	cvCvtColor(&img,gray, CV_BGR2GRAY);
-	cvResize(gray, small_img, CV_INTER_LINEAR);
-	cvEqualizeHist(small_img,small_img);
-	cvClearMemStorage(storage);
+		t = (double)cvGetTickCount() - t;
+		printf( "[mai::faceDetection::detectFace] Detection time = %gms\n", t/((double)cvGetTickFrequency()*1000.) );
 
-	double t = (double)cvGetTickCount();
-	CvSeq* objects = cvHaarDetectObjects(small_img,
-			m_Cascade,
-			storage,
-			1.1,
-			2,
-			0,
-			cvSize(20,20));
-
-	t = (double)cvGetTickCount() - t;
-	printf( "[mai::faceDetection::detectFace] Detection time = %gms\n", t/((double)cvGetTickFrequency()*1000.) );
-
-    //Loop through found objects and draw boxes around them
-    for(int i=0;i<(objects? objects->total:0);++i)
-    {
-        CvRect* r=(CvRect*)cvGetSeqElem(objects,i);
-		cvSetImageROI(&img,cvRect(r->x*1.15, r->y*1.15, (r->x+r->width*0.8), (r->y+r->height*0.8)));
-    }
-
-    face = &img;
-
-    cvReleaseImage(&gray);
-    cvReleaseImage(&small_img);
-
-    imshow( "result", image );
-	cvWaitKey(200);
-
+		//Loop through found objects and draw boxes around them
+		for( vector<Rect>::const_iterator r = facess.begin(); r != facess.end(); r++, i++ )
+		{
+			vector<Rect> nestedObjects;
+			Rect rect(r->x*scale, r->y*scale, (r->x+r->width)*scale-r->x*scale,(r->y+r->height)*scale-r->y);
+			face = image(rect);
+		}
+		
+		
 }
 
