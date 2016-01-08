@@ -24,12 +24,14 @@ public:
 	static const bool DEBUG_PCA = true;
 
 	/** Whether to show debug information for the main algorithm (UDoMLDP) */
-	static const bool DEBUG_MAIN_ALG = false;
+	static const bool DEBUG_MAIN_ALG = true;
 
 	/** Whether to show debug information for the svm parts */
 	static const bool DEBUG_SVM = false;
 	static const bool DEBUG_SVM_PREDICTION = false;
 	static const bool DEBUG_MAIN_SVM = false;
+
+	static const bool DEBUG_FACE_DETECTION = false;
 
 	/** svm labels */
 	static const int SVM_POSITIVE_LABEL = 1;

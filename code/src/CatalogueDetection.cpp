@@ -115,8 +115,18 @@ void mai::CatalogueDetection::processPipeline()
 			bWriteHOGImages,
 			bApplyPCA);
 
+	if(Constants::DEBUG_MAIN_ALG)
+	{
+		cout << "[mai::CatalogueDetection::processPipeline] HOG computation done. SVM net ..." << endl;
+	}
+
 	if(trainSVMs(iDataSetDivider))
 	{
+		if(Constants::DEBUG_MAIN_ALG)
+		{
+			cout << "[mai::CatalogueDetection::processPipeline] Training SVM done. Predicting ..." << endl;
+		}
+
 		if(bPredictTrainingData)
 		{
 			cout << "#-------------------------------------------------------------------------------#" << endl;
@@ -143,15 +153,31 @@ void mai::CatalogueDetection::processPipeline()
 
 void mai::CatalogueDetection::detectFaces()
 {
-	FaceDetection* fd = new FaceDetection(m_Config->getCascadeFilterFileName());
 	for(map<string, DataSet*>::iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); it++)
 	{
-		DataSet* faces = fd->detectFaces(it->second);
+		string strFilename = m_Config->getCascadeFilterFileName();
+		double dScale = m_Config->getFDScale();
+		int iMinNeighbors = m_Config->getFDMinNeighbors();
+		Size minSize = m_Config->getFDMinSize();
+		Size maxSize = m_Config->getFDMaxSize();
 
-		// TODO: remove old datasets from catalogue and replace them by face datasets
+		DataSet* faces = FaceDetection::detectFaces(it->second,
+				strFilename,
+				dScale,
+				iMinNeighbors,
+				minSize,
+				maxSize);
+
+		if(faces != NULL)
+		{
+			delete it->second;
+			it->second = faces;
+		}
+		else
+		{
+			cout << "[mai::CatalogueDetection::detectFaces] ERROR! No faces found for images in " << it->first << endl;
+		}
 	}
-
-	delete fd;
 }
 
 void mai::CatalogueDetection::computeHOG(Size imageSize,
@@ -205,6 +231,11 @@ bool mai::CatalogueDetection::trainSVMs(int iDataSetDivider,
 
 	divideDataSets(mPositiveTrain, mPositiveValidate, iDataSetDivider);
 
+	if(Constants::DEBUG_MAIN_ALG)
+	{
+		cout << "[mai::CatalogueDetection::trainSVMs] Dataset division done. Collecting data ..." << endl;
+	}
+
 	if(mPositiveTrain.size() < 2)
 	{
 		cout << "[mai::CatalogueDetection::trainSVMs] ERROR! At least 2 categories needed." << endl;
@@ -218,8 +249,18 @@ bool mai::CatalogueDetection::trainSVMs(int iDataSetDivider,
 	collectRandomNegatives(mPositiveTrain, mNegativeTrain);
 	collectRandomNegatives(mPositiveValidate, mNegativeValidate);
 
+	if(Constants::DEBUG_MAIN_ALG)
+	{
+		cout << "[mai::CatalogueDetection::trainSVMs] Data collection done. Setting up training data ..." << endl;
+	}
+
 	setupTrainingData(m_mTrain, mPositiveTrain, mNegativeTrain);
 	setupTrainingData(m_mValidate, mPositiveValidate, mNegativeValidate);
+
+	if(Constants::DEBUG_MAIN_ALG)
+	{
+		cout << "[mai::CatalogueDetection::trainSVMs] Training data setup done. training svm ..." << endl;
+	}
 
 	// Train svms for each category
 	for(map<string, TrainingData*>::const_iterator it = m_mTrain.begin(); it != m_mTrain.end(); it++)
@@ -239,6 +280,11 @@ bool mai::CatalogueDetection::trainSVMs(int iDataSetDivider,
 		m_mSVMs.insert(pair<string, umSVM*>(strName, svm));
 
 		svm->saveSVM(strName);
+
+		if(Constants::DEBUG_MAIN_ALG)
+		{
+			cout << "[mai::CatalogueDetection::trainSVMs] svm traind for " << strName << endl;
+		}
 
 		if(bSearchSupportVectors)
 		{
@@ -323,6 +369,12 @@ void mai::CatalogueDetection::collectRandomNegatives(map<string, vector<vector<f
 		int iPosSampleSize = itTrainCategory->second.size();
 		int iSamplesPerCategory = iPosSampleSize / (mPositives.size() - 1);
 		string strKey = itTrainCategory->first;
+
+		if(Constants::DEBUG_MAIN_ALG)
+		{
+			cout << "[mai::CatalogueDetection::collectRandomNegatives] Collecting negatives for " << strKey
+					<< ", overall " << iPosSampleSize << ", " << iSamplesPerCategory << " per category " << endl;
+		}
 
 		// Collect negative samples from all other categories
 		for(map<string, vector<vector<float> > >::const_iterator itTrainOthers = mPositives.begin();

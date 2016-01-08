@@ -401,15 +401,25 @@ void mai::IOUtils::showImage(const Mat* image)
 }
 
 void mai::IOUtils::writeImages(vector<Mat*> &vImages,
-		const string &strPath,
-		const string &strFileNameBase)
+		std::vector<std::string> &vImageNames,
+		const string &strPath)
 {
+	boost::filesystem::path dir(strPath);
+	if (!exists(dir))
+	{
+		if (!boost::filesystem::create_directory(dir))
+		{
+			cout << "[mai::IOUtils::writeHOGImages] ERROR creating directory: " << strPath << endl;
+		}
+	}
+
 	for( unsigned int i = 0; i < vImages.size(); ++i)
 	{
-		Mat image = *vImages[i];
+		Mat image = *vImages.at(i);
+		string strFileNameBase = vImageNames.at(i);
 
 		stringstream sstm;
-		sstm << strPath << "/" << strFileNameBase << "_" << i << ".jpg";
+		sstm << strPath << "/" << strFileNameBase;
 		string strFileName = sstm.str();
 
 		imwrite(strFileName, image);
@@ -428,6 +438,15 @@ void mai::IOUtils::writeHOGImages(mai::DataSet* data,
 			double vizFactor,
 			bool printValue)
 {
+	boost::filesystem::path dir(strPath);
+	if (!exists(dir))
+	{
+		if (!boost::filesystem::create_directory(dir))
+		{
+			cout << "[mai::IOUtils::writeHOGImages] ERROR creating directory: " << strPath << endl;
+		}
+	}
+
 	for ( unsigned int i = 0; i < data->getImageCount(); ++i )
 	{
 		const Mat* image = data->getImageAt(i);
@@ -456,19 +475,7 @@ void mai::IOUtils::writeHOGImages(mai::DataSet* data,
 
 
 		stringstream sstm;
-		sstm << strPath << "/" << strFileNameBase;
-		string strPathName = sstm.str();
-
-		boost::filesystem::path dir(strPathName);
-		if (!exists(dir))
-		{
-			if (!boost::filesystem::create_directory(dir))
-			{
-				cout << "[mai::IOUtils::writeHOGImages] ERROR creating directory: " << strPathName << endl;
-			}
-		}
-
-		sstm << "/" << strFileNameBase << "_" << i << ".jpg";
+		sstm << strPath << "/" << strFileNameBase << "_" << i << ".jpg";
 		string strFileName = sstm.str();
 
 		imwrite(strFileName, outImage);

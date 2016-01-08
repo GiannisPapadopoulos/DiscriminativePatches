@@ -134,6 +134,21 @@ public:
 		return m_strCascadeFilterFileName;
 	}
 
+	double getFDScale() const {
+		return m_dFDScale;
+	}
+
+	const cv::Size& getFDMaxSize() const {
+		return m_FDMaxSize;
+	}
+
+	const cv::Size& getFDMinSize() const {
+		return m_FDMinSize;
+	}
+
+	int getFDMinNeighbors() const {
+		return m_iFDMinNeighbors;
+	}
 
 private:
 
@@ -201,7 +216,10 @@ private:
 
     bool		m_bDetectFaces;
     std::string	m_strCascadeFilterFileName;
-
+    double 		m_dFDScale;
+    int			m_iFDMinNeighbors;
+    cv::Size	m_FDMinSize;
+    cv::Size	m_FDMaxSize;
 };
 
 }// namespace mai

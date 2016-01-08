@@ -15,11 +15,13 @@
 #include "FaceDetection.h"
 
 #include "../data/DataSet.h"
+#include "../Constants.h"
+#include "../IO/IOUtils.h"
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/imgproc/imgproc_c.h>
-#include "opencv2/ml/ml.hpp"
+//#include "opencv2/ml/ml.hpp"
+
 #include <iostream>
 #include <stdio.h>
 
@@ -28,36 +30,28 @@ using namespace std;
 using namespace mai;
 
 
-mai::FaceDetection::FaceDetection(const string &strFilename)
-{
-	cout << "[mai::faceDetection::faceDetection] Loading cascade filter " << strFilename << endl;
-//#ifdef linux
-	//m_Cascade = (CascadeClassifier)load(strFilename.c_str(), 0, 0, 0);
-//#else
-//	m_Cascade = (CvHaarClassifierCascade*)cvLoad(strFilename.string(), 0, 0, 0);
-//#endif
-
-	cout << "[mai::faceDetection::faceDetection] Initialization done. " << endl;
-
-}
+mai::FaceDetection::FaceDetection()
+{}
 
 mai::FaceDetection::~FaceDetection()
-{
-	//delete m_Cascade;
-}
+{}
 
-DataSet* mai::FaceDetection::detectFaces(DataSet* data)
+DataSet* mai::FaceDetection::detectFaces(DataSet* data,
+		const std::string &strFilename,
+		double dScale,
+		int iMinNeighbors,
+		Size minSize,
+		Size maxSize)
 {
 	DataSet* faces = new DataSet();
 	vector<Mat*> vImages;
 	vector<string> vImageNames;
 	CascadeClassifier cascade;
-	string cascadeName = "C:/Users/apple/Desktop/Sophia/AI/Project/opencv/sources/data/haarcascades_cuda/haarcascade_frontalface_alt2.xml" ;
 
-	if( !cascade.load(cascadeName))//从指定的文件目录中加载级联分类器
+	if(!cascade.load(strFilename))
     {
-        cerr << "ERROR: Could not load classifier cascade" << endl;
-		//return 0;
+        cerr << "[mai::FaceDetection::detectFaces] ERROR: Could not load classifier cascade from file " << strFilename << endl;
+		return NULL;
 	}
 
 	// Extract faces from all images in dataset.
@@ -66,15 +60,27 @@ DataSet* mai::FaceDetection::detectFaces(DataSet* data)
 		const Mat* image = data->getImageAt(i);
 		Mat face;
 
-		detectFace(*image, face,cascade);
+		if(detectFace(*image,
+				face,
+				cascade,
+				dScale,
+				iMinNeighbors,
+				minSize,
+				maxSize))
+		{
+			Mat* pImage = new Mat(face);
+			vImages.push_back(pImage);
+			vImageNames.push_back(data->getImageNameAt(i));
+		}
+	}
 
-		Mat* pImage = new Mat(face);
-		vImages.push_back(pImage);
-		vImageNames.push_back(data->getImageNameAt(i));
+	if(Constants::DEBUG_FACE_DETECTION)
+	{
+		string strPath = "outFD";
 
-		waitKey(50);
-		imshow( "result", face);
-
+		IOUtils::writeImages(vImages,
+				vImageNames,
+				strPath);
 	}
 
 	faces->setImages(vImages, vImageNames);
@@ -82,33 +88,44 @@ DataSet* mai::FaceDetection::detectFaces(DataSet* data)
 	return faces;
 }
 
-void mai::FaceDetection::detectFace(const Mat &image,
-		Mat &face,CascadeClassifier cascade)
+bool mai::FaceDetection::detectFace(const Mat &image,
+		Mat &face,
+		CascadeClassifier cascade,
+		double dScale,
+		int iMinNeighbors,
+		Size minSize,
+		Size maxSize)
 {
-	
-		int i = 0;
-		double scale=1.2;
-		vector<Rect> facess;
-		double t = (double)cvGetTickCount();
-		
-		Mat gray,smallImg( cvRound (image.rows/scale), cvRound(image.cols/scale), CV_8UC1 );//make the speed of detection fast
-		//cvtColor( face, face, CV_BGR2GRAY );
-		resize( image, smallImg, smallImg.size(),0,0,INTER_LINEAR );
-		equalizeHist( smallImg, smallImg );
+	vector<Rect> discoveredAreas;
 
-		cascade.detectMultiScale( smallImg, facess,1.1, 5, 0 | CV_HAAR_SCALE_IMAGE, Size(150, 150) );
+	// TODO Why the scaling, does not make any difference ?
+//	Mat smallImg( cvRound (image.rows/dScale), cvRound(image.cols/dScale), CV_8UC1 );//make the speed of detection fast
+//	resize( image, smallImg, smallImg.size(),0,0,INTER_LINEAR );
 
-		t = (double)cvGetTickCount() - t;
-		printf( "[mai::faceDetection::detectFace] Detection time = %gms\n", t/((double)cvGetTickFrequency()*1000.) );
+//	cascade.detectMultiScale( smallImg, discoveredAreas, dScale, iMinNeighbors, 0 | CV_HAAR_SCALE_IMAGE, minSize, maxSize );
+	cascade.detectMultiScale( image, discoveredAreas, dScale, iMinNeighbors, 0 | CV_HAAR_SCALE_IMAGE, minSize, maxSize );
 
-		//Loop through found objects and draw boxes around them
-		for( vector<Rect>::const_iterator r = facess.begin(); r != facess.end(); r++, i++ )
+	if(Constants::DEBUG_FACE_DETECTION)
+	{
+		cout << "[mai::FaceDetection::detectFace] faces found: " << discoveredAreas.size() << endl;
+	}
+
+	for( vector<Rect>::const_iterator it = discoveredAreas.begin(); it != discoveredAreas.end(); it++ )
+	{
+//		Rect rect(it->x*dScale, it->y*dScale, (it->x+it->width)*dScale-it->x*dScale,(it->y+it->height)*dScale-it->y);
+		Rect rect(it->x, it->y, (it->x + it->width) - it->x, (it->y + it->height) - it->y);
+		if(rect.height > 0 && rect.width > 0)
 		{
-			vector<Rect> nestedObjects;
-			Rect rect(r->x*scale, r->y*scale, (r->x+r->width)*scale-r->x*scale,(r->y+r->height)*scale-r->y);
 			face = image(rect);
 		}
-		
-		
-}
+	}
 
+	if(!face.empty())
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}

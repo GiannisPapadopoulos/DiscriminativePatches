@@ -58,6 +58,8 @@ public:
 private:
 
 	/**
+	 * Extract faces from all images and replace images by discovered faces for further processing.
+	 *
 	 * @see utils/FaceDetection::detectFaces
 	 */
 	void detectFaces();

@@ -193,8 +193,8 @@ public:
 	 * @param strFileNameBase	base part of filename
 	 */
 	static void writeImages( std::vector<cv::Mat*> &vImages,
-			const std::string &strPath,
-			const std::string &strFileNameBase );
+			std::vector<std::string> &vImageNames,
+			const std::string &strPath );
 
 	/**
 	 * Write gradiented image as jpgs to a folder with indexed filename strFileNameBase_Index.jpg

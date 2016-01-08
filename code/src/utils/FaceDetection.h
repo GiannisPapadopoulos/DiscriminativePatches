@@ -27,22 +27,32 @@ class DataSet;
 class FaceDetection
 {
 public:
+
+	virtual ~FaceDetection();
+
 	/**
 	 * 	strFilename = "C:/Users/apple/Desktop/Sophia/AI/Project/opencv/sources/data/haarcascades_cuda/haarcascade_frontalface_alt2.xml";
 	 *
 	 */
-	FaceDetection(const std::string &strFilename);
+	static DataSet* detectFaces(DataSet* data,
+			const std::string &strFilename,
+			double dScale,
+			int iMinNeighbors,
+			cv::Size minSize,
+			cv::Size maxSize);
 
-	virtual ~FaceDetection();
-
-	DataSet* detectFaces(DataSet* data);
-
-	void detectFace(const cv::Mat &image,
-			cv::Mat &face,cv::CascadeClassifier cascade);
+	static bool detectFace(const cv::Mat &image,
+			cv::Mat &face,
+			cv::CascadeClassifier cascade,
+			double dScale,
+			int iMinNeighbors,
+			cv::Size minSize,
+			cv::Size maxSize);
 
 private:
 
-	CvHaarClassifierCascade* m_Cascade;
+	FaceDetection();
+
 };
 
 }// namespace mai

@@ -53,6 +53,10 @@ mai::Configuration::Configuration(const string &strFilename)
 
 	m_bDetectFaces = pt.get<bool>("FACE_DETECTION.DETECT_FACES", trBool);
 	m_strCascadeFilterFileName = pt.get<std::string>("FACE_DETECTION.FILENAME");
+	m_dFDScale = pt.get<double>("FACE_DETECTION.SCALE", trDouble);
+	m_iFDMinNeighbors = pt.get<int>("FACE_DETECTION.MIN_NEIGHBORS", trInt);
+	m_FDMinSize = Size(pt.get<int>("FACE_DETECTION.MIN_SIZE", trInt), pt.get<int>("FACE_DETECTION.MIN_SIZE", trInt));
+	m_FDMaxSize = Size(pt.get<int>("FACE_DETECTION.MAX_SIZE", trInt), pt.get<int>("FACE_DETECTION.MAX_SIZE", trInt));
 }
 
 bool mai::Configuration::convertStringToBool(std::string str) {
