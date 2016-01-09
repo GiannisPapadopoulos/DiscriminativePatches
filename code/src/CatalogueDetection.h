@@ -107,7 +107,6 @@ private:
 	 * Size of the sampled descriptor sets are the same as the positive one to have an equal amount of positive and negative training samples.
 	 * (Almost the same at least, as division rest is not taken into account.)
 	 *
-	 * @TODO what if other set is too small ?
 	 */
 	void collectRandomNegatives(std::map<std::string, std::vector<std::vector<float> > > &mPositives,
 			std::map<std::string, std::vector<std::vector<float> > > &mNegatives);

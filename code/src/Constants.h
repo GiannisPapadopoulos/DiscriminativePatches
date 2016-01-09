@@ -24,7 +24,7 @@ public:
 	static const bool DEBUG_PCA = true;
 
 	/** Whether to show debug information for the main algorithm (UDoMLDP) */
-	static const bool DEBUG_MAIN_ALG = true;
+	static const bool DEBUG_MAIN_ALG = false;
 
 	/** Whether to show debug information for the svm parts */
 	static const bool DEBUG_SVM = false;

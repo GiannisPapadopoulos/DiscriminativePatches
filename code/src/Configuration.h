@@ -194,6 +194,7 @@ private:
 		}
 	};
 
+	// HOG parameters
 	cv::Size	m_CellSize;
 	cv::Size	m_BlockStride;
 	cv::Size	m_BlockSize;
@@ -201,19 +202,23 @@ private:
 	cv::Size	m_ImageSize;
 	int			m_iNumBins;
 
+	// pca parameters
 	bool		m_bApplyPCA;
 
+	// svm parameters
 	double		m_dSVMCValue;
+    bool		m_bPredictTrainingData;
 
+    // data setup parameters
 	std::string	m_strFilepath;
 	int			m_iDataSetDivider;
 
+	// HOG output parameters
 	bool		m_bWriteHOGImages;
     int			m_iHOGVizImageScalefactor;
     double		m_dHOGVizBinScalefactor;
 
-    bool		m_bPredictTrainingData;
-
+    // haar cascade parameters
     bool		m_bDetectFaces;
     std::string	m_strCascadeFilterFileName;
     double 		m_dFDScale;

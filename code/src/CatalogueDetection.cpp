@@ -82,7 +82,6 @@ void mai::CatalogueDetection::processPipeline()
 {
 	if(m_Config->getDetectFaces())
 	{
-		// TODO finish implementation before usage
 		detectFaces();
 	}
 
@@ -117,7 +116,7 @@ void mai::CatalogueDetection::processPipeline()
 
 	if(Constants::DEBUG_MAIN_ALG)
 	{
-		cout << "[mai::CatalogueDetection::processPipeline] HOG computation done. SVM net ..." << endl;
+		cout << "[mai::CatalogueDetection::processPipeline] HOG computation done. Setting up svm data ..." << endl;
 	}
 
 	if(trainSVMs(iDataSetDivider))
@@ -246,7 +245,16 @@ bool mai::CatalogueDetection::trainSVMs(int iDataSetDivider,
 	map<string, vector<vector<float> > > mNegativeTrain;
 	map<string, vector<vector<float> > > mNegativeValidate;
 
+	if(Constants::DEBUG_MAIN_ALG)
+	{
+		cout << "[mai::CatalogueDetection::trainSVMs] Collecting random negatives for training data." << endl;
+	}
 	collectRandomNegatives(mPositiveTrain, mNegativeTrain);
+
+	if(Constants::DEBUG_MAIN_ALG)
+	{
+		cout << "[mai::CatalogueDetection::trainSVMs] Collecting random negatives for validation data." << endl;
+	}
 	collectRandomNegatives(mPositiveValidate, mNegativeValidate);
 
 	if(Constants::DEBUG_MAIN_ALG)
@@ -259,7 +267,7 @@ bool mai::CatalogueDetection::trainSVMs(int iDataSetDivider,
 
 	if(Constants::DEBUG_MAIN_ALG)
 	{
-		cout << "[mai::CatalogueDetection::trainSVMs] Training data setup done. training svm ..." << endl;
+		cout << "[mai::CatalogueDetection::trainSVMs] Training data setup done. Training svm ..." << endl;
 	}
 
 	// Train svms for each category
@@ -393,7 +401,7 @@ void mai::CatalogueDetection::collectRandomNegatives(map<string, vector<vector<f
 
 				vector<vector<float> > vNegative;
 
-				for(int i = 0; i < iSamplesPerCategory; ++i)
+				for(int i = 0; i < iCurrentSampleSize && i < iSamplesPerCategory; ++i)
 				{
 					vNegative.push_back(itTrainOthers->second[vIndices[i]]);
 				}
