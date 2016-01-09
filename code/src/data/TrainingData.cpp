@@ -36,9 +36,15 @@ mai::TrainingData::TrainingData(vector<vector<float> > &vPositiveFeatures,
 	if(Constants::DEBUG_DATA_SETUP)
 		cout << "[mai::TrainingData] Number of features: " << iFeatureSize << endl;
 
+	int iNumMaxFeatures = vPositiveFeatures.size();
+	if(vPositiveFeatures.size() > vNegativeFeatures.size())
+	{
+		iNumMaxFeatures = vNegativeFeatures.size();
+	}
+
 	vector<std::vector<float> > vData;
-	vData.insert(end(vData), begin(vPositiveFeatures), end(vPositiveFeatures));
-	vData.insert(end(vData), begin(vNegativeFeatures), end(vNegativeFeatures));
+	vData.insert(end(vData), begin(vPositiveFeatures), begin(vPositiveFeatures) + iNumMaxFeatures);
+	vData.insert(end(vData), begin(vNegativeFeatures), begin(vNegativeFeatures) + iNumMaxFeatures);
 
 	// setup training matrices
 	unsigned int iNumPatches = vData.size();

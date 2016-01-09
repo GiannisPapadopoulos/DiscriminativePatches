@@ -81,17 +81,23 @@ private:
 				bool bApplyPCA = false);
 
 	/**
-	 * Setup training data and train svms.
+	 * Setup training data for support vector machine.
+	 * Training and validation data is split according to dataset divider.
+	 * For each category in the catalogue a training matirx is constructed using the images of that category as positive samples
+	 * and the same amount of images taken evenly from all other categries as negative samples.
+	 * Negative samples inside a category are chsoen randomly.
+	 *
+	 * @param iDataSetDivider	divider of dataset size defining validation part, e.g. 4 -> 1/4 of patches will be in validation set.
+	 */
+	void setupSVMData(int iDataSetDivider = 1);
+
+	/**
+	 * Train svms.
 	 * @see svm/umSVM::train
 	 *
 	 * Saves trained svms by catalogue category labels.
-	 *
-	 * @param iDataSetDivider	divider of dataset size defining validation part, e.g. 4 -> 1/4 of patches will be in validation set.
-	 * @param bSearchSupportVectors verify support vector existance in training data.
-	 * @return	training was successful.
 	 */
-	bool trainSVMs(int iDataSetDivider = 1,
-			bool bSearchSupportVectors = false);
+	void trainAndSaveSVMs();
 
 	/**
 	 * Assigns part of the descriptor vectors of each dataset for validation purpose, the rest for training.
@@ -110,6 +116,17 @@ private:
 	 */
 	void collectRandomNegatives(std::map<std::string, std::vector<std::vector<float> > > &mPositives,
 			std::map<std::string, std::vector<std::vector<float> > > &mNegatives);
+
+	/**
+	 * Calculate exact negative sample sizes for a category taking divison rest and partially insufficient samples in one or more categories into account.
+	 *
+	 * @param strKey			key of the currently processed category
+	 * @param[in] mFeatureSizes	Map containing the existing sample sizes for all categories
+	 * @param[out] mSampleSizes	Map where the calculated sample sizes get stored
+	 */
+	void calculateSampleSizes(std::string strKey,
+			std::map<std::string, int> &mFeatureSizes,
+			std::map<std::string, int> &mSampleSizes);
 
 	/**
 	 * Creates training data from positive and negative samples.

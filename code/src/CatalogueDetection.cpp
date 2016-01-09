@@ -39,15 +39,7 @@ using namespace std;
 
 mai::CatalogueDetection::CatalogueDetection(Configuration* config)
 :	m_Config(config)
-{
-	IOUtils::loadCatalogue(m_mCatalogue, IMREAD_COLOR, m_Config->getDataFilepath(), true);
-
-	cout << "[mai::CatalogueDetection::catalogueDetection] Number of labels: " << m_mCatalogue.size() << endl;
-	for (map<string, DataSet*>::const_iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); ++it)
-	{
-		cout << "[mai::CatalogueDetection::catalogueDetection] Label: " << it->first << ", number of images: " << it->second->getImageCount() << endl;
-	}
-}
+{}
 
 mai::CatalogueDetection::~CatalogueDetection()
 {
@@ -80,10 +72,33 @@ mai::CatalogueDetection::~CatalogueDetection()
 
 void mai::CatalogueDetection::processPipeline()
 {
+	cout << "[mai::CatalogueDetection::processPipeline] Loading data ..." << endl;
+
+	if(!IOUtils::loadCatalogue(m_mCatalogue, IMREAD_GRAYSCALE, m_Config->getDataFilepath(), true))
+		return;
+
+	if(m_mCatalogue.size() < 2)
+	{
+		cout << "[mai::CatalogueDetection::processPipeline] ERROR! At least 2 categories are needed." << endl;
+		return;
+	}
+
+	if(Constants::DEBUG_MAIN_ALG)
+	{
+		cout << "[mai::CatalogueDetection::processPipeline] Number of labels: " << m_mCatalogue.size() << endl;
+		for (map<string, DataSet*>::const_iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); ++it)
+		{
+			cout << "[mai::CatalogueDetection::processPipeline] Label: " << it->first << ", number of images: " << it->second->getImageCount() << endl;
+		}
+	}
+
 	if(m_Config->getDetectFaces())
 	{
+		cout << "[mai::CatalogueDetection::processPipeline] Performing face detection ..." << endl;
 		detectFaces();
 	}
+
+	cout << "[mai::CatalogueDetection::processPipeline] Computing HOG descriptors ..." << endl;
 
 	Size cellSize = m_Config->getCellSize();
 	Size blockStride = m_Config->getBlockStride();
@@ -114,39 +129,34 @@ void mai::CatalogueDetection::processPipeline()
 			bWriteHOGImages,
 			bApplyPCA);
 
-	if(Constants::DEBUG_MAIN_ALG)
+	cout << "[mai::CatalogueDetection::processPipeline] Setting up svm data ..." << endl;
+	setupSVMData(iDataSetDivider);
+
+	cout << "[mai::CatalogueDetection::processPipeline] Training svm ..." << endl;
+	trainAndSaveSVMs();
+
+	cout << "[mai::CatalogueDetection::processPipeline] Training SVM done." << endl;
+
+	if(bPredictTrainingData)
 	{
-		cout << "[mai::CatalogueDetection::processPipeline] HOG computation done. Setting up svm data ..." << endl;
+		cout << "#-------------------------------------------------------------------------------#" << endl;
+		cout << "[mai::CatalogueDetection::processPipeline] SVM prediction on training data." << endl;
+
+		map<string, Mat> mTrainingResults;
+		predict(m_mTrain, mTrainingResults);
+
+		cout << "#-------------------------------------------------------------------------------#" << endl;
 	}
 
-	if(trainSVMs(iDataSetDivider))
+	if(iDataSetDivider > 1)
 	{
-		if(Constants::DEBUG_MAIN_ALG)
-		{
-			cout << "[mai::CatalogueDetection::processPipeline] Training SVM done. Predicting ..." << endl;
-		}
+		cout << "#-------------------------------------------------------------------------------#" << endl;
+		cout << "[mai::CatalogueDetection::processPipeline] SVM prediction on validation data." << endl;
 
-		if(bPredictTrainingData)
-		{
-			cout << "#-------------------------------------------------------------------------------#" << endl;
-			cout << "[mai::CatalogueDetection::processPipeline] SVM prediction on training data." << endl;
+		map<string, Mat> mValidationResults;
+		predict(m_mValidate, mValidationResults);
 
-			map<string, Mat> mTrainingResults;
-			predict(m_mTrain, mTrainingResults);
-
-			cout << "#-------------------------------------------------------------------------------#" << endl;
-		}
-
-		if(iDataSetDivider > 1)
-		{
-			cout << "#-------------------------------------------------------------------------------#" << endl;
-			cout << "[mai::CatalogueDetection::processPipeline] SVM prediction on validation data." << endl;
-
-			map<string, Mat> mValidationResults;
-			predict(m_mValidate, mValidationResults);
-
-			cout << "#-------------------------------------------------------------------------------#" << endl;
-		}
+		cout << "#-------------------------------------------------------------------------------#" << endl;
 	}
 }
 
@@ -204,7 +214,7 @@ void mai::CatalogueDetection::computeHOG(Size imageSize,
 		if(bWriteHOGImages)
 		{
 			string strName = it->first;
-			string strPath = "out";
+			string strPath = "outHOG";
 
 			IOUtils::writeHOGImages(it->second,
 					strPath,
@@ -218,11 +228,9 @@ void mai::CatalogueDetection::computeHOG(Size imageSize,
 					m_Config->getHogVizBinScalefactor());
 		}
 	}
-
 }
 
-bool mai::CatalogueDetection::trainSVMs(int iDataSetDivider,
-		bool bSearchSupportVectors)
+void mai::CatalogueDetection::setupSVMData(int iDataSetDivider)
 {
 	// Positive training and validation data per named category
 	map<string, vector<vector<float> > > mPositiveTrain;
@@ -232,13 +240,7 @@ bool mai::CatalogueDetection::trainSVMs(int iDataSetDivider,
 
 	if(Constants::DEBUG_MAIN_ALG)
 	{
-		cout << "[mai::CatalogueDetection::trainSVMs] Dataset division done. Collecting data ..." << endl;
-	}
-
-	if(mPositiveTrain.size() < 2)
-	{
-		cout << "[mai::CatalogueDetection::trainSVMs] ERROR! At least 2 categories needed." << endl;
-		return false;
+		cout << "[mai::CatalogueDetection::setupSVMData] Dataset division done. Collecting data ..." << endl;
 	}
 
 	// Negative training and validation data per named category
@@ -247,29 +249,27 @@ bool mai::CatalogueDetection::trainSVMs(int iDataSetDivider,
 
 	if(Constants::DEBUG_MAIN_ALG)
 	{
-		cout << "[mai::CatalogueDetection::trainSVMs] Collecting random negatives for training data." << endl;
+		cout << "[mai::CatalogueDetection::setupSVMData] Collecting random negatives for training data." << endl;
 	}
 	collectRandomNegatives(mPositiveTrain, mNegativeTrain);
 
 	if(Constants::DEBUG_MAIN_ALG)
 	{
-		cout << "[mai::CatalogueDetection::trainSVMs] Collecting random negatives for validation data." << endl;
+		cout << "[mai::CatalogueDetection::setupSVMData] Collecting random negatives for validation data." << endl;
 	}
 	collectRandomNegatives(mPositiveValidate, mNegativeValidate);
 
 	if(Constants::DEBUG_MAIN_ALG)
 	{
-		cout << "[mai::CatalogueDetection::trainSVMs] Data collection done. Setting up training data ..." << endl;
+		cout << "[mai::CatalogueDetection::setupSVMData] Data collection done. Setting up training data ..." << endl;
 	}
 
 	setupTrainingData(m_mTrain, mPositiveTrain, mNegativeTrain);
 	setupTrainingData(m_mValidate, mPositiveValidate, mNegativeValidate);
+}
 
-	if(Constants::DEBUG_MAIN_ALG)
-	{
-		cout << "[mai::CatalogueDetection::trainSVMs] Training data setup done. Training svm ..." << endl;
-	}
-
+void mai::CatalogueDetection::trainAndSaveSVMs()
+{
 	// Train svms for each category
 	for(map<string, TrainingData*>::const_iterator it = m_mTrain.begin(); it != m_mTrain.end(); it++)
 	{
@@ -293,22 +293,7 @@ bool mai::CatalogueDetection::trainSVMs(int iDataSetDivider,
 		{
 			cout << "[mai::CatalogueDetection::trainSVMs] svm traind for " << strName << endl;
 		}
-
-		if(bSearchSupportVectors)
-		{
-			cout << "[mai::CatalogueDetection::trainSVMs] Searching support vectors in positives .." << endl;
-
-			umSVM::searchSupportVector(mPositiveTrain.at(strName), vSupport);
-
-			cout << "[mai::CatalogueDetection::trainSVMs] Searching support vectors in negatives .." << endl;
-
-			umSVM::searchSupportVector(mNegativeTrain.at(strName), vSupport);
-
-			cout << "[mai::CatalogueDetection::trainSVMs] Searching support vectors done." << endl;
-		}
 	}
-
-	return true;
 }
 
 void mai::CatalogueDetection::predict(map<string, TrainingData*> &mData,
@@ -370,19 +355,25 @@ void mai::CatalogueDetection::divideDataSets(map<string, vector<vector<float> > 
 void mai::CatalogueDetection::collectRandomNegatives(map<string, vector<vector<float> > > &mPositives,
 		map<string, vector<vector<float> > > &mNegatives)
 {
-	for(map<string,vector<vector<float> > >::const_iterator itTrainCategory = mPositives.begin();
+	// Count all sample vector sizes
+	map<string, int> mFeatureSizes;
+
+	for(map<string, vector<vector<float> > >::const_iterator itCategory = mPositives.begin();
+			itCategory != mPositives.end(); itCategory++)
+	{
+		string strKey = itCategory->first;
+		int iSampleSize = itCategory->second.size();
+		mFeatureSizes.insert(pair<string, int>(strKey, iSampleSize));
+	}
+
+	// Collect data from categories
+	for(map<string, vector<vector<float> > >::const_iterator itTrainCategory = mPositives.begin();
 			itTrainCategory != mPositives.end(); itTrainCategory++)
 	{
-		// Find number of desired negative features according to positive ones
-		int iPosSampleSize = itTrainCategory->second.size();
-		int iSamplesPerCategory = iPosSampleSize / (mPositives.size() - 1);
 		string strKey = itTrainCategory->first;
 
-		if(Constants::DEBUG_MAIN_ALG)
-		{
-			cout << "[mai::CatalogueDetection::collectRandomNegatives] Collecting negatives for " << strKey
-					<< ", overall " << iPosSampleSize << ", " << iSamplesPerCategory << " per category " << endl;
-		}
+		map<string, int> mSampleSizes;
+		calculateSampleSizes(strKey, mFeatureSizes, mSampleSizes);
 
 		// Collect negative samples from all other categories
 		for(map<string, vector<vector<float> > >::const_iterator itTrainOthers = mPositives.begin();
@@ -390,7 +381,8 @@ void mai::CatalogueDetection::collectRandomNegatives(map<string, vector<vector<f
 		{
 			if(itTrainCategory != itTrainOthers)
 			{
-				int iCurrentSampleSize = itTrainOthers->second.size();
+				int iCurrentSampleSize = mSampleSizes.at(itTrainOthers->first);
+						//itTrainOthers->second.size();
 				vector<int> vIndices;
 
 				for(int i = 0; i < iCurrentSampleSize; ++i)
@@ -401,19 +393,100 @@ void mai::CatalogueDetection::collectRandomNegatives(map<string, vector<vector<f
 
 				vector<vector<float> > vNegative;
 
-				for(int i = 0; i < iCurrentSampleSize && i < iSamplesPerCategory; ++i)
+				//  && i < mSampleSizes.at(itTrainOthers->first)
+				for(int i = 0; i < iCurrentSampleSize; ++i)
 				{
 					vNegative.push_back(itTrainOthers->second[vIndices[i]]);
 				}
 
 				if(mNegatives.count(strKey) == 0)
 				{
-					mNegatives.insert(std::pair<std::string, std::vector<std::vector<float> > >(strKey, vNegative));
+					mNegatives.insert(pair<string, vector<std::vector<float> > >(strKey, vNegative));
 				}
 				else
 				{
-					mNegatives.at(strKey).insert(std::end(mNegatives.at(strKey)), std::begin(vNegative), std::end(vNegative));
+					mNegatives.at(strKey).insert(end(mNegatives.at(strKey)), begin(vNegative), end(vNegative));
 				}
+			}
+		}
+	}
+}
+
+//iNumCategories = mPositives.size()
+void mai::CatalogueDetection::calculateSampleSizes(string strKey,
+		map<string, int> &mFeatureSizes,
+		map<string, int> &mSampleSizes)
+{
+	// Get all feature sizes
+	int iAllFeatureSizes = 0;
+	for(map<string, int>::const_iterator itHelperCategory = mFeatureSizes.begin();
+			itHelperCategory != mFeatureSizes.end(); itHelperCategory++)
+	{
+		string strHelperKey = itHelperCategory->first;
+		if(strHelperKey.compare(strKey) != 0)
+		{
+			iAllFeatureSizes += itHelperCategory->second;
+		}
+	}
+
+	// Find number of desired negative features according to positive ones
+	int iPosSampleSize = mFeatureSizes.at(strKey);
+	iPosSampleSize = iPosSampleSize < iAllFeatureSizes ? iPosSampleSize : iAllFeatureSizes;
+	int iSamplesPerCategory = iPosSampleSize / (mFeatureSizes.size() - 1);
+	int iRest = iPosSampleSize % (mFeatureSizes.size() - 1);
+
+	// Helper for actual sample sizes
+	mSampleSizes.clear();
+	for(map<string, int>::const_iterator itHelperCategory = mFeatureSizes.begin();
+			itHelperCategory != mFeatureSizes.end(); itHelperCategory++)
+	{
+		mSampleSizes.insert(pair<string, int>(itHelperCategory->first, iSamplesPerCategory));
+	}
+
+	// Disperse possible rest evenly
+	while(iRest > 0)
+	{
+		map<string, int>::iterator itSampleSize = mSampleSizes.begin();
+		map<string, int>::const_iterator itFeatureSize = mFeatureSizes.begin();
+		while(itFeatureSize != mFeatureSizes.end()
+				&& itSampleSize != mSampleSizes.end())
+		{
+			string strFeatureKey = itFeatureSize->first;
+			if(strFeatureKey.compare(strKey) != 0)
+			{
+				int iFeatureSize = itFeatureSize->second;
+				int iSampleSize = itSampleSize->second;
+				if(iSampleSize > iFeatureSize)
+				{
+					iRest += iSampleSize - iFeatureSize;
+
+					itSampleSize->second = iFeatureSize;
+				}
+				else if(iSampleSize + 1 <= iFeatureSize)
+				{
+					if(iRest > 0)
+					{
+						itSampleSize->second++;
+						iRest--;
+					}
+				}
+			}
+
+			itFeatureSize++;
+			itSampleSize++;
+		}
+	}
+
+	if(Constants::DEBUG_MAIN_ALG)
+	{
+		cout << "[mai::CatalogueDetection::calculateSampleSizes] Collecting  " << iPosSampleSize << " negatives for " << strKey << endl;
+		for(map<string, int>::const_iterator itSampleCategory = mSampleSizes.begin();
+				itSampleCategory != mSampleSizes.end(); itSampleCategory++)
+		{
+			string strSampleKey = itSampleCategory->first;
+			if(strSampleKey.compare(strKey) != 0)
+			{
+				cout << "[mai::CatalogueDetection::calculateSampleSizes] " << strSampleKey << " : " << itSampleCategory->second << endl;
 			}
 		}
 	}

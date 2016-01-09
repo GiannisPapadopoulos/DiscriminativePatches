@@ -21,7 +21,7 @@ public:
 	static const bool DEBUG_HOG = false;
 
 	/** Whether to show debug information for the PCA feature reduction */
-	static const bool DEBUG_PCA = true;
+	static const bool DEBUG_PCA = false;
 
 	/** Whether to show debug information for the main algorithm (UDoMLDP) */
 	static const bool DEBUG_MAIN_ALG = false;

@@ -213,7 +213,11 @@ bool mai::IOUtils::loadImage(Mat &image,
 
 		if (bEqualize)
 		{
-			cvtColor(image, image, CV_BGR2GRAY);
+			if(image.channels() == 3 || image.channels() == 4)
+			{
+				cvtColor(image, image, CV_BGR2GRAY);
+			}
+
 			equalizeHist(image, image);
 		}
 
