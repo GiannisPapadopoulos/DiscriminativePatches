@@ -92,14 +92,6 @@ private:
 	void setupSVMData(int iDataSetDivider = 1);
 
 	/**
-	 * Train svms.
-	 * @see svm/umSVM::train
-	 *
-	 * Saves trained svms by catalogue category labels.
-	 */
-	void trainSVMs();
-
-	/**
 	 * Assigns part of the descriptor vectors of each dataset for validation purpose, the rest for training.
 	 *
 	 * @param iDataSetDivider	divider of dataset size defining validation part, e.g. 4 -> 1/4 of patches will be in validation set.
@@ -135,12 +127,6 @@ private:
 	void setupTrainingData(std::map<std::string, TrainingData*> &mTrain,
 			std::map<std::string, std::vector<std::vector<float> > > &mPositives,
 			std::map<std::string, std::vector<std::vector<float> > > &mNegatives);
-
-	/**
-	 * Predicts data divided for each categorized svm.
-	 */
-	void predict(std::map<std::string, TrainingData*> &mData,
-			std::map<std::string, cv::Mat> &mResults);
 
 
 	/**
