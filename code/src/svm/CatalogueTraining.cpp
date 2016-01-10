@@ -12,16 +12,16 @@
  * NO CASE SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY DAMAGES.
  *****************************************************************************/
 
-#include "CatalogueDetection.h"
+#include "CatalogueTraining.h"
 
-#include "Constants.h"
-#include "Configuration.h"
-#include "svm/umSVM.h"
-#include "data/DataSet.h"
-#include "data/TrainingData.h"
-#include "IO/IOUtils.h"
-#include "featureExtraction/umHOG.h"
-#include "utils/FaceDetection.h"
+#include "ClassificationSVM.h"
+#include "../Constants.h"
+#include "../Configuration.h"
+#include "../data/DataSet.h"
+#include "../data/TrainingData.h"
+#include "../IO/IOUtils.h"
+#include "../featureExtraction/umHOG.h"
+#include "../utils/FaceDetection.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -33,15 +33,14 @@
 
 
 using namespace cv;
-
 using namespace std;
 
-
-mai::CatalogueDetection::CatalogueDetection(Configuration* config)
+mai::CatalogueTraining::CatalogueTraining(Configuration* config)
 :	m_Config(config)
+,	m_Classifiers(new ClassificationSVM())
 {}
 
-mai::CatalogueDetection::~CatalogueDetection()
+mai::CatalogueTraining::~CatalogueTraining()
 {
 	for(map<string, DataSet*>::iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); it++)
 	{
@@ -61,16 +60,12 @@ mai::CatalogueDetection::~CatalogueDetection()
 	}
 	m_mValidate.clear();
 
-	for(map<string, umSVM*>::iterator it = m_mSVMs.begin(); it != m_mSVMs.end(); it++)
-	{
-		delete it->second;
-	}
-	m_mSVMs.clear();
+	delete m_Classifiers;
 
 	delete m_Config;
 }
 
-void mai::CatalogueDetection::processPipeline()
+void mai::CatalogueTraining::processPipeline()
 {
 	cout << "[mai::CatalogueDetection::processPipeline] Loading data ..." << endl;
 
@@ -133,7 +128,8 @@ void mai::CatalogueDetection::processPipeline()
 	setupSVMData(iDataSetDivider);
 
 	cout << "[mai::CatalogueDetection::processPipeline] Training svm ..." << endl;
-	trainAndSaveSVMs();
+
+	m_Classifiers->trainSVMs(m_mTrain, m_Config->getSvmCValue());
 
 	cout << "[mai::CatalogueDetection::processPipeline] Training SVM done." << endl;
 
@@ -143,7 +139,7 @@ void mai::CatalogueDetection::processPipeline()
 		cout << "[mai::CatalogueDetection::processPipeline] SVM prediction on training data." << endl;
 
 		map<string, Mat> mTrainingResults;
-		predict(m_mTrain, mTrainingResults);
+		m_Classifiers->predict(m_mTrain, mTrainingResults);
 
 		cout << "#-------------------------------------------------------------------------------#" << endl;
 	}
@@ -154,13 +150,22 @@ void mai::CatalogueDetection::processPipeline()
 		cout << "[mai::CatalogueDetection::processPipeline] SVM prediction on validation data." << endl;
 
 		map<string, Mat> mValidationResults;
-		predict(m_mValidate, mValidationResults);
+		m_Classifiers->predict(m_mValidate, mValidationResults);
 
 		cout << "#-------------------------------------------------------------------------------#" << endl;
 	}
+
+	if(m_Config->getWriteSvMs())
+	{
+		string strSVMPath = m_Config->getSvmOutputPath();
+		cout << "[mai::CatalogueDetection::processPipeline] Saving SVM to " << strSVMPath << endl;
+
+		IOUtils::writeSVMs(m_Classifiers->getSVMs(), strSVMPath);
+		cout << "[mai::CatalogueDetection::processPipeline] Saving SVM done." << endl;
+	}
 }
 
-void mai::CatalogueDetection::detectFaces()
+void mai::CatalogueTraining::detectFaces()
 {
 	for(map<string, DataSet*>::iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); it++)
 	{
@@ -189,7 +194,7 @@ void mai::CatalogueDetection::detectFaces()
 	}
 }
 
-void mai::CatalogueDetection::computeHOG(Size imageSize,
+void mai::CatalogueTraining::computeHOG(Size imageSize,
 		Size blockSize,
 		Size blockStride,
 		Size cellSize,
@@ -214,7 +219,7 @@ void mai::CatalogueDetection::computeHOG(Size imageSize,
 		if(bWriteHOGImages)
 		{
 			string strName = it->first;
-			string strPath = "outHOG";
+			string strPath = m_Config->getHogOutputPath();
 
 			IOUtils::writeHOGImages(it->second,
 					strPath,
@@ -230,7 +235,7 @@ void mai::CatalogueDetection::computeHOG(Size imageSize,
 	}
 }
 
-void mai::CatalogueDetection::setupSVMData(int iDataSetDivider)
+void mai::CatalogueTraining::setupSVMData(int iDataSetDivider)
 {
 	// Positive training and validation data per named category
 	map<string, vector<vector<float> > > mPositiveTrain;
@@ -268,75 +273,7 @@ void mai::CatalogueDetection::setupSVMData(int iDataSetDivider)
 	setupTrainingData(m_mValidate, mPositiveValidate, mNegativeValidate);
 }
 
-void mai::CatalogueDetection::trainAndSaveSVMs()
-{
-	// Train svms for each category
-	for(map<string, TrainingData*>::const_iterator it = m_mTrain.begin(); it != m_mTrain.end(); it++)
-	{
-		string strName = it->first;
-		TrainingData* data = it->second;
-		umSVM* svm = new umSVM(m_Config->getSvmCValue());
-		vector<vector<float> > vSupport;
-
-//		std::string strDataname = "trainingdata";
-//		IOUtils::writeMatToCSV(data->getData(), strDataname);
-//		std::string strLabelname = "labeldata";
-//		IOUtils::writeMatToCSV(data->getLabels(), strLabelname);
-
-		svm->trainSVM(data->getData(), data->getLabels(), vSupport);
-
-		m_mSVMs.insert(pair<string, umSVM*>(strName, svm));
-
-		svm->saveSVM(strName);
-
-		if(Constants::DEBUG_MAIN_ALG)
-		{
-			cout << "[mai::CatalogueDetection::trainSVMs] svm traind for " << strName << endl;
-		}
-	}
-}
-
-void mai::CatalogueDetection::predict(map<string, TrainingData*> &mData,
-		map<string, Mat> &mResults)
-{
-	// Predict data by trained svms for each category
-	for(map<string, TrainingData*>::const_iterator it = mData.begin();
-			it != mData.end(); it++)
-	{
-		string strName = it->first;
-		umSVM* svm = m_mSVMs.at(strName);
-
-		// result matrix containing predicted labels
-		Mat results(it->second->getData().rows, 1, CV_32SC1);
-
-		svm->predict(it->second->getData(), results);
-
-		int iResultsRows = results.rows;
-		int iCorrectDetection = 0;
-
-		cout << "[mai::CatalogueDetection::predict] SVM prediction result for label " << strName << " has " << iResultsRows << " rows." << endl;
-
-		// Compare predicted labels with original ones
-		for(int i = 0; i < iResultsRows; ++i)
-		{
-			int iResultLabel = results.at<float>(i);
-			int iDataLabel = it->second->getLabels().at<int>(i);
-
-			if(iResultLabel == iDataLabel)
-				iCorrectDetection++;
-
-			if(Constants::DEBUG_SVM_PREDICTION)
-				cout << "[mai::CatalogueDetection::predict] SVM predict for image " << i << " is " << iResultLabel << ". Label was : " << iDataLabel << endl;
-		}
-
-		double dCorrectDetectionRatio = (double)iCorrectDetection / iResultsRows;
-		cout << "[mai::CatalogueDetection::predict] Ratio of correct detections for label " << strName << " : " << dCorrectDetectionRatio << endl;
-
-		mResults.insert(pair<string, Mat>(strName, results));
-	}
-}
-
-void mai::CatalogueDetection::divideDataSets(map<string, vector<vector<float> > > &mTrain,
+void mai::CatalogueTraining::divideDataSets(map<string, vector<vector<float> > > &mTrain,
 			map<string, vector<vector<float> > > &mValidate,
 			int iDataSetDivider)
 {
@@ -352,7 +289,7 @@ void mai::CatalogueDetection::divideDataSets(map<string, vector<vector<float> > 
 	}
 }
 
-void mai::CatalogueDetection::collectRandomNegatives(map<string, vector<vector<float> > > &mPositives,
+void mai::CatalogueTraining::collectRandomNegatives(map<string, vector<vector<float> > > &mPositives,
 		map<string, vector<vector<float> > > &mNegatives)
 {
 	// Count all sample vector sizes
@@ -412,8 +349,7 @@ void mai::CatalogueDetection::collectRandomNegatives(map<string, vector<vector<f
 	}
 }
 
-//iNumCategories = mPositives.size()
-void mai::CatalogueDetection::calculateSampleSizes(string strKey,
+void mai::CatalogueTraining::calculateSampleSizes(string strKey,
 		map<string, int> &mFeatureSizes,
 		map<string, int> &mSampleSizes)
 {
@@ -492,7 +428,7 @@ void mai::CatalogueDetection::calculateSampleSizes(string strKey,
 	}
 }
 
-void mai::CatalogueDetection::setupTrainingData(map<string, TrainingData*> &mTrainingData,
+void mai::CatalogueTraining::setupTrainingData(map<string, TrainingData*> &mTrainingData,
 			map<string, vector<vector<float> > > &mPositives,
 			map<string, vector<vector<float> > > &mNegatives)
 {

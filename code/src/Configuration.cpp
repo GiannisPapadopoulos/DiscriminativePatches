@@ -41,6 +41,7 @@ mai::Configuration::Configuration(const string &strFilename)
 	m_bApplyPCA = pt.get<bool>("HOG.APPLY_PCA", false, trBool);
 
 	m_bWriteHOGImages = pt.get<bool>("HOG.WRITE_HOGIMAGES", true, trBool);
+	m_strHOGOutputPath = pt.get<std::string>("HOG.FILEPATH", "outHOG");
 	m_iHOGVizImageScalefactor = pt.get<int>("HOG.VIZ_IMAGE_SCALEFACTOR", 4, trInt);
 	m_dHOGVizBinScalefactor = pt.get<double>("HOG.VIZ_BIN_SCALEFACTOR", 2.0, trDouble);
 
@@ -48,6 +49,8 @@ mai::Configuration::Configuration(const string &strFilename)
 	m_strFilepath = pt.get<std::string>("DATA.FILEPATH");
 
 	m_dSVMCValue = pt.get<double>("SVM.C_VALUE", 0.1, trDouble);
+	m_bWriteSVMs = pt.get<bool>("SVM.WRITE_SVMS", true, trBool);
+	m_strSVMOutputPath = pt.get<std::string>("SVM.FILEPATH", "outSVM");
 
 	m_bPredictTrainingData = pt.get<bool>("SVM.PREDICT_TRAININGDATA", true, trBool);
 

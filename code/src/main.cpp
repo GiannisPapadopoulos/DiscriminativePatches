@@ -16,7 +16,7 @@
 #include <string>
 
 #include "Configuration.h"
-#include "CatalogueDetection.h"
+#include "svm/CatalogueTraining.h"
 #include "svm/svmtest.h"
 
 using namespace std;
@@ -86,7 +86,7 @@ int main(int argc, char** argv )
 
 	Configuration* config = new Configuration(strConfigFile);
 
-	CatalogueDetection* main = new CatalogueDetection(config);
+	CatalogueTraining* main = new CatalogueTraining(config);
 	main->processPipeline();
 	delete main;
 

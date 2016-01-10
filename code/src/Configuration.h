@@ -115,12 +115,24 @@ public:
 		return m_bPredictTrainingData;
 	};
 
+	bool getWriteSvMs() const {
+		return m_bWriteSVMs;
+	}
+
+	const std::string& getSvmOutputPath() const {
+		return m_strSVMOutputPath;
+	}
+
 	/**
 	 * Whether to export the hog visualization as image files
 	 */
 	bool getWriteHogImages() const {
 		return m_bWriteHOGImages;
 	};
+
+	const std::string& getHogOutputPath() const {
+		return m_strHOGOutputPath;
+	}
 
 	bool getApplyPCA() const {
 		return m_bApplyPCA;
@@ -207,7 +219,11 @@ private:
 
 	// svm parameters
 	double		m_dSVMCValue;
+
     bool		m_bPredictTrainingData;
+
+    bool		m_bWriteSVMs;
+    std::string	m_strSVMOutputPath;
 
     // data setup parameters
 	std::string	m_strFilepath;
@@ -215,6 +231,7 @@ private:
 
 	// HOG output parameters
 	bool		m_bWriteHOGImages;
+	std::string	m_strHOGOutputPath;
     int			m_iHOGVizImageScalefactor;
     double		m_dHOGVizBinScalefactor;
 

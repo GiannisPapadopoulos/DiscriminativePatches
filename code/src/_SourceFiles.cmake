@@ -5,8 +5,6 @@ set( RelativeSourceGroup "Source Files" )
 set( SubDirs data featureExtraction IO svm utils )
 
 set( DirFiles
-	CatalogueDetection.cpp
-	CatalogueDetection.h
 	Configuration.cpp
 	Configuration.h
 	Constants.h

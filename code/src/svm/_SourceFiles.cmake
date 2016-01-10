@@ -3,6 +3,10 @@ set( RelativeDir "src/svm" )
 set( RelativeSourceGroup "Source Files\\svm" )
 
 set( DirFiles
+	CatalogueTraining.cpp
+	CatalogueTraining.h
+	ClassificationSVM.cpp
+	ClassificationSVM.h
 	svmtest.cpp
 	svmtest.h
 	umSVM.cpp

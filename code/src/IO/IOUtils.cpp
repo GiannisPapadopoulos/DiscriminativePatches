@@ -16,6 +16,7 @@
 #include "../Constants.h"
 #include "../data/DataSet.h"
 #include "../featureExtraction/umHOG.h"
+#include "../svm/umSVM.h"
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/ml/ml.hpp>
@@ -404,10 +405,30 @@ void mai::IOUtils::showImage(const Mat* image)
 	waitKey(0);
 }
 
+bool mai::IOUtils::createDirectory(const string &strPath)
+{
+	boost::filesystem::path dir(strPath);
+	if (!exists(dir))
+	{
+		if (!boost::filesystem::create_directory(dir))
+		{
+			cout << "[mai::IOUtils::CreateDirectory] ERROR creating directory: " << strPath << endl;
+			return false;
+		}
+	}
+
+	return true;
+}
+
 void mai::IOUtils::writeImages(vector<Mat*> &vImages,
-		std::vector<std::string> &vImageNames,
+		vector<string> &vImageNames,
 		const string &strPath)
 {
+	if(!createDirectory(strPath))
+	{
+		return;
+	}
+
 	boost::filesystem::path dir(strPath);
 	if (!exists(dir))
 	{
@@ -442,13 +463,9 @@ void mai::IOUtils::writeHOGImages(mai::DataSet* data,
 			double vizFactor,
 			bool printValue)
 {
-	boost::filesystem::path dir(strPath);
-	if (!exists(dir))
+	if(!createDirectory(strPath))
 	{
-		if (!boost::filesystem::create_directory(dir))
-		{
-			cout << "[mai::IOUtils::writeHOGImages] ERROR creating directory: " << strPath << endl;
-		}
+		return;
 	}
 
 	for ( unsigned int i = 0; i < data->getImageCount(); ++i )
@@ -486,6 +503,27 @@ void mai::IOUtils::writeHOGImages(mai::DataSet* data,
 	}
 }
 
+void mai::IOUtils::writeSVMs(const map<string, umSVM*> &mSVMs,
+			const string &strPath)
+{
+	if(!createDirectory(strPath))
+	{
+		return;
+	}
+
+	for(map<string, umSVM*>::const_iterator it = mSVMs.begin(); it != mSVMs.end(); it++)
+	{
+		string strName = it->first;
+		umSVM* svm = it->second;
+
+		stringstream sstm;
+		sstm << strPath << "/" << strName;
+		string strFileName = sstm.str();
+
+		svm->saveSVM(strFileName);
+	}
+}
+
 void mai::IOUtils::writeMatToCSV(const Mat &data,
 				const string &strMatName)
 {
@@ -497,5 +535,42 @@ void mai::IOUtils::writeMatToCSV(const Mat &data,
 	file << strMatName << data;
 
 	file.release();
+}
+
+bool mai::IOUtils::loadSVMsFromDirectory(map<string, umSVM*> &mSVMs,
+		const string &strPath)
+{
+	boost::filesystem::path directory( boost::filesystem::initial_path<boost::filesystem::path>() );
+	directory = boost::filesystem::system_complete( boost::filesystem::path( strPath ) );
+
+	if ( !exists( directory ) )
+	{
+		cout << "[mai::IOUtils::loadSVMsFromDirectory] ERROR loading svms. Path does not exist: " << directory << endl;
+		return false;
+	}
+
+	// default construction yields past-the-end
+	boost::filesystem::directory_iterator end_itr;
+
+	for ( boost::filesystem::directory_iterator itr( directory ); itr != end_itr; ++itr )
+	{
+		if ( !is_directory(itr->status()) )
+		{
+#ifdef linux
+			string strFilePath = itr->path().c_str();
+			string strLabel = itr->path().stem().c_str();
+#else
+			string strFilePath = itr->path().string();
+			string strLabel = itr->path().stem().string();
+#endif
+
+			umSVM* svm = new umSVM();
+			svm->loadSVM(strFilePath);
+
+			mSVMs.insert(pair<string, umSVM*>(strLabel, svm));
+		}
+	}
+
+	return true;
 }
 

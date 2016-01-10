@@ -24,6 +24,7 @@
 namespace mai{
 
 class DataSet;
+class umSVM;
 
 /**
  * Input and output tools
@@ -186,10 +187,17 @@ public:
 	static void showImage( const cv::Mat* image );
 
 	/**
+	 * Create given directory if it does not already exist.
+	 *
+	 * @param strPath	relative or absolut path of directory
+	 */
+	static bool createDirectory(const std::string &strPath );
+
+	/**
 	 * Write images as jpgs to a folder with indexed filename strFileNameBase_Index.jpg
 	 *
 	 * @param[in] vImages	images to write
-	 * @param strPath		existing filesystem folder without trailing slash
+	 * @param strPath		filesystem folder without trailing slash
 	 * @param strFileNameBase	base part of filename
 	 */
 	static void writeImages( std::vector<cv::Mat*> &vImages,
@@ -202,7 +210,7 @@ public:
 	 * Uses featureExtraction/umHOG::getHOGDescriptorVisualImage
 	 *
 	 * @param[in] data		images and descriptorvalues to write
-	 * @param strPath		existing filesystem folder without trailing slash
+	 * @param strPath		filesystem folder without trailing slash
 	 * @param strFileNameBase	base part of filename
 	 */
 	static void writeHOGImages( DataSet* data,
@@ -216,6 +224,18 @@ public:
 			int scaleFactor,
 			double vizFactor,
 			bool printValue = false);
+
+	/**
+	 * Write svms to given folder.
+	 *
+	 * @param mSVMs		trained svms
+	 * @param strPath	filesystem folder without trailing slash
+	 */
+	static void writeSVMs(const std::map<std::string, umSVM*> &mSVMs,
+			const std::string &strPath);
+
+	static bool loadSVMsFromDirectory(std::map<std::string, umSVM*> &mSVMs,
+			const std::string &strPath);
 
 	/**
 	 * Write OpenCV mat to csv file.

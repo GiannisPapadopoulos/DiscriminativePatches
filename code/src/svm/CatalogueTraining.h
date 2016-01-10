@@ -12,8 +12,8 @@
  * NO CASE SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY DAMAGES.
  *****************************************************************************/
 
-#ifndef SRC_CATALOGUEDETECTION_H_
-#define SRC_CATALOGUEDETECTION_H_
+#ifndef SRC_SVM_CATALOGUETRAINING_H_
+#define SRC_SVM_CATALOGUETRAINING_H_
 
 #include <string>
 #include <vector>
@@ -25,25 +25,25 @@ namespace mai{
 class Configuration;
 class DataSet;
 class TrainingData;
-class umSVM;
+class ClassificationSVM;
 
 /**
  * Train classifiers and predict sampled images on a catalogue of labeled images.
  *
  */
-class CatalogueDetection
+class CatalogueTraining
 {
 public:
 
 	/**
 	 * Load image catalogue according to configuration
 	 */
-	CatalogueDetection(Configuration* config);
+	CatalogueTraining(Configuration* config);
 
 	/**
 	 * Deletes everything
 	 */
-	virtual ~CatalogueDetection();
+	virtual ~CatalogueTraining();
 
 	/**
 	 * Processing pipeline:
@@ -97,7 +97,7 @@ private:
 	 *
 	 * Saves trained svms by catalogue category labels.
 	 */
-	void trainAndSaveSVMs();
+	void trainSVMs();
 
 	/**
 	 * Assigns part of the descriptor vectors of each dataset for validation purpose, the rest for training.
@@ -159,9 +159,9 @@ private:
 	std::map<std::string, TrainingData*> m_mValidate;
 
 	/**
-	 * Trained SVMs per named category
+	 * Trained svms
 	 */
-	std::map<std::string, umSVM*> m_mSVMs;
+	ClassificationSVM* m_Classifiers;
 
 	/**
 	 * Application settings
@@ -173,4 +173,4 @@ private:
 
 
 
-#endif /* SRC_CATALOGUEDETECTION_H_ */
+#endif /* SRC_SVM_CATALOGUETRAINING_H_ */

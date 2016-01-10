@@ -75,12 +75,12 @@ public:
 	void predict(const cv::Mat &data, cv::Mat &results);
 
 	/**
-	 *
+	 * Save svm as xml. ".xml" will be added to the given name.
 	 */
 	void saveSVM(const std::string &strFilename);
 
 	/**
-	 *
+	 * Load svm from given file.
 	 */
 	void loadSVM(const std::string &strFilename);
 
