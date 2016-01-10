@@ -51,16 +51,11 @@ void mai::umHOG::computeHOGForDataSet(DataSet* data,
 	{
 		const Mat* image = data->getImageAt(i);
 
-		if(Constants::DEBUG_HOG) {
-		  cout << "[mai::cvHOG::computeHOGForDataSet] resizing image to " << imageSize << endl;
-		}
-		Mat resizedImage;
-		resize(*image, resizedImage, imageSize);
-
 		vector<float> descriptorsValues;
 
 		umHOG::extractFeatures(descriptorsValues,
-				resizedImage,
+				*image,
+				imageSize,
 				blockSize,
 				blockStride,
 				cellSize,
@@ -74,7 +69,8 @@ void mai::umHOG::computeHOGForDataSet(DataSet* data,
 }
 
 void mai::umHOG::extractFeatures(vector<float> &descriptorsValues,
-								Mat &image,
+								const Mat &image,
+								Size imageSize,
 								Size blockSize,
 								Size blockStride,
 								Size cellSize,
@@ -83,21 +79,25 @@ void mai::umHOG::extractFeatures(vector<float> &descriptorsValues,
 								Size padding,
 								bool bApplyPCA)
 {
-	Size sizeImage = image.size();
+	if(Constants::DEBUG_HOG) {
+	  cout << "[mai::cvHOG::computeHOGForDataSet] resizing image to " << imageSize << endl;
+	}
+	Mat resizedImage;
+	resize(image, resizedImage, imageSize);
 
 	if(Constants::DEBUG_HOG) {
 		cout << "[mai::cvHOG::extractFeatures] computing HOG with blocksize " << blockSize
 				<< ", blockstride " << blockStride << ", cellSize " << cellSize << ", num Bins " << iNumBins << endl;
 	}
 
-	HOGDescriptor hog( sizeImage, blockSize, blockStride, cellSize, iNumBins);
+	HOGDescriptor hog( imageSize, blockSize, blockStride, cellSize, iNumBins);
 
 	vector< Point> locations;
 
 	if(bApplyPCA)
 	{
 		vector<float> unreducedFeatures;
-		hog.compute( image, unreducedFeatures, winStride, padding, locations);
+		hog.compute( resizedImage, unreducedFeatures, winStride, padding, locations);
 
 		umPCA::decreaseHOGDescriptorCellsByPCA(
 				unreducedFeatures,
@@ -110,7 +110,7 @@ void mai::umHOG::extractFeatures(vector<float> &descriptorsValues,
 	}
 	else
 	{
-		hog.compute( image, descriptorsValues, winStride, padding, locations);
+		hog.compute( resizedImage, descriptorsValues, winStride, padding, locations);
 	}
 
 	if(Constants::DEBUG_HOG) {

@@ -24,6 +24,7 @@ namespace mai{
 
 class TrainingData;
 class umSVM;
+class Configuration;
 
 /**
  * Unsupervised discovery of mid-level discriminative patches
@@ -52,11 +53,42 @@ public:
 	void trainSVMs(std::map<std::string, TrainingData*> &mTrainingData,
 			double dCValue);
 
+	/**
+	 * Load trained svms from filesystem.
+	 *
+	 * @param strPath	Path to folder containing traind svm descriptions.
+	 * @return			Were there any errors on loading ?
+	 */
 	bool loadSVMs(const std::string &strPath);
 
+
+	/**
+	 * Predict data using the stored svms.
+	 *
+	 * @param[in] mData		Data that has to be predicted.
+	 * @param[out] mResults	Result matrix containing predicted labels according to input matrices
+	 */
 	void predict(std::map<std::string, TrainingData*> &mData,
 			std::map<std::string, cv::Mat> &mResults);
 
+	/**
+	 * Classify a single image by the stored svms.
+	 *
+	 * @param[in] image		Image to be classified
+	 * @param[out] mResults Predicted distances for each svm category
+	 * @param config		Configuration containing HOG parameters as used for training
+	 * @return				Category name of best prediction
+	 */
+	std::string predict(const cv::Mat &image,
+			std::map<std::string, float> &mResults,
+			Configuration* config);
+
+	void loadAndPredictImage(const std::string &strFilename,
+			Configuration* config);
+
+	/**
+	 * Access the stored svms
+	 */
 	const std::map<std::string, umSVM*>& getSVMs() const {
 		return m_mSVMs;
 	}

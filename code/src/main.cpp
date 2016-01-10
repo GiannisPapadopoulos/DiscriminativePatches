@@ -18,6 +18,8 @@
 #include "Configuration.h"
 #include "svm/CatalogueTraining.h"
 #include "svm/svmtest.h"
+#include "IO/IOUtils.h"
+#include "svm/ClassificationSVM.h"
 
 using namespace std;
 using namespace mai;
@@ -37,7 +39,10 @@ int main(int argc, char** argv )
 		return -1;
 	}
 
-	string strConfigFile;
+	bool bPredict = false;
+	bool bTrain = false;
+	string strConfigFile = "";
+	string strImage = "";
 
 	for(int i = 0; i < argc; ++i)
 	{
@@ -46,13 +51,17 @@ int main(int argc, char** argv )
 			if(i+1 < argc)
 			{
 				strConfigFile = string(argv[i+1]);
-
 			}
 			else
 			{
 				cerr << "ERROR: Option -config given without filepath." << endl;
 				return -1;
 			}
+		}
+
+		if(string(argv[i]) == "-train")
+		{
+			bTrain = true;
 		}
 
 		if(string(argv[i]) == "-svmtest")
@@ -82,13 +91,45 @@ int main(int argc, char** argv )
 				return -1;
 			}
 		}
+
+		if(string(argv[i]) == "-predict")
+		{
+			if(i+1 < argc)
+			{
+				strImage = string(argv[i+1]);
+				bPredict = true;
+			}
+			else
+			{
+				cerr << "ERROR: Option -predict given without filename." << endl;
+				return -1;
+			}
+		}
+	}
+
+	if(strConfigFile.empty())
+	{
+		cerr << "ERROR: No configuration file given." << endl;
+		return -1;
 	}
 
 	Configuration* config = new Configuration(strConfigFile);
 
-	CatalogueTraining* main = new CatalogueTraining(config);
-	main->processPipeline();
-	delete main;
+	if(bTrain)
+	{
+		cout << "Training classifiers according to configuration given in " << strConfigFile << endl;
+		CatalogueTraining* trainer = new CatalogueTraining(config);
+		trainer->processPipeline();
+		delete trainer;
+	}
+
+	if(bPredict)
+	{
+		cout << "Predicting image from " << strImage << " according to configuration given in " << strConfigFile << endl;
+		ClassificationSVM* classifier = new ClassificationSVM();
+		classifier->loadAndPredictImage(strImage, config);
+		delete classifier;
+	}
 
 	return 0;
 }

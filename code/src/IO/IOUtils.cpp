@@ -568,6 +568,11 @@ bool mai::IOUtils::loadSVMsFromDirectory(map<string, umSVM*> &mSVMs,
 			svm->loadSVM(strFilePath);
 
 			mSVMs.insert(pair<string, umSVM*>(strLabel, svm));
+
+			if(Constants::DEBUG_SVM_PREDICTION)
+			{
+				cout << "[mai::IOUtils::loadSVMsFromDirectory] SVM loaded for category " << strLabel << endl;
+			}
 		}
 	}
 

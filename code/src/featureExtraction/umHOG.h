@@ -45,6 +45,7 @@ public:
 	 * @see featureExtraction/umHOG::extractFeatures
 	 *
 	 * @param data			from which features are extracted
+	 * @param imageSize
 	 * @param blockSize
 	 * @param blockStride
 	 * @param cellSize
@@ -63,6 +64,7 @@ public:
 			bool bApplyPCA = false);
 
 	/**
+	 * Image will be resized to imageSize for further processing to ensure equal size.
 	 * Block size and block stride have to multiples of cell size.
 	 * Image size has to be multiple of block size.
 	 * Bins are 1, 3, 5, 7, 9, .. with 9 as optimum.
@@ -74,6 +76,7 @@ public:
 	 *
 	 * @param[out] descriptorsValues	extracted features
 	 * @param[in] image		from which features are extracted
+	 * @param imageSize
 	 * @param blockSize
 	 * @param blockStride
 	 * @param cellSize
@@ -83,7 +86,8 @@ public:
 	 * @param bApplyPCA		reduce features by applying PCA. @see featureExtraction/umPCA::decreaseHOGDescriptorCellsByPCA
 	 */
 	static void extractFeatures(std::vector<float> &descriptorsValues,
-			cv::Mat &image,
+			const cv::Mat &image,
+			cv::Size imageSize,
 			cv::Size blockSize = cv::Size(16,16),
 			cv::Size blockStride = cv::Size(8,8),
 			cv::Size cellSize = cv::Size(8,8),
