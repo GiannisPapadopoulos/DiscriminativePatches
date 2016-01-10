@@ -19,6 +19,8 @@
 
 #include <vector>
 
+using namespace std;
+
 namespace mai{
 
 /**
@@ -98,6 +100,12 @@ public:
 	bool addDescriptorValuesToImageAt(int iIndex,
 			const std::vector<float> &vDescriptorValues);
 
+  /**
+   * Add feature vectors for each patch for image at position iIndex
+   */
+	bool addPatchDescriptorValuesToImageAt(int iIndex,
+	    const std::vector<vector<vector<float>>> &patchDescriptorValues);
+
 	/**
 	 * Get the feature vector from the image at position iIndex.
 	 */
@@ -111,6 +119,20 @@ public:
 		}
 		return false;
 	};
+
+  /**
+   * Get the feature vectors for all patches from the image at position iIndex.
+   */
+  bool getPatchDescriptorValuesFromImageAt(int iIndex,
+      std::vector<vector<vector<float>>> &vPatchDescriptorValues)
+  {
+    if(m_vData[iIndex] != NULL)
+    {
+      vPatchDescriptorValues = m_vData[iIndex]->getPatchDescriptorValues();
+      return true;
+    }
+    return false;
+  };
 
 	/**
 	 * Add all images with their names from the input vectors.
@@ -184,13 +206,22 @@ private:
 			return m_vDescriptorValues;
 		};
 
+    const std::vector<vector<vector<float>>>& getPatchDescriptorValues() const {
+      return m_patchDescriptorValues;
+    };
+
 		void setDescriptorValues(const std::vector<float> &vDescriptorValues) {
 			m_vDescriptorValues = vDescriptorValues;
 		};
 
+    void setPatchDescriptorValues(const std::vector<vector<vector<float>>> &patchDescriptorValues) {
+      m_patchDescriptorValues = patchDescriptorValues;
+    };
+
 	private:
 		cv::Mat*			m_pImage;
 		std::vector<float>	m_vDescriptorValues;
+		std::vector<vector<vector<float>>> m_patchDescriptorValues;
 		std::string			m_strImageName;
 	};
 

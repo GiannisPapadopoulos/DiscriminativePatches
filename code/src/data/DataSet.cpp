@@ -44,6 +44,16 @@ bool mai::DataSet::addDescriptorValuesToImageAt(int iIndex,
 	return false;
 }
 
+bool mai::DataSet::addPatchDescriptorValuesToImageAt(int iIndex,
+    const std::vector<vector<vector<float>>> &patchDescriptorValues)
+{
+  if(m_vData[iIndex] != NULL)
+  {
+    m_vData[iIndex]->setPatchDescriptorValues(patchDescriptorValues);
+  }
+  return false;
+}
+
 int mai::DataSet::setImages(vector<Mat*> &vImages,
 		vector<string> &vImageNames)
 {

@@ -39,8 +39,8 @@ int main(int argc, char** argv )
 		return -1;
 	}
 
-	bool bPredict = false;
-	bool bTrain = false;
+	bool bPredict = true;
+	bool bTrain = true;
 	string strConfigFile = "";
 	string strImage = "";
 

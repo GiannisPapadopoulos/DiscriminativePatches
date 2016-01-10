@@ -46,6 +46,11 @@ void mai::umHOG::computeHOGForDataSet(DataSet* data,
 		Size padding,
 		bool bApplyPCA)
 {
+  int cellsPerBlock = (blockSize.width / cellSize.width) * (blockSize.height / cellSize.height);
+  int blockFeatures = cellsPerBlock * iNumBins;
+  int blocksPerRow = imageSize.width / blockStride.width - (blockSize.width / blockStride.width - 1) ;
+  int blocksPerColumn = imageSize.height / blockStride.height - (blockSize.height / blockStride.height - 1) ;
+
 	// Extract features from all images in dataset.
 	for(unsigned int i = 0; i < data->getImageCount(); ++i)
 	{
@@ -65,6 +70,22 @@ void mai::umHOG::computeHOGForDataSet(DataSet* data,
 				bApplyPCA);
 
 		data->addDescriptorValuesToImageAt(i, descriptorsValues);
+
+		vector<vector<vector<float>>> patchDescriptorValues(blocksPerColumn);
+		for(int i = 0; i < blocksPerColumn; i++) {
+		  patchDescriptorValues[i] = vector<vector<float>>(blocksPerRow);
+		}
+
+    for(int i = 0; i < blocksPerColumn; i++) {
+      for(int j = 0; j < blocksPerRow; j++) {
+        patchDescriptorValues[i][j] = vector<float>(blockFeatures);
+        int block = blocksPerColumn * i + j;
+        std::copy(descriptorsValues.begin() + block * blockFeatures, descriptorsValues.begin() + (block +1) * blockFeatures, patchDescriptorValues[i][j].begin());
+      }
+    }
+    data->addPatchDescriptorValuesToImageAt(i, patchDescriptorValues);
+
+//		cout << patchDescriptorValues.size() << " " << patchDescriptorValues[0].size() << " " << patchDescriptorValues[0][0].size() << endl;
 	}
 }
 
