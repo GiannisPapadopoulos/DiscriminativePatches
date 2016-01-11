@@ -153,9 +153,9 @@ bool mai::IOUtils::loadImagesOrdered(vector<Mat*> &vImages,
     	    	{
 
 #ifdef linux
-    				string strDirectoryItem = directoryItem.c_str();
+    				string strDirectoryItem = subDirectoryItem.c_str();
 #else
-    				string strDirectoryItem = directoryItem.string();
+    				string strDirectoryItem = subDirectoryItem.string();
 #endif
 
     				loadAndAddImage(vImages,
