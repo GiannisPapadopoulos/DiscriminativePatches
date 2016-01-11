@@ -2,7 +2,7 @@
 set( RelativeDir "src" )
 set( RelativeSourceGroup "Source Files" )
 
-set( SubDirs data featureExtraction IO svm utils )
+set( SubDirs data featureExtraction IO svm utils kmeans )
 
 set( DirFiles
 	Configuration.cpp
