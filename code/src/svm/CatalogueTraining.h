@@ -68,6 +68,8 @@ private:
 	 * Computes HOG descriptors for all Datasets in catalogue.
 	 * @see featureExtraction/umHOG::computeHOGForDataSet
 	 *
+	 * After feature extraction images are removed from dataset to free memory.
+	 *
 	 * param bWriteHOGImages	write HOG visualization to local folder "out"
 	 */
 	void computeHOG(cv::Size imageSize,
@@ -79,6 +81,16 @@ private:
 				cv::Size padding,
 				bool bWriteHOGImages = false,
 				bool bApplyPCA = false);
+
+	/**
+	 * k-means clustering.
+	 * First  patches are extracted from feature vectors.
+	 */
+	void performClustering(cv::Size imageSize,
+			cv::Size blockSize,
+			cv::Size blockStride,
+			cv::Size cellSize,
+			int iNumBins);
 
 	/**
 	 * Setup training data for support vector machine.

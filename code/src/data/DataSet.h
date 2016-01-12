@@ -71,7 +71,10 @@ public:
 	};
 
 	/**
-	 * Get the image at position iIndex
+	 * Get the image at position iIndex.
+	 * Image may be NULL depending on current state of the processing pipeline !
+	 *
+	 * @return	image or NULL
 	 */
 	const cv::Mat* getImageAt(int iIndex) const
 	{
@@ -86,13 +89,13 @@ public:
 	 * Get the name of the image at position iIndex.
 	 */
 	std::string getImageNameAt(int iIndex) const
+	{
+		if(m_vData[iIndex] != NULL)
 		{
-			if(m_vData[iIndex] != NULL)
-			{
-				return m_vData[iIndex]->getImageName();
-			}
-			return "";
-		};
+			return m_vData[iIndex]->getImageName();
+		}
+		return "";
+	};
 
 	/**
 	 * Add feature vector for image at position iIndex,
@@ -100,11 +103,11 @@ public:
 	bool addDescriptorValuesToImageAt(int iIndex,
 			const std::vector<float> &vDescriptorValues);
 
-  /**
-   * Add feature vectors for each patch for image at position iIndex
-   */
+	/**
+	 * Add feature vectors for each patch for image at position iIndex
+	 */
 	bool addPatchDescriptorValuesToImageAt(int iIndex,
-	    const std::vector<vector<vector<float>>> &patchDescriptorValues);
+			const std::vector<vector<vector<float>>> &patchDescriptorValues);
 
 	/**
 	 * Get the feature vector from the image at position iIndex.
@@ -120,19 +123,19 @@ public:
 		return false;
 	};
 
-  /**
-   * Get the feature vectors for all patches from the image at position iIndex.
-   */
-  bool getPatchDescriptorValuesFromImageAt(int iIndex,
-      std::vector<vector<vector<float>>> &vPatchDescriptorValues)
-  {
-    if(m_vData[iIndex] != NULL)
-    {
-      vPatchDescriptorValues = m_vData[iIndex]->getPatchDescriptorValues();
-      return true;
-    }
-    return false;
-  };
+	/**
+	 * Get the feature vectors for all patches from the image at position iIndex.
+	 */
+	bool getPatchDescriptorValuesFromImageAt(int iIndex,
+			std::vector<vector<vector<float>>> &vPatchDescriptorValues)
+	{
+		if(m_vData[iIndex] != NULL)
+		{
+			vPatchDescriptorValues = m_vData[iIndex]->getPatchDescriptorValues();
+			return true;
+		}
+		return false;
+	};
 
 	/**
 	 * Add all images with their names from the input vectors.
@@ -140,6 +143,12 @@ public:
 	 */
 	int setImages(std::vector<cv::Mat*> &vImages,
 			std::vector<std::string> &vImageNames);
+
+	/**
+	 * Remove the images from the dataset to free memory.
+	 * Obviously this should only be done after feature extraction when the images themselves are no longer needed.
+	 */
+	void removeImages();
 
 	/**
 	 * Get maximum dimension of all images in the dataset
@@ -185,13 +194,13 @@ private:
 	public:
 		ImageWithDescriptors(cv::Mat* pImage,
 				std::string strImageName)
-			: m_pImage(pImage)
-			, m_strImageName(strImageName)
-		{};
+	: m_pImage(pImage)
+	, m_strImageName(strImageName)
+	{};
 
 		virtual ~ImageWithDescriptors()
 		{
-			delete m_pImage;
+			removeImage();
 		};
 
 		const cv::Mat* getImage() const {
@@ -206,17 +215,27 @@ private:
 			return m_vDescriptorValues;
 		};
 
-    const std::vector<vector<vector<float>>>& getPatchDescriptorValues() const {
-      return m_patchDescriptorValues;
-    };
+		void removeImage()
+		{
+			if(m_pImage != NULL)
+			{
+				delete m_pImage;
+			}
+
+			m_pImage = NULL;
+		};
+
+		const std::vector<vector<vector<float>>>& getPatchDescriptorValues() const {
+			return m_patchDescriptorValues;
+		};
 
 		void setDescriptorValues(const std::vector<float> &vDescriptorValues) {
 			m_vDescriptorValues = vDescriptorValues;
 		};
 
-    void setPatchDescriptorValues(const std::vector<vector<vector<float>>> &patchDescriptorValues) {
-      m_patchDescriptorValues = patchDescriptorValues;
-    };
+		void setPatchDescriptorValues(const std::vector<vector<vector<float>>> &patchDescriptorValues) {
+			m_patchDescriptorValues = patchDescriptorValues;
+		};
 
 	private:
 		cv::Mat*			m_pImage;

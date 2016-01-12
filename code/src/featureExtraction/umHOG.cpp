@@ -46,62 +46,48 @@ void mai::umHOG::computeHOGForDataSet(DataSet* data,
 		Size padding,
 		bool bApplyPCA)
 {
-  int cellsPerBlock = (blockSize.width / cellSize.width) * (blockSize.height / cellSize.height);
-  int blockFeatures = cellsPerBlock * iNumBins;
-  int blocksPerRow = imageSize.width / blockStride.width - (blockSize.width / blockStride.width - 1) ;
-  int blocksPerColumn = imageSize.height / blockStride.height - (blockSize.height / blockStride.height - 1) ;
-
 	// Extract features from all images in dataset.
 	for(unsigned int i = 0; i < data->getImageCount(); ++i)
 	{
 		const Mat* image = data->getImageAt(i);
 
-		vector<float> descriptorsValues;
+		if(image != NULL)
+		{
+			vector<float> descriptorsValues;
 
-		umHOG::extractFeatures(descriptorsValues,
-				*image,
-				imageSize,
-				blockSize,
-				blockStride,
-				cellSize,
-				iNumBins,
-				winStride,
-				padding,
-				bApplyPCA);
+			umHOG::extractFeatures(descriptorsValues,
+					*image,
+					imageSize,
+					blockSize,
+					blockStride,
+					cellSize,
+					iNumBins,
+					winStride,
+					padding,
+					bApplyPCA);
 
-		data->addDescriptorValuesToImageAt(i, descriptorsValues);
-
-		vector<vector<vector<float>>> patchDescriptorValues(blocksPerColumn);
-		for(int i = 0; i < blocksPerColumn; i++) {
-		  patchDescriptorValues[i] = vector<vector<float>>(blocksPerRow);
+			data->addDescriptorValuesToImageAt(i, descriptorsValues);
 		}
-
-    for(int i = 0; i < blocksPerColumn; i++) {
-      for(int j = 0; j < blocksPerRow; j++) {
-        patchDescriptorValues[i][j] = vector<float>(blockFeatures);
-        int block = blocksPerColumn * i + j;
-        std::copy(descriptorsValues.begin() + block * blockFeatures, descriptorsValues.begin() + (block +1) * blockFeatures, patchDescriptorValues[i][j].begin());
-      }
-    }
-    data->addPatchDescriptorValuesToImageAt(i, patchDescriptorValues);
-
-//		cout << patchDescriptorValues.size() << " " << patchDescriptorValues[0].size() << " " << patchDescriptorValues[0][0].size() << endl;
+		else
+		{
+			cerr << "[mai::cvHOG::computeHOGForDataSet] ERROR! No image." << endl;
+		}
 	}
 }
 
 void mai::umHOG::extractFeatures(vector<float> &descriptorsValues,
-								const Mat &image,
-								Size imageSize,
-								Size blockSize,
-								Size blockStride,
-								Size cellSize,
-								int iNumBins,
-								Size winStride,
-								Size padding,
-								bool bApplyPCA)
+		const Mat &image,
+		Size imageSize,
+		Size blockSize,
+		Size blockStride,
+		Size cellSize,
+		int iNumBins,
+		Size winStride,
+		Size padding,
+		bool bApplyPCA)
 {
 	if(Constants::DEBUG_HOG) {
-	  cout << "[mai::cvHOG::computeHOGForDataSet] resizing image to " << imageSize << endl;
+		cout << "[mai::cvHOG::extractFeatures] resizing image to " << imageSize << endl;
 	}
 	Mat resizedImage;
 	resize(image, resizedImage, imageSize);
@@ -140,16 +126,16 @@ void mai::umHOG::extractFeatures(vector<float> &descriptorsValues,
 }
 
 void mai::umHOG::getHOGDescriptorVisualImage(Mat &outImage,
-							   Mat &origImg,
-                               vector<float> &descriptorValues,
-                               Size winSize,
-                               Size cellSize,
-							   Size blockSize,
-							   Size blockStride,
-							   int iNumBins,
-                               int scaleFactor,
-                               double vizFactor,
-							   bool printValue)
+		Mat &origImg,
+		vector<float> &descriptorValues,
+		Size winSize,
+		Size cellSize,
+		Size blockSize,
+		Size blockStride,
+		int iNumBins,
+		int scaleFactor,
+		double vizFactor,
+		bool printValue)
 {
 	resize(origImg, outImage, Size(origImg.cols*scaleFactor, origImg.rows*scaleFactor));
 
@@ -205,7 +191,7 @@ void mai::umHOG::getHOGDescriptorVisualImage(Mat &outImage,
 					gradientStrengths[celly][cellx][bin] += gradientStrength;
 				} // for (all bins)
 
-					// note: overlapping blocks lead to multiple updates of this sum!
+				// note: overlapping blocks lead to multiple updates of this sum!
 				// we therefore keep track how often a cell was updated,
 				// to compute average gradient strengths
 				cellUpdateCounter[celly][cellx]++;

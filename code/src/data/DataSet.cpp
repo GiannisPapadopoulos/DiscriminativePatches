@@ -70,6 +70,14 @@ int mai::DataSet::setImages(vector<Mat*> &vImages,
 	return m_vData.size();
 }
 
+void mai::DataSet::removeImages()
+{
+	for(std::vector<ImageWithDescriptors*>::iterator it = m_vData.begin(); it != m_vData.end(); it++)
+	{
+		(*it)->removeImage();
+	}
+}
+
 string mai::DataSet::getFirstSplitBy(const string &strToSplit,
 		const string &strDelimiter)
 {

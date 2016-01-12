@@ -60,6 +60,8 @@ mai::Configuration::Configuration(const string &strFilename)
 	m_iFDMinNeighbors = pt.get<int>("FACE_DETECTION.MIN_NEIGHBORS", 3, trInt);
 	m_FDMinSize = Size(pt.get<int>("FACE_DETECTION.MIN_SIZE", 240, trInt), pt.get<int>("FACE_DETECTION.MIN_SIZE", 240, trInt));
 	m_FDMaxSize = Size(pt.get<int>("FACE_DETECTION.MAX_SIZE", 480, trInt), pt.get<int>("FACE_DETECTION.MAX_SIZE",480, trInt));
+
+	m_bPerformClustering = pt.get<bool>("CLUSTERING.PERFORM_CLUSTERING", false, trBool);
 }
 
 bool mai::Configuration::convertStringToBool(std::string str) {

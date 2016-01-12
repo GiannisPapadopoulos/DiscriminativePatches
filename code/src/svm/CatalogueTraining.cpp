@@ -124,6 +124,17 @@ void mai::CatalogueTraining::processPipeline()
 			bWriteHOGImages,
 			bApplyPCA);
 
+	if(m_Config->getPerfromClustering())
+	{
+		cout << "[mai::CatalogueDetection::processPipeline] clustering data ..." << endl;
+
+		performClustering(imageSize,
+			blockSize,
+			blockStride,
+			cellSize,
+			iNumBins);
+	}
+
 	cout << "[mai::CatalogueDetection::processPipeline] Setting up svm data ..." << endl;
 	setupSVMData(iDataSetDivider);
 
@@ -206,7 +217,9 @@ void mai::CatalogueTraining::computeHOG(Size imageSize,
 {
 	for(map<string, DataSet*>::iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); it++)
 	{
-		umHOG::computeHOGForDataSet(it->second,
+		DataSet* pDataset = it->second;
+
+		umHOG::computeHOGForDataSet(pDataset,
 					imageSize,
 					blockSize,
 					blockStride,
@@ -221,7 +234,7 @@ void mai::CatalogueTraining::computeHOG(Size imageSize,
 			string strName = it->first;
 			string strPath = m_Config->getHogOutputPath();
 
-			IOUtils::writeHOGImages(it->second,
+			IOUtils::writeHOGImages(pDataset,
 					strPath,
 					strName,
 					imageSize,
@@ -231,6 +244,49 @@ void mai::CatalogueTraining::computeHOG(Size imageSize,
 					iNumBins,
 					m_Config->getHogVizImageScalefactor(),
 					m_Config->getHogVizBinScalefactor());
+		}
+
+		// free memory
+		pDataset->removeImages();
+	}
+}
+
+void mai::CatalogueTraining::performClustering(Size imageSize,
+		Size blockSize,
+		Size blockStride,
+		Size cellSize,
+		int iNumBins)
+{
+	int cellsPerBlock = (blockSize.width / cellSize.width) * (blockSize.height / cellSize.height);
+	int blockFeatures = cellsPerBlock * iNumBins;
+	int blocksPerRow = imageSize.width / blockStride.width - (blockSize.width / blockStride.width - 1) ;
+	int blocksPerColumn = imageSize.height / blockStride.height - (blockSize.height / blockStride.height - 1) ;
+
+	for(map<string, DataSet*>::iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); it++)
+	{
+		DataSet* pDataset = it->second;
+
+		// Extract features from all images in dataset.
+		for(unsigned int i = 0; i < pDataset->getImageCount(); ++i)
+		{
+			vector<float> descriptorsValues;
+			pDataset->getDescriptorValuesFromImageAt(i, descriptorsValues);
+
+			vector<vector<vector<float>>> patchDescriptorValues(blocksPerColumn);
+			for(int i = 0; i < blocksPerColumn; i++) {
+				patchDescriptorValues[i] = vector<vector<float>>(blocksPerRow);
+			}
+
+			for(int i = 0; i < blocksPerColumn; i++) {
+				for(int j = 0; j < blocksPerRow; j++) {
+					patchDescriptorValues[i][j] = vector<float>(blockFeatures);
+					int block = blocksPerColumn * i + j;
+					std::copy(descriptorsValues.begin() + block * blockFeatures, descriptorsValues.begin() + (block +1) * blockFeatures, patchDescriptorValues[i][j].begin());
+				}
+			}
+			pDataset->addPatchDescriptorValuesToImageAt(i, patchDescriptorValues);
+
+			//		cout << patchDescriptorValues.size() << " " << patchDescriptorValues[0].size() << " " << patchDescriptorValues[0][0].size() << endl;
 		}
 	}
 }

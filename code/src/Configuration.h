@@ -117,11 +117,11 @@ public:
 
 	bool getWriteSvMs() const {
 		return m_bWriteSVMs;
-	}
+	};
 
 	const std::string& getSvmOutputPath() const {
 		return m_strSVMOutputPath;
-	}
+	};
 
 	/**
 	 * Whether to export the hog visualization as image files
@@ -132,7 +132,7 @@ public:
 
 	const std::string& getHogOutputPath() const {
 		return m_strHOGOutputPath;
-	}
+	};
 
 	bool getApplyPCA() const {
 		return m_bApplyPCA;
@@ -144,23 +144,27 @@ public:
 
 	const std::string getCascadeFilterFileName() const{
 		return m_strCascadeFilterFileName;
-	}
+	};
 
 	double getFDScale() const {
 		return m_dFDScale;
-	}
+	};
 
 	const cv::Size& getFDMaxSize() const {
 		return m_FDMaxSize;
-	}
+	};
 
 	const cv::Size& getFDMinSize() const {
 		return m_FDMinSize;
-	}
+	};
 
 	int getFDMinNeighbors() const {
 		return m_iFDMinNeighbors;
-	}
+	};
+
+	bool getPerfromClustering() const {
+		return m_bPerformClustering;
+	};
 
 private:
 
@@ -242,6 +246,9 @@ private:
     int			m_iFDMinNeighbors;
     cv::Size	m_FDMinSize;
     cv::Size	m_FDMaxSize;
+
+    // k-means parameters
+    bool		m_bPerformClustering;
 };
 
 }// namespace mai
