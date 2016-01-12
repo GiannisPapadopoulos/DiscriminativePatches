@@ -47,6 +47,7 @@ mai::Configuration::Configuration(const string &strFilename)
 
 	m_iDataSetDivider = pt.get<int>("DATA.DATESET_DIVIDER", 4, trInt);
 	m_strFilepath = pt.get<std::string>("DATA.FILEPATH");
+	m_bAddFlippedImages = pt.get<bool>("DATA.ADD_FLIPPED_IMAGES", true, trBool);
 
 	m_dSVMCValue = pt.get<double>("SVM.C_VALUE", 0.1, trDouble);
 	m_bWriteSVMs = pt.get<bool>("SVM.WRITE_SVMS", true, trBool);

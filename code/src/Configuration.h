@@ -165,6 +165,10 @@ public:
 	bool getPerfromClustering() const {
 		return m_bPerformClustering;
 	};
+	
+	bool getAddFlipedImages() const {
+		return m_bAddFlippedImages;
+	};
 
 private:
 
@@ -232,6 +236,7 @@ private:
     // data setup parameters
 	std::string	m_strFilepath;
 	int			m_iDataSetDivider;
+	bool		m_bAddFlippedImages;
 
 	// HOG output parameters
 	bool		m_bWriteHOGImages;

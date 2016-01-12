@@ -86,7 +86,7 @@
 \tableofcontents
 \newpage
 \section{Introduction}\label{sec:Introduction}
-Unsupervised Discovery of mid-level discriminative patches is a method to extract from an image the primitives for visual information that satisfy the requirements of being representative as well as discriminative and that have been discovered in a fully unsupervised manner. The method was elaborated by Singh et Al. at the Carnegie Mellon University of Pittsburgh, Pennsylvania, and published at the European Conference on Computer Vision in the year 2012.\cite[Singh2012]{Singh2012DiscPat} The method is settled in the fields of computer vision and machine learning and combines techniques from these fields to produce promising results in image recognition and classification. Singh et Al. showed the capabilities of their method in a follow-up publication “What Makes Paris Look like Paris?”.\cite[Doersch2012]{doersch2012what} Here they identified the most distinct elements on images of architecturally different cities like Paris and London classifying these images as being shot in the corresponding city.
+Unsupervised Discovery of mid-level discriminative patches is a method to extract from an image the primitives for visual information that satisfy the requirements of being representative as well as discriminative and that have been discovered in a fully unsupervised manner. The method was elaborated by Singh et Al. at the Carnegie Mellon University of Pittsburgh, Pennsylvania, and published at the European Conference on Computer Vision in the year 2012.\cite{Singh2012DiscPat} The method is settled in the fields of computer vision and machine learning and combines techniques from these fields to produce promising results in image recognition and classification. Singh et Al. showed the capabilities of their method in a follow-up publication “What Makes Paris Look like Paris?”.\cite{doersch2012what} Here they identified the most distinct elements on images of architecturally different cities like Paris and London classifying these images as being shot in the corresponding city.
 \\
 \\
 The idea of this project is to apply this method on the classification of images of human facial expressions. This could for example aid in human computer interaction to recognize particular emotions or cognitive states through visual or expressive features contained in an image.
@@ -110,7 +110,7 @@ This chapter gives an explanation of definitions used and an overview of the alg
 To explain the notion of mid-level discriminative patches it is best to first take a look at the different levels of visual information that can be retrieved from an image. Approaching from bottom-up, the lowest level would correspond to a single pixel. But single pixels do obviously not provide much useful information to describe features of the real world. From top-down, the highest level would be the image as a whole. This imposes several problems such as a high number of spatial configurations needed to describe objects as well as too much unnecessary information to describe certain features contained in that image. The best way is found in between by looking at parts of the image that are just right to describe a certain feature of an image. Such parts are called mid-level image patches.
 \\
 \\
-Singh et Al. define such patches as being discriminative if they are representative concerning the described feature and different enough from other patches describing the same or any other feature. Additionally they require such patches to be detectable with “high recall and precision” in a large number of images.\cite[Singh2012]{Singh2012DiscPat}
+Singh et Al. define such patches as being discriminative if they are representative concerning the described feature and different enough from other patches describing the same or any other feature. Additionally they require such patches to be detectable with “high recall and precision” in a large number of images.\cite{Singh2012DiscPat}
 
 \subsection{Applied Techniques}
 
@@ -119,13 +119,13 @@ The algorithm to detect discriminative patches in an unsupervised manner mainly 
 The first one is to extract features from an image, then these features are clustered and the clusters are train a linear support vector machine (SVM) used to classify new elements in the end.
 \\
 \\
-The feature extraction is supposed to be done using histogram of oriented gradients (HOG). The features are computed as intensity gradients for small parts of an image. The edge directions defined like this are then counted and concatenated to form a comprehensive descriptor. One of the key advantages of this technique is that it is invariant to geometric or photometric transformations.\cite[Dalal2005]{Dalal:2005:HOG:1068507.1069007}
+The feature extraction is supposed to be done using histogram of oriented gradients (HOG). The features are computed as intensity gradients for small parts of an image. The edge directions defined like this are then counted and concatenated to form a comprehensive descriptor. One of the key advantages of this technique is that it is invariant to geometric or photometric transformations.\cite{Dalal:2005:HOG:1068507.1069007}
 \\
 \\
-Clustering is done using k-means clustering. K-means clustering partitions a dataset into a given number of clusters in such a way that the sum of the quadratic deviations from each cluster centroid is minimized. As metric usually the Euclidian distance is used.\cite[Coates2012]{DBLP:series/lncs/CoatesN12}
+Clustering is done using k-means clustering. K-means clustering partitions a dataset into a given number of clusters in such a way that the sum of the quadratic deviations from each cluster centroid is minimized. As metric usually the Euclidian distance is used.\cite{DBLP:series/lncs/CoatesN12}
 \\
 \\
-A linear SVM separates points with a hyperplane that has a maximized distance to the nearest data points on each side of the plane. This can be used as binary classifier to classify input data according to recognized patterns. These patterns are obtained by training the SVM on positive and negative samples of data describing the problem that needs to be solved by classification.\cite[Chang2011]{Chang:2011:LLS:1961189.1961199}
+A linear SVM separates points with a hyperplane that has a maximized distance to the nearest data points on each side of the plane. This can be used as binary classifier to classify input data according to recognized patterns. These patterns are obtained by training the SVM on positive and negative samples of data describing the problem that needs to be solved by classification.\cite{Chang:2011:LLS:1961189.1961199}
 
 \subsection{Proposed Algorithm}
 
@@ -136,7 +136,7 @@ Purity is defined as the sum of the classifiers detection scores of the top clus
 Discriminativeness describes the ratio of detections on the positive training data and the union of the positive and negative training data. This ratio should be low but still above 0.
 \\
 \\
-The drawback of the described process is that classifier might suffer from overfitting. Overfitting occurs for example when the number of features exceeds the number of training datasets. The effect then is that the classifier does not predict by generalizing from what he has learned but memorizes input patterns and recalls them. It can be measured when the prediction of training samples is far more accurate than the prediction of unknown validation data. To prevent this overfitting Singh et Al. divided the input data of the algorithm consisting of positive examples containing the features that are searched and negative ones not containing this feature further into two datasets each. From these two positive and negative training datasets one will then act as training and the other one as validation dataset. In each iteration of the algorithm, the datasets are flipped for the next iteration to enhance the clusters by new feature patches. Furthermore, the best patches recognized in the validation dataset will be added to the training data patches to ensure even more diversity.\cite[Singh2012]{Singh2012DiscPat}
+The drawback of the described process is that classifier might suffer from overfitting. Overfitting occurs for example when the number of features exceeds the number of training datasets. The effect then is that the classifier does not predict by generalizing from what he has learned but memorizes input patterns and recalls them. It can be measured when the prediction of training samples is far more accurate than the prediction of unknown validation data. To prevent this overfitting Singh et Al. divided the input data of the algorithm consisting of positive examples containing the features that are searched and negative ones not containing this feature further into two datasets each. From these two positive and negative training datasets one will then act as training and the other one as validation dataset. In each iteration of the algorithm, the datasets are flipped for the next iteration to enhance the clusters by new feature patches. Furthermore, the best patches recognized in the validation dataset will be added to the training data patches to ensure even more diversity.\cite{Singh2012DiscPat}
 
 
 \section{Project work}\label{sec:projectwork}
@@ -173,7 +173,7 @@ The application was used in the following experimental setup.
 
 \section{Conducted Experiments}
 
-The dataset used in the experiments is the Cohn-Kanade Database for facial expressions.\cite[Kanade2000]{Kanade2000CK+}\cite[Lucey2010]{Lucey2010CK+} As the application does not yet provide mechanism for clustering data, patches were extracted manually simulating optimal clusters of positive patches and clusters of corresponding negative features. Because it is the most distinguishable expression contained in the dataset, surprise was chosen as positive feature and the mouth was identified to be the promising most discriminative image patch. The amount of positive images thereby is 88 and for the negative images the same amount is chosen from about 400 images overall.
+The dataset used in the experiments is the Cohn-Kanade Database for facial expressions.\cite{Kanade2000CK+}\cite{Lucey2010CK+} As the application does not yet provide mechanism for clustering data, patches were extracted manually simulating optimal clusters of positive patches and clusters of corresponding negative features. Because it is the most distinguishable expression contained in the dataset, surprise was chosen as positive feature and the mouth was identified to be the promising most discriminative image patch. The amount of positive images thereby is 88 and for the negative images the same amount is chosen from about 400 images overall.
 \\
 \\
 The test runs were conducted using different configurations, one using the average original patch size of 96x96 pixels divided by 4 cells of 48x48 each in the HOGDescriptor. The other one was based on a cell size of 8x8 pixels leading to rescaled patches of 16x16 pixels again using 4 cells per patch. The cell size had to be reduced to 4 because multiplied with the 9 bins indicating the gradient directions computed by the HOGDescriptor this gives a total of 36 features per patch. As the feature space should be by far smaller than the number of samples this still gives a relation of roughly one to four features to samples taken the doubled images from the flipping into account. Single cells would correspond to single features which are not expressive anymore and thereby not feasible.
@@ -190,7 +190,7 @@ The results were not as good as expected which might be due to possible overfitt
 
 
 %\bibliographystyle{apacite}
-\bibliographystyle{plain}
+\bibliographystyle{apalike}
 \bibliography{maip4}
 
 %\printbibliography

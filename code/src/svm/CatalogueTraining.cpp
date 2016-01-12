@@ -69,7 +69,7 @@ void mai::CatalogueTraining::processPipeline()
 {
 	cout << "[mai::CatalogueDetection::processPipeline] Loading data ..." << endl;
 
-	if(!IOUtils::loadCatalogue(m_mCatalogue, IMREAD_GRAYSCALE, m_Config->getDataFilepath(), true))
+	if(!IOUtils::loadCatalogue(m_mCatalogue, IMREAD_GRAYSCALE, m_Config->getDataFilepath(), m_Config->getAddFlipedImages()))
 		return;
 
 	if(m_mCatalogue.size() < 2)
