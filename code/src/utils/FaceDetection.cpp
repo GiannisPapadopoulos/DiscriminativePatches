@@ -78,7 +78,7 @@ DataSet* mai::FaceDetection::detectFaces(DataSet* data,
 		}
 		else
 		{
-	        cerr << "[mai::FaceDetection::detectFaces] ERROR: Image was NULL : " << strFilename << endl;
+	        cerr << "[mai::FaceDetection::detectFaces] ERROR: Image was NULL  at position " << i << endl;
 		}
 	}
 
