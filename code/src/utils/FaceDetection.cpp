@@ -58,19 +58,27 @@ DataSet* mai::FaceDetection::detectFaces(DataSet* data,
 	for(unsigned int i = 0; i < data->getImageCount(); ++i)
 	{
 		const Mat* image = data->getImageAt(i);
-		Mat face;
 
-		if(detectFace(*image,
-				face,
-				cascade,
-				dScale,
-				iMinNeighbors,
-				minSize,
-				maxSize))
+		if(image != NULL)
 		{
-			Mat* pImage = new Mat(face);
-			vImages.push_back(pImage);
-			vImageNames.push_back(data->getImageNameAt(i));
+			Mat face;
+
+			if(detectFace(*image,
+					face,
+					cascade,
+					dScale,
+					iMinNeighbors,
+					minSize,
+					maxSize))
+			{
+				Mat* pImage = new Mat(face);
+				vImages.push_back(pImage);
+				vImageNames.push_back(data->getImageNameAt(i));
+			}
+		}
+		else
+		{
+	        cerr << "[mai::FaceDetection::detectFaces] ERROR: Image was NULL : " << strFilename << endl;
 		}
 	}
 
