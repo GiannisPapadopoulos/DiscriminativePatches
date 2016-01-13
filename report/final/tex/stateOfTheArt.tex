@@ -1,0 +1,38 @@
+
+\section{Technological Background}\label{sec:StateArt}
+
+This chapter gives an explanation of definitions used and an overview of the algorithm proposed by Singh et Al. as well as the image processing techniques used therein.
+
+\subsection{Image Patches}
+
+To explain the notion of mid-level discriminative patches it is best to first take a look at the different levels of visual information that can be retrieved from an image. Approaching from bottom-up, the lowest level would correspond to a single pixel. But single pixels do obviously not provide much useful information to describe features of the real world. From top-down, the highest level would be the image as a whole. This imposes several problems such as a high number of spatial configurations needed to describe objects as well as too much unnecessary information to describe certain features contained in that image. The best way is found in between by looking at parts of the image that are just right to describe a certain feature of an image. Such parts are called mid-level image patches.
+\\
+\\
+Singh et Al. define such patches as being discriminative if they are representative concerning the described feature and different enough from other patches describing the same or any other feature. Additionally they require such patches to be detectable with "`high recall and precision"' in a large number of images.\cite{Singh2012DiscPat}
+
+\subsection{Applied Techniques}
+
+The algorithm to detect discriminative patches in an unsupervised manner mainly consists of three parts:
+\\
+The first one is to extract features from an image, then these features are clustered and the clusters are train a linear support vector machine (SVM) used to classify new elements in the end.
+\\
+\\
+The feature extraction is supposed to be done using histogram of oriented gradients (HOG). The features are computed as intensity gradients for small parts of an image. The edge directions defined like this are then counted and concatenated to form a comprehensive descriptor. One of the key advantages of this technique is that it is invariant to geometric or photometric transformations.\cite{Dalal:2005:HOG:1068507.1069007}
+\\
+\\
+Clustering is done using k-means clustering. K-means clustering partitions a dataset into a given number of clusters in such a way that the sum of the quadratic deviations from each cluster centroid is minimized. As metric usually the Euclidian distance is used.\cite{DBLP:series/lncs/CoatesN12}
+\\
+\\
+A linear SVM separates points with a hyperplane that has a maximized distance to the nearest data points on each side of the plane. This can be used as binary classifier to classify input data according to recognized patterns. These patterns are obtained by training the SVM on positive and negative samples of data describing the problem that needs to be solved by classification.\cite{Chang:2011:LLS:1961189.1961199}
+
+\subsection{Proposed Algorithm}
+
+Applying these techniques, the feature extraction using HOG descriptors produces a large number of possibly overlapping patches at multiple scales. If one would now know that some of these patches are similar, these could be used to train a SVM for classification. Fortunately a similarity can also be produced by clustering the patches using k-means clustering. The problem with the low-level metric used by k-means clustering is that it does not produce good results on image patches. To address this again a SVM could be trained to produce a similarity metric needed to refine these clusters. So the clustering depends on the similarity metric of the SVM while the SVM itself depends on the clusters to be trained. To solve this problem the described approach is done in an iterative way. First the data is clustered in HOG space then a SVM is trained using the clusters to produce a metric which then is used to refine the clusters. This is done until a convergence criterion is reached. The final classifiers then are ranked according to their purity and discriminativeness.
+\\
+Purity is defined as the sum of the classifiers detection scores of the top cluster members.
+\\
+Discriminativeness describes the ratio of detections on the positive training data and the union of the positive and negative training data. This ratio should be low but still above 0.
+\\
+\\
+The drawback of the described process is that classifier might suffer from overfitting. Overfitting occurs for example when the number of features exceeds the number of training datasets. The effect then is that the classifier does not predict by generalizing from what he has learned but memorizes input patterns and recalls them. It can be measured when the prediction of training samples is far more accurate than the prediction of unknown validation data. To prevent this overfitting Singh et Al. divided the input data of the algorithm consisting of positive examples containing the features that are searched and negative ones not containing this feature further into two datasets each. From these two positive and negative training datasets one will then act as training and the other one as validation dataset. In each iteration of the algorithm, the datasets are flipped for the next iteration to enhance the clusters by new feature patches. Furthermore, the best patches recognized in the validation dataset will be added to the training data patches to ensure even more diversity.\cite{Singh2012DiscPat}
+

@@ -1,0 +1,9 @@
+\section{Conducted Experiments}
+
+The dataset used in the experiments is the Cohn-Kanade Database for facial expressions.\cite{Kanade2000CK+}\cite{Lucey2010CK+} As the application does not yet provide mechanism for clustering data, patches were extracted manually simulating optimal clusters of positive patches and clusters of corresponding negative features. Because it is the most distinguishable expression contained in the dataset, surprise was chosen as positive feature and the mouth was identified to be the promising most discriminative image patch. The amount of positive images thereby is 88 and for the negative images the same amount is chosen from about 400 images overall.
+\\
+\\
+The test runs were conducted using different configurations, one using the average original patch size of 96x96 pixels divided by 4 cells of 48x48 each in the HOGDescriptor. The other one was based on a cell size of 8x8 pixels leading to rescaled patches of 16x16 pixels again using 4 cells per patch. The cell size had to be reduced to 4 because multiplied with the 9 bins indicating the gradient directions computed by the HOGDescriptor this gives a total of 36 features per patch. As the feature space should be by far smaller than the number of samples this still gives a relation of roughly one to four features to samples taken the doubled images from the flipping into account. Single cells would correspond to single features which are not expressive anymore and thereby not feasible.
+\\
+\\
+Running the application on the extracted patches unfortunately did not yield good results. The predictions on the negative validation dataset were negative as they were expected. But also the prediction on the positive dataset was negative for all patches. A possible reason for this outcome is that the feature space is too high compared to the number of samples and thereby the effect of overfitting can be seen here.
