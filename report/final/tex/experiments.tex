@@ -6,9 +6,17 @@ TODO: describe setup of datasets sued for training and validation.Present result
 
 The dataset used in the experiments is the Cohn-Kanade Database for facial expressions.\nocite{Kanade2000CK+}\nocite{Lucey2010CK+}
 
-\subsection{Manually extracted patches}
+\subsection{Experiment setup}
+The experiments were performed doing one versus all classification. The data for each expression is divided into a training and a validation set and an SVM
+classifier is calculated based on the training set. The accuracy of the classifiers is then measured on the validation set. It was ensured that images of the same
+person are not present in both the training and validation set. The fraction of the data used for the validation set is a configurable parameter, for the 
+following experiments 75\% of the data was used for the training set and 25\% for the valdiation set. Tables \ref{table:left_eye}, \ref{table:right_eye}, \ref{table:between_eyes} and \ref{table:mouth} show the results for the manually extracted patches of 
+the left eye, right eye, the region between the eyes and the mouth region respectively. 
 
-\subsection{Results}
+%\subsection{Manually extracted patches}
+
+
+%\subsection{Results}
 
 \begin{table}
 \caption{Left eye patches}
@@ -19,7 +27,7 @@ The dataset used in the experiments is the Cohn-Kanade Database for facial expre
 Expression & 32 x 32 &  64 x 64  & 96 x 96  \\
 
 \hline
-Angry & 0.5789 & 0.6786 & 10.6767 \\
+Angry & 0.5789 & 0.6786 & 0.6767 \\
 Contempt & 0.6596 &	0.5745 & 0.5532 \\
 Disgust	& 0.7586 &	0.7672 &	0.7651 \\
 Fear &	0.6155 & 0.6315 & 0.6394 \\ 
@@ -95,7 +103,8 @@ Neutral	&	0.7818	&	0.8405	&	0.8204	\\
 Sadness	&	0.8589	&	0.8651	&	0.8631	\\
 Surprise &	0.8628	&	0.8674	&	0.8959	\\
 
-
 \hline
 \end{tabular}
 \end{table}
+
+\section{Discussion}
