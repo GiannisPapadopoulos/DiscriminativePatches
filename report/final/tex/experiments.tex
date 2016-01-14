@@ -28,12 +28,35 @@ person are not present in both the training and validation set. The fraction of 
 following experiments 75\% of the data was used for the training set and 25\% for the valdiation set. 
 
 \subsection{Manually extracted patches}
-For this experiment we manually extracted the patches for each eye, the area between the eyes and the mouth region. These regions were chosen because they 
-appear to be the most discriminative. The patches were extracted with as uniform alignment as possible and resized to 96 x96 pixels. 
-Tables \ref{table:left_eye}, \ref{table:right_eye}, \ref{table:between_eyes} and \ref{table:mouth} show the results for each region, for classifiers trained 
-with the original patch size of 96x96 and also rescaled to 32x32 and 64x64 pixels. Shrinking the images on the one hand results in fewer hog features which
-is likely to reduce the effect of overfitting, on the other hand some visual information may be lost. The table entries represent the fraction of the
-images of the corresponding expression that were correctly classified, in the 0 to 1 range.
+
+An image can have multiple discriminating patches. As shown in Figure \ref{fig:manual_patch}, some patches are highly noticeably discriminating such an open mouth and raised eyebrows in “surprise” expression or a wrinkled glabella (area between eyes) in “disgust” expression. Such patches can be the best approximation of most discriminating patches. Hence, they make a good basis for testing the algorithm. 
+
+\begin{figure}
+\centering
+\includegraphics[width=300pt]{manual_patch.png}
+  \caption{Noticeably discriminating patches}
+  \label{fig:manual_patch}
+\end{figure}
+
+We identified four such patches, that 2 patches for eyes and one each for mouth and glabella. We extracted them manually and resized them to 36*36 pixels, 64*64 pixels and 96*96 pixels. It was ensured that extracted images of same patch are consistent with each other in terms feature content of the patch. For example, in case of mouth patches, it was ensured that the boundaries of the patch touch the edges of lips in all mouth patches.  
+
+
+
+
+\section{Manual Patches}
+
+An image can have multiple discriminating patches. As shown in Figure \ref{fig:manual_patch}, some patches are highly noticeably discriminating such an open mouth and raised eyebrows in “surprise” expression or a wrinkled glabella (area between eyes) in “disgust” expression. Such patches can be the best approximation of most discriminating patches. Hence, they make a good basis for testing the algorithm. 
+
+\begin{figure}
+\centering
+\includegraphics[width=300pt]{manual_patch.png}
+  \caption{Noticeably discriminating patches}
+  \label{fig:manual_patch}
+\end{figure}
+
+We identified four such patches, that 2 patches for eyes and one each for mouth and glabella. We extracted them manually and resized them to 36*36 pixels, 64*64 pixels and 96*96 pixels. It was ensured that extracted images of same patch are consistent with each other in terms feature content of the patch. For example, in case of mouth patches, it was ensured that the boundaries of the patch touch the edges of lips in all mouth patches.  
+
+
 
 %\subsection{Results}
 
