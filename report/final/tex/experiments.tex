@@ -17,7 +17,8 @@ For this experiment we manually extracted the patches for each eye, the area bet
 appear to be the most discriminative. The patches were extracted with as uniform alignment as possible and resized to 96 x96 pixels. 
 Tables \ref{table:left_eye}, \ref{table:right_eye}, \ref{table:between_eyes} and \ref{table:mouth} show the results for each region, for classifiers trained 
 with the original patch size of 96x96 and also rescaled to 32x32 and 64x64 pixels. Shrinking the images on the one hand results in fewer hog features which
-is likely to reduce the effect of overfitting, on the other hand some visual information may be lost. 
+is likely to reduce the effect of overfitting, on the other hand some visual information may be lost. The table entries represent the fraction of the
+images of the corresponding expression that were correctly classified, in the 0 to 1 range.
 
 %\subsection{Results}
 
@@ -36,7 +37,7 @@ Disgust	& 0.7586 &	0.7672 &	0.7651 \\
 Fear &	0.6155 & 0.6315 & 0.6394 \\ 
 Happy &	0.6063 & 0.6562 & 0.6464 \\ 
 Neutral & 0.6851 &	0.6948 & 0.7023 \\
-Sadness &	0.5207 & 0.5021 &	0.5 \\
+Sadness & 0.5207 & 0.5021 &	0.5 \\
 Surprise & 0.7424 &	0.7591 & 0.75 \\
 
 \hline
@@ -110,9 +111,43 @@ Surprise &	0.8628	&	0.8674	&	0.8959	\\
 \end{tabular}
 \end{table}
 
+\subsection{SVM on the entire facial images}
+We also experimented with training SVM classifiers considering the entire facial area as a single patch. First the bounding box of the face was detected
+for each image using the Viola-Jones algorithm, then rescaled to a uniform size. % TODO: Add Reference. 
+The rest of the procedure was identical to the preceding experiment. The results can be found in Table \ref{table:entire_images}.
+
+\begin{table}
+\caption{Classifying the whole image}
+\label{table:entire_images}
+
+\begin{tabular}{| c | c | c | c |}
+\hline
+Expression & 32x32 & 96 x 96  \\
+
+\hline
+Angry	 & 0.6165 & 0.6015	\\
+Contempt & 0.4894 & 0.4043	\\
+Disgust	 & 0.7109 & 0.8783	\\
+Fear	 & 0.354  & 0.6420	\\
+Happy	 & 0.808  & 0.9198	\\
+Neutral	 & 0.7203 & 0.8115	\\
+Sadness	 & 0.5996 & 0.6432	\\
+Surprise & 0.8765 & 0.9436	\\
+
+\hline
+\end{tabular}
+\end{table}
+
 \section{Discussion}
-For the manually extracted patches the best overall results were obtained for the mouth region. This confirms our intuition as this region is the most distinguishable
-from a human perspective. Results for the eye regions were better than expected, visually the extracted patches look very similar. For the disgust emotion all 
+For the manually extracted patches the best overall results were obtained for the mouth region, with over 80\% of the images classified correctly.
+This confirms our intuition as this region is the most distinguishable
+from a human perspective. Results for the eye regions were better than expected, as visually the extracted patches look very similar. For the disgust emotion all 
 four regions lead to comparable results, while for the anger emotion the region between the eyes is almost as discriminative as the mouth. 
+Rescaling the images does not appear to have a very significant effect. 
+
+Performing SVM classification on the entire facial region led to good results if the region was rescaled to 96x96 pixels, better than all manually extracted 
+patches except the mouth. In this case there is a clear loss
+of precision if the image is rescaled to 32x32 pixels. % TODO Run the experiment without face detection to measure the effect, discuss the original paper
+
 
 
