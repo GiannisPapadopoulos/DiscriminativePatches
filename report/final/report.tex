@@ -8,7 +8,7 @@
    paper=a4,% [Todo: add alternatives]
    paper=portrait, % landscape
    pagesize=auto, % driver
-   %twocolumn,
+   twocolumn,
    % --- Base Font Size ---
    fontsize=10pt,%
 	 % --- Koma Script Version ---
@@ -69,7 +69,7 @@
 \begin{document}
 
 %\begin{@twocolumnfalse}
-
+\onecolumn
 
 \maketitle
 
@@ -84,9 +84,9 @@
 
 %\end{@twocolumnfalse}
 
-\begin{multicols}{2} 
+%\begin{multicols}{2} 
  
-%
+\twocolumn
 
 
 \input{./tex/introduction.tex}
@@ -101,7 +101,7 @@
 \clearpage
 \addcontentsline{toc}{section}{Bibliography}
 
-\end{multicols}
+%\end{multicols}
 
 \bibliographystyle{apalike}
 \bibliography{./tex/report}
