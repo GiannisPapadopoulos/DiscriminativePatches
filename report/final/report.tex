@@ -8,6 +8,7 @@
    paper=a4,% [Todo: add alternatives]
    paper=portrait, % landscape
    pagesize=auto, % driver
+   twocolumn,
    % --- Base Font Size ---
    fontsize=10pt,%
 	 % --- Koma Script Version ---
@@ -31,8 +32,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[english]{babel}
 
-
-%\usepackage{mathptmx}
+\usepackage{multicol}
 %\usepackage[scaled]{uarial}
 
 
@@ -46,6 +46,7 @@
 \usepackage{array}
 \usepackage{graphicx}
 \usepackage{caption}
+
 
 \usepackage{subcaption}
 %prefer subcaption instead of subfigure
@@ -67,13 +68,24 @@
 %% Dokument -----------------------------------------
 \begin{document}
 
+\begin{@twocolumnfalse}
+%\begin{multicols}{1} 
+
 \maketitle
 
+
+
 \newpage
+
 \tableofcontents
 \listoffigures
 \listoftables
 \newpage
+
+\end{@twocolumnfalse}
+ 
+%\end{multicols}
+
 
 \input{./tex/introduction.tex}
 \input{./tex/stateOfTheArt.tex}
@@ -89,5 +101,7 @@
 
 \bibliographystyle{apalike}
 \bibliography{./tex/report}
+
+
 
 \end{document}

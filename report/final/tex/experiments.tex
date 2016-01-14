@@ -1,9 +1,101 @@
 \section{Conducted Experiments}
 
-The dataset used in the experiments is the Cohn-Kanade Database for facial expressions.\cite{Kanade2000CK+}\cite{Lucey2010CK+} As the application does not yet provide mechanism for clustering data, patches were extracted manually simulating optimal clusters of positive patches and clusters of corresponding negative features. Because it is the most distinguishable expression contained in the dataset, surprise was chosen as positive feature and the mouth was identified to be the promising most discriminative image patch. The amount of positive images thereby is 88 and for the negative images the same amount is chosen from about 400 images overall.
+The dataset used in the experiments is the Cohn-Kanade Database for facial expressions.\cite{Kanade2000CK+}, \cite{Lucey2010CK+} As the application does not yet provide mechanism for clustering data, patches were extracted manually simulating optimal clusters of positive patches and clusters of corresponding negative features. Because it is the most distinguishable expression contained in the dataset, surprise was chosen as positive feature and the mouth was identified to be the promising most discriminative image patch. The amount of positive images thereby is 88 and for the negative images the same amount is chosen from about 400 images overall.
 \\
 \\
 The test runs were conducted using different configurations, one using the average original patch size of 96x96 pixels divided by 4 cells of 48x48 each in the HOGDescriptor. The other one was based on a cell size of 8x8 pixels leading to rescaled patches of 16x16 pixels again using 4 cells per patch. The cell size had to be reduced to 4 because multiplied with the 9 bins indicating the gradient directions computed by the HOGDescriptor this gives a total of 36 features per patch. As the feature space should be by far smaller than the number of samples this still gives a relation of roughly one to four features to samples taken the doubled images from the flipping into account. Single cells would correspond to single features which are not expressive anymore and thereby not feasible.
 \\
 \\
 Running the application on the extracted patches unfortunately did not yield good results. The predictions on the negative validation dataset were negative as they were expected. But also the prediction on the positive dataset was negative for all patches. A possible reason for this outcome is that the feature space is too high compared to the number of samples and thereby the effect of overfitting can be seen here.
+
+\subsection{Manually extracted patches}
+
+\begin{table}
+\caption{Left eye patches}
+\label{table:left_eye}
+
+\begin{tabular}{| c | c | c | c |}
+\hline
+Expression & 32 &  64  & 96  \\
+
+\hline
+Angry & 0.5789 & 0.6786 & 10.6767 \\
+Contempt & 0.6596 &	0.5745 & 0.5532 \\
+Disgust	& 0.7586 &	0.7672 &	0.7651 \\
+Fear &	0.6155 & 0.6315 & 0.6394 \\ 
+Happy &	0.6063 & 0.6562 & 0.6464 \\ 
+Neutral & 0.6851 &	0.6948 & 0.7023 \\
+Sadness &	0.5207 & 0.5021 &	0.5 \\
+Surprise & 0.7424 &	0.7591 & 0.75 \\
+
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}
+\caption{Right eye patches}
+\label{table:right_eye}
+
+\begin{tabular}{| c | c | c | c |}
+\hline
+Expression & 32 &  64  & 96  \\
+
+\hline
+Angry    & 0.562 & 0.6353 & 0.6617 \\
+Contempt & 0.6277 & 0.5106 & 0.617 \\ 
+Disgust	 & 0.7263 & 0.7414 & 0.7155 \\
+Fear	 & 0.6474 & 0.5992 & 0.5893 \\
+Happy	 & 0.6171 & 0.6063 & 0.6573 \\
+Neutral  & 0.7065 & 0.7251 & 0.7562 \\
+Sadness  & 0.498 & 0.5187 & 0.5436 \\
+Surprise & 0.7774 & 0.7866 & 0.7866 \\
+
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}
+\caption{Part between eyes patches}
+\label{table:between_eyes}
+
+\begin{tabular}{| c | c | c | c |}
+\hline
+Expression & 32 &  64  & 96  \\
+
+\hline
+Angry & 0.7971 & 0.812 & 0.7857 \\
+Contempt & 0.4468 & 0.4574 & 0.4681 \\
+Disgust & 0.6983 & 0.7155 & 0.7306 \\
+Fear & 0.7071 & 0.7649 & 0.7351 \\
+Happy & 0.8503 & 0.8503 & 0.8329 \\
+Neutral & 0.7438 & 0.7845 & 0.7921 \\
+Sadness & 0.7324 & 0.7697 & 0.7635 \\
+Surprise & 0.7317 & 0.7485 & 0.7165 \\
+
+\hline
+\end{tabular}
+\end{table}
+
+
+\begin{table}
+\caption{Mouth patches}
+\label{table:mouth}
+
+\begin{tabular}{| c | c | c | c |}
+\hline
+Expression & 32 &  64  & 96  \\
+
+\hline
+Angry	&	0.7782	&	0.8008	&	0.7876	\\
+Contempt	&	0.6277	&	0.6596	&	0.6596	\\
+Disgust	&	0.6897	&	0.7888	&	0.7996	\\
+Fear	&	0.7231	&	0.8108	&	0.8068	\\
+Happy	&	0.8948	&	0.9111	&	0.9121	\\
+Neutral	&	0.7818	&	0.8405	&	0.8204	\\
+Sadness	&	0.8589	&	0.8651	&	0.8631	\\
+Surprise &	0.8628	&	0.8674	&	0.8959	\\
+
+
+\hline
+\end{tabular}
+\end{table}
