@@ -1,32 +1,12 @@
 
 \section{Project work}\label{sec:projectwork}
-This chapter presents the group's work conducted so far. First the project setup and preliminary work is described then the implementation of the algorithm is explained.
 
-\subsection{Project setup}
+TODO: Describe the project work and the application in general, details of the software will be part of appendix.
+\\
+\\
+This chapter presents the group's work that has been conducted. First the project setup and preliminary work is described then the implementation of the algorithm is explained.
 
-To enable collaborative work in a software development project basic standards have to be clarified. This includes an agreement on which techniques to use and according to what standards code will be written as well as to define mandatory versions of underlying toolsets and frameworks.
-\\
-\\
-Most important is to answer the question how to exchange the code and any other material between the participating group members. The UM Blackboard for example provides file exchange mechanisms that will mainly be used to exchange official data like protocols especially when access from the project supervisors is obliged. It will also be used to exchange large binary data like image datasets needed for the experiments.
-\\
-\\
-To share the code and any textual data produced in the course of this project a code repository is used. The choice was made to setup a project on GitHub because it is easy and uncomplicated to access and to work with.
-\\
-\\
-The programming language was presumed to be C++ in the projects description. The framework was suggested to be OpenCV which is an Open Source image processing toolkit for C++ providing state of the art image processing algorithm and tools. Version 2.4 was agreed on to be used for the implementation of the project s work.
-\\
-\\
-The project's codebase is configured using CMake. CMake is a platform independent build tool for C++ that enables a simple setup of abstract and generic compiler related configurations from which concrete build information like Makefiles used by the GNU compiler chain on Linux or Visual Studio project files for Microsoft Windows can be generated automatically thus eliminating the need to maintain multiple version of such definitions for multiple and heterogeneous development environments like they are given on the laptops and computers of the project members.
-\\
-\\
-The need to produce extensible and well documented code will be fulfilled by providing a comprehensive report as well as inline code documentation. For the latter Doxygen is considered to be the best choice. Thereby a complete and always up to date code description on html pages can be generated automatically from the comments that should be added to the code anyway.
-\\
-\\
-Armed with these tools the application described in the following section is being developed.
 
 \subsection{Software Application}
 
-The application is capable of loading image datasets from two folders defined on the command-line input. One of them has to be the dataset containing the positive features and the other one the dataset containing any other features except those from the positive dataset. The application splits the datasets into defined parts for training and validation. To obtain more data needed for successful training, additional images from the horizontally flipped versions of the input images are computed and added to the datasets. Then the features for all images are computed using the OpenCV HOGDescriptor. To enhance the feature detection the images are adjusted beforehand by histogram equalization using the corresponding OpenCV method to increase the contrast of the image and produce sharper edges for the edge gradient computation of the HOG feature extractor. The computed features for the positive and negative training datasets are then combined in a training matrix which his fed into the OpenCV SVM instance together with according labels indicating positive and negative samples in the training matrix. Finally the SVM predicts the patches from the validation datasets and the prediction results are displayed.
-\\
-\\
-The application was used in the following experimental setup.
+The application is capable of loading image datasets from two folders defined on the command-line input. One should be the dataset containing the positive features and the other containing any other features. The application splits the datasets into defined parts for training and validation. To obtain more data needed for successful training, additional images from the horizontally flipped versions of the input images are computed and added to the datasets. Then the features for all images are computed using the OpenCV HOGDescriptor. To enhance the feature detection the images are adjusted beforehand by histogram equalization using the corresponding OpenCV method to increase the contrast of the image and produce sharper edges for the edge gradient computation of the HOG feature extractor. The computed features for the positive and negative training datasets are then combined in a training matrix which is fed into the OpenCV SVM instance together with according labels indicating positive and negative samples in the training matrix. Finally the SVM predicts the patches from the validation datasets and the prediction results are displayed.
