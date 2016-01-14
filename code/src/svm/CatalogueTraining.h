@@ -140,6 +140,8 @@ private:
 			std::map<std::string, std::vector<std::vector<float> > > &mPositives,
 			std::map<std::string, std::vector<std::vector<float> > > &mNegatives);
 
+	void clusterOriginalImages(std::map<std::string, TrainingData*> trainingData);
+
 
 	/**
 	 * Original images and extraacted feature vectors per named category

@@ -22,9 +22,8 @@ mai::umKmeans::~umKmeans() {
 cv::Mat mai::umKmeans::performClustering(const cv::Mat& data,
                                          const int numClusters,
                                          const cv::Mat& labels) {
-  cv::Mat centers;
   cv::kmeans(data, numClusters, labels, cv::TermCriteria(), 1,
-             cv::KMEANS_RANDOM_CENTERS, centers);
-  return centers;
+             cv::KMEANS_RANDOM_CENTERS, m_clusterCenters);
+  return m_clusterCenters;
 }
 

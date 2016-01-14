@@ -27,6 +27,9 @@ class umKmeans {
    */
   cv::Mat performClustering(const cv::Mat &data, const int numClusters, const cv::Mat &labels);
 
+ private:
+  cv::Mat m_clusterCenters;
+
 };
 
 }// namespace mai

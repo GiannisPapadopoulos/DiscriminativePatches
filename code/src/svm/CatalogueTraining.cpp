@@ -22,6 +22,7 @@
 #include "../IO/IOUtils.h"
 #include "../featureExtraction/umHOG.h"
 #include "../utils/FaceDetection.h"
+#include "../kmeans/umKmeans.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -133,10 +134,17 @@ void mai::CatalogueTraining::processPipeline()
 			blockStride,
 			cellSize,
 			iNumBins);
+
+
 	}
 
 	cout << "[mai::CatalogueDetection::processPipeline] Setting up svm data ..." << endl;
 	setupSVMData(iDataSetDivider);
+
+	// TODO Organize
+  if (m_Config->getPerfromClustering()) {
+    clusterOriginalImages(m_mTrain);
+  }
 
 	cout << "[mai::CatalogueDetection::processPipeline] Training svm ..." << endl;
 
@@ -251,6 +259,23 @@ void mai::CatalogueTraining::computeHOG(Size imageSize,
 	}
 }
 
+void mai::CatalogueTraining::clusterOriginalImages(std::map<std::string, TrainingData*> trainingData) {
+  umKmeans kMeans;
+  cv::Mat allData;
+  cv::Mat labels;
+  int numClusters = trainingData.size();
+
+  for(map<string, TrainingData*>::iterator it = trainingData.begin(); it != trainingData.end(); it++) {
+    string name = it->first;
+    TrainingData* pDataset = it->second;
+//    cout << "size " << pDataset->getData().rows << " " << pDataset->getData().cols  << endl;
+    allData.push_back(pDataset->getData());
+  }
+  cout << "all " << " " << allData.rows << " " << allData.cols  << endl;
+  cout << "clusters " << numClusters << endl;
+  kMeans.performClustering(allData, numClusters, labels);
+}
+
 void mai::CatalogueTraining::performClustering(Size imageSize,
 		Size blockSize,
 		Size blockStride,
@@ -285,8 +310,6 @@ void mai::CatalogueTraining::performClustering(Size imageSize,
 				}
 			}
 			pDataset->addPatchDescriptorValuesToImageAt(i, patchDescriptorValues);
-
-			//		cout << patchDescriptorValues.size() << " " << patchDescriptorValues[0].size() << " " << patchDescriptorValues[0][0].size() << endl;
 		}
 	}
 }
