@@ -2,19 +2,61 @@
 \appendixpage
 \addappheadtotoc
 
-\section{Technical Details}\label{sec:details}
-Detailed description of application
+\section{User Documentation}\label{sec:userdoc}
+
+\subsection{How to start the application}
+The application is implemented as a commandline application. It is invoked on the commandline by it's name "`MAIProject"' with the following parameters:
+\\
+TODO add parameters
+\\
+\\
+
+\subsection{How to configure the application}
+The application is configured in detail by a configuration file. This configuration file is formatted using the ini-format. There are sections for each part of the implemented algorithm giving detailed control of the configurable aspects of the corresponding feature.
+\\
+\\
+The section DATA provides parameters to configure the input dataset. The parameter FILEPATH defines the location of the image catalog that should be used for classification. The parameter DATASET\_DIVIDER defines the size of the validation part of the input dataset by dividing the size of the whole dataset, e.g. a value of 4 means that 1/4 of the input will be used for validation and 3/4 for training of the SVMs. The flag ADD\_FLIPPED\_IMAGES enables the addition of horizontally flipped versions of the input images to effectively double the overall size of samples, if this is necessary to obtain more training samples.
+\\
+\\
+The section HOG provides parameters to configure the size of image, block and cells, the block stride and the number of bins used to extract the HOG features from the input images. If it is desired to visualize the HOG features together with the image they are computed from, the flag WRITE\_HOGIMAGES can be set together with parameters defining the scaling of the image and the visualized gradients. Concrete values depend on the original image size and the parameters used to compute the features.
+\\
+\\
+The section SVM provides parameters used in combination with the vector machines. The C\_VALUE parameter is used to penalize outliers on an imperfect separation. The flag PREDICT\_TRAININGDATA enables or disables prediction of the dataset used for training. The flag WRITE\_SVM can be set if the trained SVMs should be saved to disc in combination with the parameter FILEPATH which defines the output location of the saved SVMs.
+\\
+\\
+The section FACE\_DETECTION provides parameters to configure the haar cascade classifier. The flag DETECT\_FACES enables face detection on the images of the input dataset. The parameter FILENAME defines the path and filename of the trained haar cascade classifier desired to perform the face detection. Such classifiers can be found in the corresponding OpenCV package. The parameters MIN\_SIZE and MAX\_SIZE indicate the minimum and maximum possible size of the obtained faces. They depend on the image size of the input dataset which has to be examined to obtain rational values for these parameters.
+\\
+\\
+TODO describe more config parameters
+
+\section{Developer Documentation}\label{sec:devdoc}
+
+\subsection{Dependencies}
+
+TODO
+\\
+OpenCV 2.4.X
+\\
+Boost
 
 \subsection{Build environment}
 
-CMake files and automated setup
-Dependency handling
+The project’s codebase can be configured with CMake. CMake is a platform independent build
+tool for C++ that automatically generates compiler configurations. On linux systems the Makefiles that are used by the GNU compiler chain and on Microsoft Windows Visual Studio project files can be generated from the given configurations. This eliminates the need for tracking such files for different platforms or different versions of development environments.
+\\
+\\
+CMake comes with either commandline or GUI tools to configure the concrete setup. The main configuration is defined in the file CMakeLists.txt in the code root folder of the application. Please refer to the CMake documentation on how to configure and generate the desired build files.
 
 \subsection{Automated Documentation}
 
+TODO
+\\
 Doxygen definitions, inline comments and documentation generation.
 
 \subsection{Application}
 
+TODO
+\\
 Classes
+\\
 Program flow
