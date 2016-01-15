@@ -80,11 +80,9 @@ public:
 	 * @return				Category name of best prediction
 	 */
 	std::string predict(const cv::Mat &image,
-			std::map<std::string, float> &mResults,
 			Configuration* config);
 
-	void loadAndPredictImage(const std::string &strFilename,
-			Configuration* config);
+	void loadAndPredictImage(Configuration* config);
 
 	/**
 	 * Access the stored svms

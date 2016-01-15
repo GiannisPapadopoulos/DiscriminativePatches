@@ -42,6 +42,35 @@ public:
 	virtual ~Configuration()
 	{};
 
+	enum appMode
+	{
+		Undef = 0,
+		Train = 1,
+		Retrain,
+		Predict
+	};
+
+	/**
+	 *
+	 */
+	const appMode getApplicationMode() const {
+		return m_AppMode;
+	};
+
+	/**
+	 * Path to input data for classification
+	 */
+	const std::string& getImageInputPath() const {
+		return m_strImageInputPath;
+	};
+
+	/**
+	 * Path to trained svms for classification or retraining
+	 */
+	const std::string& getSVMInputPath() const {
+		return m_strSVMInputPath;
+	};
+
 	/**
 	 * OpenCV Documentation says that block size has to be 16x16. Other values are not supported.
 	 * Experiments say otherwise !?
@@ -109,6 +138,10 @@ public:
 	 */
 	const std::string& getDataFilepath() const {
 		return m_strFilepath;
+	};
+
+	bool getCrossValidate() const {
+		return m_bCrossValidate;
 	};
 
 	bool getPredictTrainingData() const {
@@ -214,6 +247,12 @@ private:
 		}
 	};
 
+
+	// Main application parameters
+	appMode		m_AppMode;
+	std::string	m_strImageInputPath;
+	std::string	m_strSVMInputPath;
+
 	// HOG parameters
 	cv::Size	m_CellSize;
 	cv::Size	m_BlockStride;
@@ -227,7 +266,7 @@ private:
 
 	// svm parameters
 	double		m_dSVMCValue;
-
+	bool		m_bCrossValidate;
     bool		m_bPredictTrainingData;
 
     bool		m_bWriteSVMs;

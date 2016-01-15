@@ -32,6 +32,34 @@ mai::Configuration::Configuration(const string &strFilename)
 	StringToDoubleTranslator trDouble;
 	StringToBoolTranslator trBool;
 
+	string strMode = pt.get<std::string>("MAIN.MODE");
+	if (strMode.compare("TRAIN") == 0)
+	{
+		m_AppMode = appMode::Train;
+	}
+	else if (strMode.compare("RETRAIN") == 0)
+	{
+		m_AppMode = appMode::Retrain;
+	}
+	else if (strMode.compare("PREDICT") == 0)
+	{
+		m_AppMode = appMode::Predict;
+	}
+	else
+	{
+		m_AppMode = appMode::Undef;
+	}
+
+	if (m_AppMode == appMode::Predict)
+	{
+		m_strImageInputPath = pt.get<std::string>("MAIN.IMAGE_FILEPATH");
+	}
+
+	if (m_AppMode == appMode::Predict || m_AppMode == appMode::Retrain)
+	{
+		m_strSVMInputPath = pt.get<std::string>("MAIN.SVM_FILEPATH", "outSVM");
+	}
+
 	m_CellSize = Size(pt.get<int>("HOG.CELLSIZE_X", 8, trInt), pt.get<int>("HOG.CELLSIZE_Y", 8, trInt));
 	m_BlockStride = Size(pt.get<int>("HOG.BLOCKSTRIDE_X", 8, trInt), pt.get<int>("HOG.BLOCKSTRIDE_Y", 8, trInt));
 	m_BlockSize = Size(pt.get<int>("HOG.BLOCKSIZE_X", 32, trInt), pt.get<int>("HOG.BLOCKSIZE_Y", 32, trInt));
@@ -51,6 +79,7 @@ mai::Configuration::Configuration(const string &strFilename)
 
 	m_dSVMCValue = pt.get<double>("SVM.C_VALUE", 0.1, trDouble);
 	m_bWriteSVMs = pt.get<bool>("SVM.WRITE_SVMS", true, trBool);
+	m_bCrossValidate = pt.get<bool>("SVM.CROSS_VALIDATE", true, trBool);
 	m_strSVMOutputPath = pt.get<std::string>("SVM.FILEPATH", "outSVM");
 
 	m_bPredictTrainingData = pt.get<bool>("SVM.PREDICT_TRAININGDATA", true, trBool);

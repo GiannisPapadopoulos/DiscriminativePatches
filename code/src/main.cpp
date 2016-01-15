@@ -39,10 +39,7 @@ int main(int argc, char** argv )
 		return -1;
 	}
 
-	bool bPredict = false;
-	bool bTrain = false;
 	string strConfigFile = "";
-	string strImage = "";
 
 	for(int i = 0; i < argc; ++i)
 	{
@@ -57,11 +54,6 @@ int main(int argc, char** argv )
 				cerr << "ERROR: Option -config given without filepath." << endl;
 				return -1;
 			}
-		}
-
-		if(string(argv[i]) == "-train")
-		{
-			bTrain = true;
 		}
 
 		if(string(argv[i]) == "-svmtest")
@@ -91,20 +83,6 @@ int main(int argc, char** argv )
 				return -1;
 			}
 		}
-
-		if(string(argv[i]) == "-predict")
-		{
-			if(i+1 < argc)
-			{
-				strImage = string(argv[i+1]);
-				bPredict = true;
-			}
-			else
-			{
-				cerr << "ERROR: Option -predict given without filename." << endl;
-				return -1;
-			}
-		}
 	}
 
 	if(strConfigFile.empty())
@@ -115,7 +93,14 @@ int main(int argc, char** argv )
 
 	Configuration* config = new Configuration(strConfigFile);
 
-	if(bTrain)
+	if(config->getApplicationMode() == Configuration::appMode::Undef)
+	{
+		cout << "ERROR: Application mode undefined. What should I do ?" << endl;
+		return -1;
+	}
+
+	if(config->getApplicationMode() == Configuration::appMode::Train
+			|| config->getApplicationMode() == Configuration::appMode::Retrain)
 	{
 		cout << "Training classifiers according to configuration given in " << strConfigFile << endl;
 		CatalogueTraining* trainer = new CatalogueTraining(config);
@@ -123,11 +108,11 @@ int main(int argc, char** argv )
 		delete trainer;
 	}
 
-	if(bPredict)
+	if(config->getApplicationMode() == Configuration::appMode::Predict)
 	{
-		cout << "Predicting image from " << strImage << " according to configuration given in " << strConfigFile << endl;
+		cout << "Predicting image according to configuration given in " << strConfigFile << endl;
 		ClassificationSVM* classifier = new ClassificationSVM();
-		classifier->loadAndPredictImage(strImage, config);
+		classifier->loadAndPredictImage(config);
 		delete classifier;
 	}
 

@@ -87,6 +87,18 @@ void mai::CatalogueTraining::processPipeline()
 		}
 	}
 
+	if(m_Config->getApplicationMode() == Configuration::appMode::Retrain)
+	{
+		cout << "[mai::CatalogueDetection::processPipeline] Loading svms for retraining ..." << endl;
+		string strSVMInputPath = m_Config->getSVMInputPath();
+
+		if(!m_Classifiers->loadSVMs(strSVMInputPath))
+		{
+			cout << "[mai::CatalogueDetection::processPipeline] WARNING! Loading svms for retraining from " << strSVMInputPath
+					<< " failed. Training new ones." << endl;
+		}
+	}
+
 	if(m_Config->getDetectFaces())
 	{
 		cout << "[mai::CatalogueDetection::processPipeline] Performing face detection ..." << endl;
@@ -113,6 +125,11 @@ void mai::CatalogueTraining::processPipeline()
 	bool bWriteHOGImages= m_Config->getWriteHogImages();
 
 	bool bApplyPCA = m_Config->getApplyPCA();
+
+	bool bCrossValidate = m_Config->getCrossValidate();
+
+	map<string, Mat> mTrainingResults;
+	map<string, Mat> mValidationResults;
 
 	computeHOG(imageSize,
 			blockSize,
@@ -149,7 +166,6 @@ void mai::CatalogueTraining::processPipeline()
 		cout << "#-------------------------------------------------------------------------------#" << endl;
 		cout << "[mai::CatalogueDetection::processPipeline] SVM prediction on training data." << endl;
 
-		map<string, Mat> mTrainingResults;
 		m_Classifiers->predict(m_mTrain, mTrainingResults);
 
 		cout << "#-------------------------------------------------------------------------------#" << endl;
@@ -160,10 +176,33 @@ void mai::CatalogueTraining::processPipeline()
 		cout << "#-------------------------------------------------------------------------------#" << endl;
 		cout << "[mai::CatalogueDetection::processPipeline] SVM prediction on validation data." << endl;
 
-		map<string, Mat> mValidationResults;
 		m_Classifiers->predict(m_mValidate, mValidationResults);
 
 		cout << "#-------------------------------------------------------------------------------#" << endl;
+
+		if(bCrossValidate)
+		{
+			cout << "[mai::CatalogueDetection::processPipeline] Training SVM with validation data for cross validation ..." << endl;
+
+			m_Classifiers->trainSVMs(m_mValidate, m_Config->getSvmCValue());
+
+			if(bPredictTrainingData)
+			{
+				cout << "#-------------------------------------------------------------------------------#" << endl;
+				cout << "[mai::CatalogueDetection::processPipeline] SVM prediction on swapped training data." << endl;
+
+				m_Classifiers->predict(m_mValidate, mTrainingResults);
+
+				cout << "#-------------------------------------------------------------------------------#" << endl;
+			}
+
+			cout << "#-------------------------------------------------------------------------------#" << endl;
+			cout << "[mai::CatalogueDetection::processPipeline] SVM prediction on swapped validation data." << endl;
+
+			m_Classifiers->predict(m_mTrain, mValidationResults);
+
+			cout << "#-------------------------------------------------------------------------------#" << endl;
+		}
 	}
 
 	if(m_Config->getWriteSvMs())

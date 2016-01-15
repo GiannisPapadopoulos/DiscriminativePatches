@@ -140,7 +140,6 @@ private:
 			std::map<std::string, std::vector<std::vector<float> > > &mPositives,
 			std::map<std::string, std::vector<std::vector<float> > > &mNegatives);
 
-
 	/**
 	 * Original images and extraacted feature vectors per named category
 	 */

@@ -46,8 +46,17 @@ void mai::ClassificationSVM::trainSVMs(map<string, TrainingData*> &mTrainingData
 	{
 		string strName = it->first;
 		TrainingData* data = it->second;
-		umSVM* svm = new umSVM(dCValue);
 		vector<vector<float> > vSupport;
+		umSVM* svm;
+
+		try
+		{
+			svm = m_mSVMs.at(strName);
+		}
+		catch (out_of_range &e)
+		{
+			svm = new umSVM(dCValue);
+		}
 
 //		std::string strDataname = "trainingdata";
 //		IOUtils::writeMatToCSV(data->getData(), strDataname);
@@ -126,12 +135,17 @@ void mai::ClassificationSVM::predict(map<string, TrainingData*> &mData,
 		double dCorrectDetectionRatio = (double)iCorrectDetection / iResultsRows;
 		cout << "[mai::ClassificationSVM::predict] Ratio of correct detections for label " << strName << " : " << dCorrectDetectionRatio << endl;
 
+		map<string, Mat>::iterator itFound = mResults.find(strName);
+		if (itFound != mResults.end())
+		{
+			mResults.erase(itFound);
+		}
+
 		mResults.insert(pair<string, Mat>(strName, results));
 	}
 }
 
 string mai::ClassificationSVM::predict(const Mat &image,
-		map<string, float> &mResults,
 		Configuration* config)
 {
 	if(m_mSVMs.size() < 1)
@@ -193,8 +207,6 @@ string mai::ClassificationSVM::predict(const Mat &image,
 			fBestResultValue = fResultValue;
 			strBest = strCategory;
 		}
-
-		mResults.insert(pair<string, float>(strCategory, fResultValue));
 	}
 
 	if(Constants::DEBUG_SVM_PREDICTION)
@@ -205,9 +217,10 @@ string mai::ClassificationSVM::predict(const Mat &image,
 	return strBest;
 }
 
-void mai::ClassificationSVM::loadAndPredictImage(const string &strFilename,
-		Configuration* config)
+void mai::ClassificationSVM::loadAndPredictImage(Configuration* config)
 {
+	string strFilename = config->getImageInputPath();
+
 	cv::Mat image;
 	if(!IOUtils::loadImage(image,
 			IMREAD_GRAYSCALE,
@@ -225,12 +238,13 @@ void mai::ClassificationSVM::loadAndPredictImage(const string &strFilename,
 		cout << "[mai::ClassificationSVM::loadAndPredictImage] Loading classifiers from " << strSVMPath << endl;
 	}
 
-	loadSVMs(strSVMPath);
+	if(!loadSVMs(strSVMPath))
+	{
+		cout << "[mai::ClassificationSVM::loadAndPredictImage] ERROR! Loading svms " << strSVMPath << endl;
+		return;
+	}
 
-	map<string, float> mResults;
-	string strClassifiedAs = predict(image,
-			mResults,
-			config);
+	string strClassifiedAs = predict(image, config);
 
 	cout << "#-------------------------------------------------------------------------------#" << endl;
 	cout << "[mai::ClassificationSVM::loadAndPredictImage] Prediction done. Best classification is " << strClassifiedAs << endl;
