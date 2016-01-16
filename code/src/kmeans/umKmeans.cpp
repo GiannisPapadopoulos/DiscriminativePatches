@@ -19,9 +19,9 @@ mai::umKmeans::~umKmeans() {
 
 }
 
-cv::Mat mai::umKmeans::performClustering(const cv::Mat& data,
-                                         const int numClusters,
-                                         const cv::Mat& labels) {
+cv::Mat mai::umKmeans::performClustering(cv::Mat& data,
+                                         int numClusters,
+                                         cv::Mat& labels) {
   cv::Mat centers;
   cv::kmeans(data, numClusters, labels, cv::TermCriteria(), 1,
              cv::KMEANS_RANDOM_CENTERS, centers);
