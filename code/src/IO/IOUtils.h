@@ -39,6 +39,18 @@ public:
 	virtual ~IOUtils();
 
 	/**
+	 * @param strPath	filesystem item to check
+	 * @return true, if strPath is a directory, false if not or if it does not exist.
+	 */
+	static bool getIsDirectory(const std::string &strPath);
+
+	/**
+	 * @param strPath	filesystem item to check
+	 * @return true, if strPath is a regular file, false if not or if it does not exist.
+	 */
+	static bool getIsFile(const std::string &strPath);
+
+	/**
 	 * Load all images from given directory containing labeled image catalogue.
 	 * Subfolders define label separation, their names define the labels themselves.
 	 *
@@ -68,18 +80,18 @@ public:
 	 */
 	static bool loadImagesOrdered(std::vector<cv::Mat*> &vImages,
 			std::vector<std::string> &vImageNames,
-			int iMode,
+			const int iMode,
 			const std::string &strDirectory,
-			bool bEqualize);
+			const bool bEqualize);
 
 	/**
 	 * Uses IO/IOUtils::loadImage
 	 */
 	static void loadAndAddImage(std::vector<cv::Mat*> &vImages,
 			std::vector<std::string> &vImageNames,
-			int iMode,
+			const int iMode,
 			const std::string &strDirectoryItem,
-			bool bEqualize);
+			const bool bEqualize);
 
 	/**
 	 * Load image
@@ -98,9 +110,9 @@ public:
 	 *
 	 */
 	static bool loadImage(cv::Mat &image,
-			int iMode,
+			const int iMode,
 			const std::string &strFileName,
-			bool bEqualize = true);
+			const bool bEqualize = true);
 
 	/**
 	 * Double the images by adding flipped versions
@@ -111,7 +123,7 @@ public:
 	 */
 	static void addFlippedImages( std::vector<cv::Mat*> &vImages,
 			std::vector<std::string> &vImageNames,
-			int iFlipMode );
+			const int iFlipMode );
 
 	/**
 	 * Convert given images
@@ -125,9 +137,9 @@ public:
 	 * @param[out] vConvertedImages	converted results
 	 * @param iMode					OpenCV conversion mode
 	 */
-	static void convertImages( std::vector<cv::Mat*> &vImages,
+	static void convertImages(const std::vector<cv::Mat*> &vImages,
 			std::vector<cv::Mat*> &vConvertedImages,
-			int iMode );
+			const int iMode);
 
 	/**
 	 * Apply histogram equalization on the input images
@@ -135,8 +147,8 @@ public:
 	 * @param[in] vImages			to be converted
 	 * @param[out] vConvertedImages	converted results
 	 */
-	static void equalizeImages( std::vector<cv::Mat*> &vImages,
-			std::vector<cv::Mat*> &vConvertedImages );
+	static void equalizeImages(const std::vector<cv::Mat*> &vImages,
+			std::vector<cv::Mat*> &vConvertedImages);
 
 	/**
 	 * Calculate max dimension of given images
@@ -145,9 +157,9 @@ public:
 	 * @param iMaxHeight	max height
 	 * @param iMaxWidth		max width
 	 */
-	static void getMaxImageDimensions( std::vector<cv::Mat> &vImages,
+	static void getMaxImageDimensions(const std::vector<cv::Mat> &vImages,
 			int &iMaxHeight,
-			int &iMaxWidth );
+			int &iMaxWidth);
 
 	/**
 	 * Sample image to given size
@@ -157,10 +169,10 @@ public:
 	 * @param iHeight				sample height
 	 * @param iWidth				sample width
 	 */
-	static void sampleImage( cv::Mat &image,
+	static void sampleImage(const cv::Mat &image,
 			cv::Mat &sampledImage,
-			int iHeight,
-			int iWidth );
+			const int iHeight,
+			const int iWidth);
 
 	/**
 	 * Sample images to given size
@@ -170,21 +182,21 @@ public:
 	 * @param iHeight				sample height
 	 * @param iWidth				sample width
 	 */
-	static void sampleImages( std::vector<cv::Mat> &vImages,
+	static void sampleImages(const std::vector<cv::Mat> &vImages,
 			std::vector<cv::Mat> &vSampledImages,
-			int iHeight,
-			int iWidth );
+			const int iHeight,
+			const int iWidth);
 
 	/**
 	 * Show given images and wait for keystroke between each.
 	 */
-	static void showImages( std::vector<cv::Mat> &vImages );
+	static void showImages(const std::vector<cv::Mat> &vImages);
 
 	/**
 	 * Show given image and wait for keystroke between each.
 	 */
-	static void showImage( cv::Mat &image );
-	static void showImage( const cv::Mat* image );
+	static void showImage( const cv::Mat &image );
+	static void showImage( const cv::Mat* const image );
 
 	/**
 	 * Create given directory if it does not already exist.
@@ -200,8 +212,8 @@ public:
 	 * @param strPath		filesystem folder without trailing slash
 	 * @param strFileNameBase	base part of filename
 	 */
-	static void writeImages( std::vector<cv::Mat*> &vImages,
-			std::vector<std::string> &vImageNames,
+	static void writeImages(const std::vector<cv::Mat*> &vImages,
+			const std::vector<std::string> &vImageNames,
 			const std::string &strPath );
 
 	/**
@@ -213,17 +225,17 @@ public:
 	 * @param strPath		filesystem folder without trailing slash
 	 * @param strFileNameBase	base part of filename
 	 */
-	static void writeHOGImages( DataSet* data,
+	static void writeHOGImages(const DataSet* const data,
 			const std::string &strPath,
 			const std::string &strFileNameBase,
-			cv::Size imageSize,
-			cv::Size cellSize,
-			cv::Size blockSize,
-			cv::Size blockStride,
-			int iNumBins,
-			int scaleFactor,
-			double vizFactor,
-			bool printValue = false);
+			const cv::Size imageSize,
+			const cv::Size cellSize,
+			const cv::Size blockSize,
+			const cv::Size blockStride,
+			const int iNumBins,
+			const int scaleFactor,
+			const double vizFactor,
+			const bool printValue = false);
 
 	/**
 	 * Write svms to given folder.

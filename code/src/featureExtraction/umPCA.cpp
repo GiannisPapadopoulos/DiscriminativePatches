@@ -30,9 +30,9 @@ mai::umPCA::umPCA()
 mai::umPCA::~umPCA()
 {}
 
-void mai::umPCA::decreaseHOGDescriptorCellsByPCA(vector<float> &inputFeatures,
+void mai::umPCA::decreaseHOGDescriptorCellsByPCA(const vector<float> &inputFeatures,
 		vector<float> &reducedFeatures,
-		int iNumBins)
+		const int iNumBins)
 {
 	int iNumCells = inputFeatures.size() / iNumBins;
 	int iCellPosition = 0;
@@ -67,7 +67,7 @@ void mai::umPCA::decreaseHOGDescriptorCellsByPCA(vector<float> &inputFeatures,
 	}
 }
 
-void mai::umPCA::decreaseFeatureSpacebyPCA(Mat &features,
+void mai::umPCA::decreaseFeatureSpacebyPCA(const Mat &features,
 									Mat &eigenValues,
 									Mat &eigenVectors,
 									Mat &mean)

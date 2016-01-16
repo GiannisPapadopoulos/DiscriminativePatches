@@ -32,8 +32,8 @@ public:
 	/**
 	 * Builds the training and label matrices from the given data vectors.
 	 */
-	TrainingData(std::vector<std::vector<float> > &vPositiveFeatures,
-			std::vector<std::vector<float> > &vNegativeFeatures);
+	TrainingData(const std::vector<std::vector<float> > &vPositiveFeatures,
+			const std::vector<std::vector<float> > &vNegativeFeatures);
 
 	/**
 	 * Nothing to delete here.

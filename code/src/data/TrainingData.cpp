@@ -19,8 +19,8 @@
 
 using namespace std;
 
-mai::TrainingData::TrainingData(vector<vector<float> > &vPositiveFeatures,
-		vector<vector<float> > &vNegativeFeatures)
+mai::TrainingData::TrainingData(const vector<vector<float> > &vPositiveFeatures,
+		const vector<vector<float> > &vNegativeFeatures)
 :	m_Data(0, 0, CV_32FC1)
 ,	m_Labels(0, 0, CV_32SC1)
 {

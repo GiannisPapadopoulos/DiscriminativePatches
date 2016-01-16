@@ -37,7 +37,7 @@ public:
 	/**
 	 * Constructor
 	 */
-	ClassificationSVM();
+	ClassificationSVM(const Configuration* const config);
 
 	/**
 	 * Deletes classifiers
@@ -50,8 +50,8 @@ public:
 	 *
 	 * Saves trained svms by catalogue category labels.
 	 */
-	void trainSVMs(std::map<std::string, TrainingData*> &mTrainingData,
-			double dCValue);
+	void trainSVMs(const std::map<std::string, TrainingData*> &mTrainingData,
+			const double dCValue);
 
 	/**
 	 * Load trained svms from filesystem.
@@ -68,7 +68,7 @@ public:
 	 * @param[in] mData		Data that has to be predicted.
 	 * @param[out] mResults	Result matrix containing predicted labels according to input matrices
 	 */
-	void predict(std::map<std::string, TrainingData*> &mData,
+	void predict(const std::map<std::string, TrainingData*> &mData,
 			std::map<std::string, cv::Mat> &mResults);
 
 	/**
@@ -79,10 +79,14 @@ public:
 	 * @param config		Configuration containing HOG parameters as used for training
 	 * @return				Category name of best prediction
 	 */
-	std::string predict(const cv::Mat &image,
-			Configuration* config);
+	std::string predict(const cv::Mat &image);
 
-	void loadAndPredictImage(Configuration* config);
+	/**
+	 * Load and predict images according to configuration.
+	 *
+	 * @param config	defining parameters.
+	 */
+	void loadAndPredict();
 
 	/**
 	 * Access the stored svms
@@ -93,11 +97,22 @@ public:
 
 private:
 
+	void loadAndPredictImage();
+
+	void loadAndPredictImages();
+
+	void predictAndShowResults(const cv::Mat &image,
+			const std::string &strName);
+
 	/**
 	 * Trained SVMs per named category
 	 */
 	std::map<std::string, umSVM*> m_mSVMs;
 
+	/**
+	 * Application settings
+	 */
+	const Configuration* const	m_Config;
 };
 
 }// namespace mai

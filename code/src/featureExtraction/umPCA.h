@@ -41,14 +41,14 @@ public:
 	 * @param reducedFeatures	output feature vector
 	 * @param iNumBins	number of gradient directions used in HOG computation. Size of reduced feature vector.
 	 */
-	static void decreaseHOGDescriptorCellsByPCA(std::vector<float> &features,
+	static void decreaseHOGDescriptorCellsByPCA(const std::vector<float> &features,
 			std::vector<float> &reducedFeatures,
-			int iNumBins);
+			const int iNumBins);
 
 	/**
 	 * @see http://docs.opencv.org/ref/2.4/d3/d8d/classcv_1_1PCA.html
 	 */
-	static void decreaseFeatureSpacebyPCA(cv::Mat &features,
+	static void decreaseFeatureSpacebyPCA(const cv::Mat &features,
 			cv::Mat &eigenValues,
 			cv::Mat &eigenVectors,
 			cv::Mat &mean);

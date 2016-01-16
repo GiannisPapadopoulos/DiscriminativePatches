@@ -21,7 +21,7 @@
 using namespace std;
 using namespace cv;
 
-bool mai::DataSet::addDescriptorValuesToImageAt(int iIndex,
+bool mai::DataSet::addDescriptorValuesToImageAt(const int iIndex,
 		const vector<float> &vDescriptorValues)
 {
 	if(m_vData[iIndex] != NULL)
@@ -44,7 +44,7 @@ bool mai::DataSet::addDescriptorValuesToImageAt(int iIndex,
 	return false;
 }
 
-bool mai::DataSet::addPatchDescriptorValuesToImageAt(int iIndex,
+bool mai::DataSet::addPatchDescriptorValuesToImageAt(const int iIndex,
     const std::vector<vector<vector<float>>> &patchDescriptorValues)
 {
   if(m_vData[iIndex] != NULL)
@@ -54,8 +54,8 @@ bool mai::DataSet::addPatchDescriptorValuesToImageAt(int iIndex,
   return false;
 }
 
-int mai::DataSet::setImages(vector<Mat*> &vImages,
-		vector<string> &vImageNames)
+int mai::DataSet::setImages(const vector<Mat*> &vImages,
+		const vector<string> &vImageNames)
 {
 	if(vImages.size() != vImageNames.size())
 	{
@@ -87,7 +87,7 @@ string mai::DataSet::getFirstSplitBy(const string &strToSplit,
 	return strs.at(0);
 }
 
-void mai::DataSet::getDescriptorsSeparated(int iDivider,
+void mai::DataSet::getDescriptorsSeparated(const int iDivider,
 		vector<vector<float> > &vFirstPart,
 		vector<vector<float> > &vSecondPart)
 {
@@ -117,7 +117,7 @@ void mai::DataSet::getDescriptorsSeparated(int iDivider,
 	}
 }
 
-void mai::DataSet::setMaxImageDimensions(Mat* image)
+void mai::DataSet::setMaxImageDimensions(const Mat* const image)
 {
 	Size s = image->size();
 	int iW = s.width;

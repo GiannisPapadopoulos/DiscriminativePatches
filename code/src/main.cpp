@@ -111,10 +111,12 @@ int main(int argc, char** argv )
 	if(config->getApplicationMode() == Configuration::appMode::Predict)
 	{
 		cout << "Predicting image according to configuration given in " << strConfigFile << endl;
-		ClassificationSVM* classifier = new ClassificationSVM();
-		classifier->loadAndPredictImage(config);
+		ClassificationSVM* classifier = new ClassificationSVM(config);
+		classifier->loadAndPredict();
 		delete classifier;
 	}
+
+	delete config;
 
 	return 0;
 }

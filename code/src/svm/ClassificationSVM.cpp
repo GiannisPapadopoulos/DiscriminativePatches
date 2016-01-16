@@ -26,7 +26,8 @@
 using namespace std;
 using namespace cv;
 
-mai::ClassificationSVM::ClassificationSVM()
+mai::ClassificationSVM::ClassificationSVM(const Configuration* const config)
+:	m_Config(config)
 {}
 
 mai::ClassificationSVM::~ClassificationSVM()
@@ -38,8 +39,8 @@ mai::ClassificationSVM::~ClassificationSVM()
 	m_mSVMs.clear();
 }
 
-void mai::ClassificationSVM::trainSVMs(map<string, TrainingData*> &mTrainingData,
-		double dCValue)
+void mai::ClassificationSVM::trainSVMs(const map<string, TrainingData*> &mTrainingData,
+		const double dCValue)
 {
 	// Train svms for each category
 	for(map<string, TrainingData*>::const_iterator it = mTrainingData.begin(); it != mTrainingData.end(); it++)
@@ -84,7 +85,7 @@ bool mai::ClassificationSVM::loadSVMs(const std::string &strPath)
 	return true;
 }
 
-void mai::ClassificationSVM::predict(map<string, TrainingData*> &mData,
+void mai::ClassificationSVM::predict(const map<string, TrainingData*> &mData,
 		map<string, Mat> &mResults)
 {
 	if(m_mSVMs.size() < 1)
@@ -145,8 +146,7 @@ void mai::ClassificationSVM::predict(map<string, TrainingData*> &mData,
 	}
 }
 
-string mai::ClassificationSVM::predict(const Mat &image,
-		Configuration* config)
+string mai::ClassificationSVM::predict(const Mat &image)
 {
 	if(m_mSVMs.size() < 1)
 	{
@@ -154,16 +154,16 @@ string mai::ClassificationSVM::predict(const Mat &image,
 		return "";
 	}
 
-	Size cellSize = config->getCellSize();
-	Size blockStride = config->getBlockStride();
-	Size blockSize = config->getBlockSize();
-	Size imageSize = config->getImageSize();
+	Size cellSize = m_Config->getCellSize();
+	Size blockStride = m_Config->getBlockStride();
+	Size blockSize = m_Config->getBlockSize();
+	Size imageSize = m_Config->getImageSize();
 
 	// Not sure about these
 	Size winStride = Size(0,0);
 	Size padding = Size(0,0);
 
-	int iNumBins = config->getNumBins();
+	int iNumBins = m_Config->getNumBins();
 
 	vector<float> descriptorsValues;
 	umHOG::extractFeatures(descriptorsValues,
@@ -217,21 +217,10 @@ string mai::ClassificationSVM::predict(const Mat &image,
 	return strBest;
 }
 
-void mai::ClassificationSVM::loadAndPredictImage(Configuration* config)
+void mai::ClassificationSVM::loadAndPredict()
 {
-	string strFilename = config->getImageInputPath();
-
-	cv::Mat image;
-	if(!IOUtils::loadImage(image,
-			IMREAD_GRAYSCALE,
-			strFilename,
-			true))
-	{
-		cout << "[mai::ClassificationSVM::loadAndPredictImage] ERROR! Loading image from " << strFilename << endl;
-		return;
-	}
-
-	string strSVMPath = config->getSvmOutputPath();
+	string strFilename = m_Config->getImageInputPath();
+	string strSVMPath = m_Config->getSvmOutputPath();
 
 	if(Constants::DEBUG_SVM_PREDICTION)
 	{
@@ -244,10 +233,76 @@ void mai::ClassificationSVM::loadAndPredictImage(Configuration* config)
 		return;
 	}
 
-	string strClassifiedAs = predict(image, config);
-
-	cout << "#-------------------------------------------------------------------------------#" << endl;
-	cout << "[mai::ClassificationSVM::loadAndPredictImage] Prediction done. Best classification is " << strClassifiedAs << endl;
-	cout << "#-------------------------------------------------------------------------------#" << endl;
+	if(IOUtils::getIsDirectory(strFilename))
+	{
+		loadAndPredictImages();
+	}
+	else if(IOUtils::getIsFile(strFilename))
+	{
+		loadAndPredictImage();
+	}
+	else
+	{
+		cout << "[mai::ClassificationSVM::loadAndPredictImage] ERROR! File or directory does not exist: " << strFilename << endl;
+	}
 }
 
+void mai::ClassificationSVM::loadAndPredictImages()
+{
+	string strFilename = m_Config->getImageInputPath();
+
+	vector<Mat*> vImages;
+	vector<string> vImageNames;
+
+	if(!IOUtils::loadImagesOrdered(vImages,
+			vImageNames,
+			IMREAD_GRAYSCALE,
+			strFilename,
+			true))
+	{
+		cout << "[mai::ClassificationSVM::loadAndPredictImage] ERROR! Loading image from " << strFilename << endl;
+		return;
+	}
+
+	if(vImageNames.size() != vImages.size())
+	{
+		cout << "[mai::ClassificationSVM::loadAndPredictImage] ERROR! Loading image from " << strFilename << endl;
+		return;
+	}
+
+	for(unsigned int i = 0; i < vImages.size(); ++i)
+	{
+		Mat* image = vImages.at(i);
+		string strName = vImageNames.at(i);
+
+		predictAndShowResults(*image, strName);
+	}
+}
+
+void mai::ClassificationSVM::loadAndPredictImage()
+{
+	string strFilename = m_Config->getImageInputPath();
+
+	Mat image;
+	if(!IOUtils::loadImage(image,
+			IMREAD_GRAYSCALE,
+			strFilename,
+			true))
+	{
+		cout << "[mai::ClassificationSVM::loadAndPredictImage] ERROR! Loading image from " << strFilename << endl;
+		return;
+	}
+
+	predictAndShowResults(image, strFilename);
+}
+
+void mai::ClassificationSVM::predictAndShowResults(const Mat &image,
+		const string &strName)
+{
+	string strClassifiedAs = predict(image);
+
+	cout << "#-------------------------------------------------------------------------------#" << endl;
+	cout << " Prediction for image " << strName << endl;
+	cout << " Best classification is " << strClassifiedAs << endl;
+	cout << "#-------------------------------------------------------------------------------#" << endl;
+}

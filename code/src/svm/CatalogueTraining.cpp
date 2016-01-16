@@ -35,9 +35,9 @@
 using namespace cv;
 using namespace std;
 
-mai::CatalogueTraining::CatalogueTraining(Configuration* config)
+mai::CatalogueTraining::CatalogueTraining(const Configuration* const config)
 :	m_Config(config)
-,	m_Classifiers(new ClassificationSVM())
+,	m_Classifiers(new ClassificationSVM(config))
 {}
 
 mai::CatalogueTraining::~CatalogueTraining()
@@ -61,8 +61,6 @@ mai::CatalogueTraining::~CatalogueTraining()
 	m_mValidate.clear();
 
 	delete m_Classifiers;
-
-	delete m_Config;
 }
 
 void mai::CatalogueTraining::processPipeline()
@@ -161,7 +159,7 @@ void mai::CatalogueTraining::processPipeline()
 
 	cout << "[mai::CatalogueDetection::processPipeline] Training SVM done." << endl;
 
-	if(bPredictTrainingData)
+	if(bPredictTrainingData && !bCrossValidate)
 	{
 		cout << "#-------------------------------------------------------------------------------#" << endl;
 		cout << "[mai::CatalogueDetection::processPipeline] SVM prediction on training data." << endl;
@@ -186,20 +184,10 @@ void mai::CatalogueTraining::processPipeline()
 
 			m_Classifiers->trainSVMs(m_mValidate, m_Config->getSvmCValue());
 
-			if(bPredictTrainingData)
-			{
-				cout << "#-------------------------------------------------------------------------------#" << endl;
-				cout << "[mai::CatalogueDetection::processPipeline] SVM prediction on swapped training data." << endl;
-
-				m_Classifiers->predict(m_mValidate, mTrainingResults);
-
-				cout << "#-------------------------------------------------------------------------------#" << endl;
-			}
-
 			cout << "#-------------------------------------------------------------------------------#" << endl;
-			cout << "[mai::CatalogueDetection::processPipeline] SVM prediction on swapped validation data." << endl;
+			cout << "[mai::CatalogueDetection::processPipeline] SVM prediction on training data swapped for validation." << endl;
 
-			m_Classifiers->predict(m_mTrain, mValidationResults);
+			m_Classifiers->predict(m_mTrain, mTrainingResults);
 
 			cout << "#-------------------------------------------------------------------------------#" << endl;
 		}
@@ -244,15 +232,15 @@ void mai::CatalogueTraining::detectFaces()
 	}
 }
 
-void mai::CatalogueTraining::computeHOG(Size imageSize,
-		Size blockSize,
-		Size blockStride,
-		Size cellSize,
-		int iNumBins,
-		Size winStride,
-		Size padding,
-		bool bWriteHOGImages,
-		bool bApplyPCA)
+void mai::CatalogueTraining::computeHOG(const Size imageSize,
+		const Size blockSize,
+		const Size blockStride,
+		const Size cellSize,
+		const int iNumBins,
+		const Size winStride,
+		const Size padding,
+		const bool bWriteHOGImages,
+		const bool bApplyPCA)
 {
 	for(map<string, DataSet*>::iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); it++)
 	{
@@ -290,11 +278,11 @@ void mai::CatalogueTraining::computeHOG(Size imageSize,
 	}
 }
 
-void mai::CatalogueTraining::performClustering(Size imageSize,
-		Size blockSize,
-		Size blockStride,
-		Size cellSize,
-		int iNumBins)
+void mai::CatalogueTraining::performClustering(const Size imageSize,
+		const Size blockSize,
+		const Size blockStride,
+		const Size cellSize,
+		const int iNumBins)
 {
 	int cellsPerBlock = (blockSize.width / cellSize.width) * (blockSize.height / cellSize.height);
 	int blockFeatures = cellsPerBlock * iNumBins;
@@ -330,7 +318,7 @@ void mai::CatalogueTraining::performClustering(Size imageSize,
 	}
 }
 
-void mai::CatalogueTraining::setupSVMData(int iDataSetDivider)
+void mai::CatalogueTraining::setupSVMData(const int iDataSetDivider)
 {
 	// Positive training and validation data per named category
 	map<string, vector<vector<float> > > mPositiveTrain;
@@ -370,7 +358,7 @@ void mai::CatalogueTraining::setupSVMData(int iDataSetDivider)
 
 void mai::CatalogueTraining::divideDataSets(map<string, vector<vector<float> > > &mTrain,
 			map<string, vector<vector<float> > > &mValidate,
-			int iDataSetDivider)
+			const int iDataSetDivider)
 {
 	// Divide datasets of each catefory into exclusive training and validation parts
 	for(map<string, DataSet*>::const_iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); it++)
@@ -384,7 +372,7 @@ void mai::CatalogueTraining::divideDataSets(map<string, vector<vector<float> > >
 	}
 }
 
-void mai::CatalogueTraining::collectRandomNegatives(map<string, vector<vector<float> > > &mPositives,
+void mai::CatalogueTraining::collectRandomNegatives(const map<string, vector<vector<float> > > &mPositives,
 		map<string, vector<vector<float> > > &mNegatives)
 {
 	// Count all sample vector sizes
@@ -444,8 +432,8 @@ void mai::CatalogueTraining::collectRandomNegatives(map<string, vector<vector<fl
 	}
 }
 
-void mai::CatalogueTraining::calculateSampleSizes(string strKey,
-		map<string, int> &mFeatureSizes,
+void mai::CatalogueTraining::calculateSampleSizes(const string &strKey,
+		const map<string, int> &mFeatureSizes,
 		map<string, int> &mSampleSizes)
 {
 	// Get all feature sizes
@@ -524,8 +512,8 @@ void mai::CatalogueTraining::calculateSampleSizes(string strKey,
 }
 
 void mai::CatalogueTraining::setupTrainingData(map<string, TrainingData*> &mTrainingData,
-			map<string, vector<vector<float> > > &mPositives,
-			map<string, vector<vector<float> > > &mNegatives)
+			const map<string, vector<vector<float> > > &mPositives,
+			const map<string, vector<vector<float> > > &mNegatives)
 {
 	// Setup training data for each category
 	for(map<string, DataSet*>::const_iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); it++)

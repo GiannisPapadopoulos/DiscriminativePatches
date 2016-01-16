@@ -113,8 +113,8 @@ void mai::umSVM::loadSVM(const string &strFilename)
 //#endif
 }
 
-void mai::umSVM::searchSupportVector(vector<vector<float> > &vData,
-			vector<vector<float> > &vSupport,
+void mai::umSVM::searchSupportVector(const vector<vector<float> > &vData,
+			const vector<vector<float> > &vSupport,
 			bool bSort)
 {
 	for(unsigned int i = 0; i < vSupport.size(); ++i)
@@ -138,8 +138,8 @@ void mai::umSVM::searchSupportVector(vector<vector<float> > &vData,
 	}
 }
 
-void mai::umSVM::searchSupportVector(DataSet* data,
-			vector<vector<float> > &vSupport,
+void mai::umSVM::searchSupportVector(const DataSet* const data,
+			const vector<vector<float> > &vSupport,
 			bool bSort)
 {
 	for(unsigned int i = 0; i < vSupport.size(); ++i)

@@ -36,15 +36,15 @@ mai::umHOG::umHOG()
 mai::umHOG::~umHOG()
 {}
 
-void mai::umHOG::computeHOGForDataSet(DataSet* data,
-		Size imageSize,
-		Size blockSize,
-		Size blockStride,
-		Size cellSize,
-		int iNumBins,
-		Size winStride,
-		Size padding,
-		bool bApplyPCA)
+void mai::umHOG::computeHOGForDataSet(DataSet* const data,
+		const Size imageSize,
+		const Size blockSize,
+		const Size blockStride,
+		const Size cellSize,
+		const int iNumBins,
+		const Size winStride,
+		const Size padding,
+		const bool bApplyPCA)
 {
 	// Extract features from all images in dataset.
 	for(unsigned int i = 0; i < data->getImageCount(); ++i)
@@ -77,14 +77,14 @@ void mai::umHOG::computeHOGForDataSet(DataSet* data,
 
 void mai::umHOG::extractFeatures(vector<float> &descriptorsValues,
 		const Mat &image,
-		Size imageSize,
-		Size blockSize,
-		Size blockStride,
-		Size cellSize,
-		int iNumBins,
-		Size winStride,
-		Size padding,
-		bool bApplyPCA)
+		const Size imageSize,
+		const Size blockSize,
+		const Size blockStride,
+		const Size cellSize,
+		const int iNumBins,
+		const Size winStride,
+		const Size padding,
+		const bool bApplyPCA)
 {
 	if(Constants::DEBUG_HOG) {
 		cout << "[mai::cvHOG::extractFeatures] resizing image to " << imageSize << endl;
@@ -126,16 +126,16 @@ void mai::umHOG::extractFeatures(vector<float> &descriptorsValues,
 }
 
 void mai::umHOG::getHOGDescriptorVisualImage(Mat &outImage,
-		Mat &origImg,
-		vector<float> &descriptorValues,
-		Size winSize,
-		Size cellSize,
-		Size blockSize,
-		Size blockStride,
-		int iNumBins,
-		int scaleFactor,
-		double vizFactor,
-		bool printValue)
+		const Mat &origImg,
+		const vector<float> &descriptorValues,
+		const Size winSize,
+		const Size cellSize,
+		const Size blockSize,
+		const Size blockStride,
+		const int iNumBins,
+		const int scaleFactor,
+		const double vizFactor,
+		const bool printValue)
 {
 	resize(origImg, outImage, Size(origImg.cols*scaleFactor, origImg.rows*scaleFactor));
 

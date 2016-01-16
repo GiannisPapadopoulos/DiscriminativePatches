@@ -53,15 +53,15 @@ public:
 	 * @param winStride		?
 	 * @param padding		?
 	 */
-	static void computeHOGForDataSet(DataSet* data,
-			cv::Size imageSize,
-			cv::Size blockSize = cv::Size(16,16),
-			cv::Size blockStride = cv::Size(8,8),
-			cv::Size cellSize = cv::Size(8,8),
-			int iNumBins = 9,
-			cv::Size winStride = cv::Size(0,0),
-			cv::Size padding = cv::Size(0,0),
-			bool bApplyPCA = false);
+	static void computeHOGForDataSet(DataSet* const data,
+			const cv::Size imageSize,
+			const cv::Size blockSize = cv::Size(16,16),
+			const cv::Size blockStride = cv::Size(8,8),
+			const cv::Size cellSize = cv::Size(8,8),
+			const int iNumBins = 9,
+			const cv::Size winStride = cv::Size(0,0),
+			const cv::Size padding = cv::Size(0,0),
+			const bool bApplyPCA = false);
 
 	/**
 	 * Image will be resized to imageSize for further processing to ensure equal size.
@@ -87,30 +87,30 @@ public:
 	 */
 	static void extractFeatures(std::vector<float> &descriptorsValues,
 			const cv::Mat &image,
-			cv::Size imageSize,
-			cv::Size blockSize = cv::Size(16,16),
-			cv::Size blockStride = cv::Size(8,8),
-			cv::Size cellSize = cv::Size(8,8),
-			int iNumBins = 9,
-			cv::Size winStride = cv::Size(0,0),
-			cv::Size padding = cv::Size(0,0),
-			bool bApplyPCA = false);
+			const cv::Size imageSize,
+			const cv::Size blockSize = cv::Size(16,16),
+			const cv::Size blockStride = cv::Size(8,8),
+			const cv::Size cellSize = cv::Size(8,8),
+			const int iNumBins = 9,
+			const cv::Size winStride = cv::Size(0,0),
+			const cv::Size padding = cv::Size(0,0),
+			const bool bApplyPCA = false);
 
 	/**
 	 * Visualize HOG descriptor on image
 	 * @see http://www.juergenwiki.de/work/wiki/doku.php?id=public:hog_descriptor_computation_and_visualization#computing_the_hog_descriptor_using_opencv
 	 */
 	static void getHOGDescriptorVisualImage(cv::Mat &outImage,
-			cv::Mat &origImg,
-			std::vector<float> &descriptorValues,
-			cv::Size winSize,
-			cv::Size cellSize,
-			cv::Size blockSize,
-			cv::Size blockStride,
-			int iNumBins,
-			int scaleFactor,
-			double vizFactor,
-			bool printValue = false);
+			const cv::Mat &origImg,
+			const std::vector<float> &descriptorValues,
+			const cv::Size winSize,
+			const cv::Size cellSize,
+			const cv::Size blockSize,
+			const cv::Size blockStride,
+			const int iNumBins,
+			const int scaleFactor,
+			const double vizFactor,
+			const bool printValue = false);
 
 private:
 

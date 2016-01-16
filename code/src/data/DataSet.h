@@ -54,8 +54,8 @@ public:
 	/**
 	 * Add an image and its filename to the dataset.
 	 */
-	unsigned int addImage(cv::Mat* image,
-			std::string &strImageName)
+	unsigned int addImage(const cv::Mat* const image,
+			const std::string &strImageName)
 	{
 		m_vData.push_back(new ImageWithDescriptors(image, strImageName));
 		setMaxImageDimensions(image);
@@ -76,7 +76,7 @@ public:
 	 *
 	 * @return	image or NULL
 	 */
-	const cv::Mat* getImageAt(int iIndex) const
+	const cv::Mat* getImageAt(const int iIndex) const
 	{
 		if(m_vData[iIndex] != NULL)
 		{
@@ -88,7 +88,7 @@ public:
 	/**
 	 * Get the name of the image at position iIndex.
 	 */
-	std::string getImageNameAt(int iIndex) const
+	std::string getImageNameAt(const int iIndex) const
 	{
 		if(m_vData[iIndex] != NULL)
 		{
@@ -100,20 +100,20 @@ public:
 	/**
 	 * Add feature vector for image at position iIndex,
 	 */
-	bool addDescriptorValuesToImageAt(int iIndex,
+	bool addDescriptorValuesToImageAt(const int iIndex,
 			const std::vector<float> &vDescriptorValues);
 
 	/**
 	 * Add feature vectors for each patch for image at position iIndex
 	 */
-	bool addPatchDescriptorValuesToImageAt(int iIndex,
+	bool addPatchDescriptorValuesToImageAt(const int iIndex,
 			const std::vector<vector<vector<float>>> &patchDescriptorValues);
 
 	/**
 	 * Get the feature vector from the image at position iIndex.
 	 */
-	bool getDescriptorValuesFromImageAt(int iIndex,
-			std::vector<float> &vDescriptorValues)
+	bool getDescriptorValuesFromImageAt(const int iIndex,
+			std::vector<float> &vDescriptorValues) const
 	{
 		if(m_vData[iIndex] != NULL)
 		{
@@ -126,8 +126,8 @@ public:
 	/**
 	 * Get the feature vectors for all patches from the image at position iIndex.
 	 */
-	bool getPatchDescriptorValuesFromImageAt(int iIndex,
-			std::vector<vector<vector<float>>> &vPatchDescriptorValues)
+	bool getPatchDescriptorValuesFromImageAt(const int iIndex,
+			std::vector<vector<vector<float>>> &vPatchDescriptorValues) const
 	{
 		if(m_vData[iIndex] != NULL)
 		{
@@ -141,8 +141,8 @@ public:
 	 * Add all images with their names from the input vectors.
 	 * Uses DataSet::AddImage
 	 */
-	int setImages(std::vector<cv::Mat*> &vImages,
-			std::vector<std::string> &vImageNames);
+	int setImages(const std::vector<cv::Mat*> &vImages,
+			const std::vector<std::string> &vImageNames);
 
 	/**
 	 * Remove the images from the dataset to free memory.
@@ -180,7 +180,7 @@ public:
 	 * The division will be adjusted for the first part of the filenames split by '_'
 	 * to make sure that images of such name are exclusively contained in first part.
 	 */
-	void getDescriptorsSeparated(int iDivider,
+	void getDescriptorsSeparated(const int iDivider,
 			std::vector<std::vector<float> > &vFirstPart,
 			std::vector<std::vector<float> > &vSecondPart);
 
@@ -192,7 +192,7 @@ private:
 	class ImageWithDescriptors
 	{
 	public:
-		ImageWithDescriptors(cv::Mat* pImage,
+		ImageWithDescriptors(const cv::Mat* const pImage,
 				std::string strImageName)
 	: m_pImage(pImage)
 	, m_strImageName(strImageName)
@@ -238,13 +238,13 @@ private:
 		};
 
 	private:
-		cv::Mat*			m_pImage;
+		const cv::Mat*			m_pImage;
 		std::vector<float>	m_vDescriptorValues;
 		std::vector<vector<vector<float>>> m_patchDescriptorValues;
 		std::string			m_strImageName;
 	};
 
-	void setMaxImageDimensions(cv::Mat* image);
+	void setMaxImageDimensions(const cv::Mat* const image);
 
 	std::string getFirstSplitBy(const std::string &strToSplit, const std::string &strDelimiter);
 

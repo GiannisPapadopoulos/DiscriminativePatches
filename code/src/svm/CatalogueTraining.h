@@ -38,7 +38,7 @@ public:
 	/**
 	 * Load image catalogue according to configuration
 	 */
-	CatalogueTraining(Configuration* config);
+	CatalogueTraining(const Configuration* const config);
 
 	/**
 	 * Deletes everything
@@ -72,25 +72,25 @@ private:
 	 *
 	 * param bWriteHOGImages	write HOG visualization to local folder "out"
 	 */
-	void computeHOG(cv::Size imageSize,
-				cv::Size blockSize,
-				cv::Size blockStride,
-				cv::Size cellSize,
-				int iNumBins,
-				cv::Size winStride,
-				cv::Size padding,
-				bool bWriteHOGImages = false,
-				bool bApplyPCA = false);
+	void computeHOG(const cv::Size imageSize,
+				const cv::Size blockSize,
+				const cv::Size blockStride,
+				const cv::Size cellSize,
+				const int iNumBins,
+				const cv::Size winStride,
+				const cv::Size padding,
+				const bool bWriteHOGImages = false,
+				const bool bApplyPCA = false);
 
 	/**
 	 * k-means clustering.
 	 * First  patches are extracted from feature vectors.
 	 */
-	void performClustering(cv::Size imageSize,
-			cv::Size blockSize,
-			cv::Size blockStride,
-			cv::Size cellSize,
-			int iNumBins);
+	void performClustering(const cv::Size imageSize,
+			const cv::Size blockSize,
+			const cv::Size blockStride,
+			const cv::Size cellSize,
+			const int iNumBins);
 
 	/**
 	 * Setup training data for support vector machine.
@@ -101,7 +101,7 @@ private:
 	 *
 	 * @param iDataSetDivider	divider of dataset size defining validation part, e.g. 4 -> 1/4 of patches will be in validation set.
 	 */
-	void setupSVMData(int iDataSetDivider = 1);
+	void setupSVMData(const int iDataSetDivider = 1);
 
 	/**
 	 * Assigns part of the descriptor vectors of each dataset for validation purpose, the rest for training.
@@ -110,7 +110,7 @@ private:
 	 */
 	void divideDataSets(std::map<std::string, std::vector<std::vector<float> > > &mTrain,
 			std::map<std::string, std::vector<std::vector<float> > > &mValidate,
-			int iDataSetDivider);
+			const int iDataSetDivider);
 
 	/**
 	 * Collects random samples for each positive descriptor set from all other descriptor sets at equal part.
@@ -118,7 +118,7 @@ private:
 	 * (Almost the same at least, as division rest is not taken into account.)
 	 *
 	 */
-	void collectRandomNegatives(std::map<std::string, std::vector<std::vector<float> > > &mPositives,
+	void collectRandomNegatives(const std::map<std::string, std::vector<std::vector<float> > > &mPositives,
 			std::map<std::string, std::vector<std::vector<float> > > &mNegatives);
 
 	/**
@@ -128,8 +128,8 @@ private:
 	 * @param[in] mFeatureSizes	Map containing the existing sample sizes for all categories
 	 * @param[out] mSampleSizes	Map where the calculated sample sizes get stored
 	 */
-	void calculateSampleSizes(std::string strKey,
-			std::map<std::string, int> &mFeatureSizes,
+	void calculateSampleSizes(const std::string &strKey,
+			const std::map<std::string, int> &mFeatureSizes,
 			std::map<std::string, int> &mSampleSizes);
 
 	/**
@@ -137,8 +137,8 @@ private:
 	 * @see data/TrainingData
 	 */
 	void setupTrainingData(std::map<std::string, TrainingData*> &mTrain,
-			std::map<std::string, std::vector<std::vector<float> > > &mPositives,
-			std::map<std::string, std::vector<std::vector<float> > > &mNegatives);
+			const std::map<std::string, std::vector<std::vector<float> > > &mPositives,
+			const std::map<std::string, std::vector<std::vector<float> > > &mNegatives);
 
 	/**
 	 * Original images and extraacted feature vectors per named category
@@ -163,7 +163,7 @@ private:
 	/**
 	 * Application settings
 	 */
-	Configuration*	m_Config;
+	const Configuration* const	m_Config;
 };
 
 }// namespace mai

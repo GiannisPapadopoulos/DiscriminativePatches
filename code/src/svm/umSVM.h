@@ -91,8 +91,8 @@ public:
 	 * @param vSupport	svm support vectors
 	 * @param bSort		should the vectors be sorted before comparison ?
 	 */
-	static void searchSupportVector(std::vector<std::vector<float> > &vData,
-				std::vector<std::vector<float> > &vSupport,
+	static void searchSupportVector(const std::vector<std::vector<float> > &vData,
+				const std::vector<std::vector<float> > &vSupport,
 				bool bSort = false);
 
 	/**
@@ -102,8 +102,8 @@ public:
 	 * @param vSupport	svm support vectors
 	 * @param bSort		should the vectors be sorted before comparison ?
 	 */
-	static void searchSupportVector(DataSet* data,
-			std::vector<std::vector<float> > &vSupport,
+	static void searchSupportVector(const DataSet* const data,
+			const std::vector<std::vector<float> > &vSupport,
 			bool bSort = false);
 
 private:

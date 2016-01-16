@@ -36,11 +36,43 @@ mai::IOUtils::IOUtils()
 mai::IOUtils::~IOUtils()
 {}
 
+bool mai::IOUtils::getIsDirectory(const string &strPath)
+{
+	boost::filesystem::path directory( boost::filesystem::initial_path<boost::filesystem::path>() );
+	directory = boost::filesystem::system_complete( boost::filesystem::path( strPath ) );
+
+	if( exists(directory) )
+	{
+		if( is_directory(directory) )
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool mai::IOUtils::getIsFile(const string &strPath)
+{
+	boost::filesystem::path directory( boost::filesystem::initial_path<boost::filesystem::path>() );
+	directory = boost::filesystem::system_complete( boost::filesystem::path( strPath ) );
+
+	if( exists(directory) )
+	{
+		if( is_regular_file(directory) )
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool mai::IOUtils::loadCatalogue(map<string, DataSet* > &mCatalogue,
-				int iCVLoadMode,
-				const string &strDirectory,
-				bool bAddFlipped,
-				bool bEqualize )
+		const int iCVLoadMode,
+		const string &strDirectory,
+		const bool bAddFlipped,
+		const bool bEqualize )
 {
 	boost::filesystem::path directory( boost::filesystem::initial_path<boost::filesystem::path>() );
 	directory = boost::filesystem::system_complete( boost::filesystem::path( strDirectory ) );
@@ -93,9 +125,9 @@ bool mai::IOUtils::loadCatalogue(map<string, DataSet* > &mCatalogue,
 
 bool mai::IOUtils::loadImagesOrdered(vector<Mat*> &vImages,
 		vector<string> &vImageNames,
-		int iMode,
+		const int iMode,
 		const string &strDirectory,
-		bool bEqualize)
+		const bool bEqualize)
 {
 	boost::filesystem::path directory( boost::filesystem::initial_path<boost::filesystem::path>() );
 	directory = boost::filesystem::system_complete( boost::filesystem::path( strDirectory ) );
@@ -172,9 +204,9 @@ bool mai::IOUtils::loadImagesOrdered(vector<Mat*> &vImages,
 
 void mai::IOUtils::loadAndAddImage(vector<Mat*> &vImages,
 			vector<string> &vImageNames,
-			int iMode,
+			const int iMode,
 			const string &strDirectoryItem,
-			bool bEqualize)
+			const bool bEqualize)
 {
 	boost::filesystem::path directory( boost::filesystem::initial_path<boost::filesystem::path>() );
 	directory = boost::filesystem::system_complete( boost::filesystem::path(strDirectoryItem) );
@@ -198,9 +230,9 @@ void mai::IOUtils::loadAndAddImage(vector<Mat*> &vImages,
 }
 
 bool mai::IOUtils::loadImage(Mat &image,
-			int iMode,
-			const string &strFileName,
-			bool bEqualize)
+		const int iMode,
+		const string &strFileName,
+		const bool bEqualize)
 {
 
 	image = imread(strFileName, iMode);
@@ -233,7 +265,7 @@ bool mai::IOUtils::loadImage(Mat &image,
 
 void mai::IOUtils::addFlippedImages(vector<Mat*> &vImages,
 		std::vector<std::string> &vImageNames,
-		int iFlipMode)
+		const int iFlipMode)
 {
 	vector<Mat*> vDoubledImages;
 
@@ -272,9 +304,9 @@ void mai::IOUtils::addFlippedImages(vector<Mat*> &vImages,
 	vImages.insert(end(vImages), begin(vDoubledImages), end(vDoubledImages));
 }
 
-void mai::IOUtils::convertImages(vector<Mat*> &vImages,
+void mai::IOUtils::convertImages(const vector<Mat*> &vImages,
 		vector<Mat*> &vConvertedImages,
-		int iMode )
+		const int iMode )
 {
 	for( Mat* image : vImages)
 	{
@@ -290,7 +322,7 @@ void mai::IOUtils::convertImages(vector<Mat*> &vImages,
 	}
 }
 
-void mai::IOUtils::equalizeImages(vector<Mat*> &vImages,
+void mai::IOUtils::equalizeImages(const vector<Mat*> &vImages,
 		vector<Mat*> &vConvertedImages )
 {
 	for( Mat* image : vImages)
@@ -307,7 +339,7 @@ void mai::IOUtils::equalizeImages(vector<Mat*> &vImages,
 	}
 }
 
-void mai::IOUtils::getMaxImageDimensions(vector<Mat> &vImages,
+void mai::IOUtils::getMaxImageDimensions(const vector<Mat> &vImages,
 		int &iMaxHeight,
 		int &iMaxWidth)
 {
@@ -325,10 +357,10 @@ void mai::IOUtils::getMaxImageDimensions(vector<Mat> &vImages,
 	}
 }
 
-void mai::IOUtils::sampleImage(Mat &image,
+void mai::IOUtils::sampleImage(const Mat &image,
 		Mat &sampledImage,
-		int iHeight,
-		int iWidth )
+		const int iHeight,
+		const int iWidth )
 {
 	Size s = image.size();
 	int iW = s.width;
@@ -351,10 +383,10 @@ void mai::IOUtils::sampleImage(Mat &image,
 	assert( !sampledImage.empty() );
 }
 
-void mai::IOUtils::sampleImages(vector<Mat> &vImages,
+void mai::IOUtils::sampleImages(const vector<Mat> &vImages,
 		vector<Mat> &vSampledImages,
-		int iHeight,
-		int iWidth )
+		const int iHeight,
+		const int iWidth )
 {
 	for( Mat image : vImages)
 	{
@@ -385,7 +417,7 @@ void mai::IOUtils::sampleImages(vector<Mat> &vImages,
 	}
 }
 
-void mai::IOUtils::showImages(vector<Mat> &vImages)
+void mai::IOUtils::showImages(const vector<Mat> &vImages)
 {
 	for( Mat image : vImages)
 	{
@@ -393,13 +425,13 @@ void mai::IOUtils::showImages(vector<Mat> &vImages)
 	}
 }
 
-void mai::IOUtils::showImage(Mat &image)
+void mai::IOUtils::showImage(const Mat &image)
 {
 	imshow("Image", image);
 	waitKey(0);
 }
 
-void mai::IOUtils::showImage(const Mat* image)
+void mai::IOUtils::showImage(const Mat* const image)
 {
 	imshow("Image", *image);
 	waitKey(0);
@@ -420,8 +452,8 @@ bool mai::IOUtils::createDirectory(const string &strPath)
 	return true;
 }
 
-void mai::IOUtils::writeImages(vector<Mat*> &vImages,
-		vector<string> &vImageNames,
+void mai::IOUtils::writeImages(const vector<Mat*> &vImages,
+		const vector<string> &vImageNames,
 		const string &strPath)
 {
 	if(!createDirectory(strPath))
@@ -451,17 +483,17 @@ void mai::IOUtils::writeImages(vector<Mat*> &vImages,
 	}
 }
 
-void mai::IOUtils::writeHOGImages(mai::DataSet* data,
+void mai::IOUtils::writeHOGImages(const DataSet* const data,
 			const string &strPath,
 			const string &strFileNameBase,
-			Size imageSize,
-			Size cellSize,
-			Size blockSize,
-			Size blockStride,
-			int iNumBins,
-			int scaleFactor,
-			double vizFactor,
-			bool printValue)
+			const Size imageSize,
+			const Size cellSize,
+			const Size blockSize,
+			const Size blockStride,
+			const int iNumBins,
+			const int scaleFactor,
+			const double vizFactor,
+			const bool printValue)
 {
 	if(!createDirectory(strPath))
 	{
