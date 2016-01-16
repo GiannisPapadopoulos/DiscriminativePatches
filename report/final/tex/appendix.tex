@@ -42,27 +42,30 @@ The section FACE\_DETECTION provides parameters to configure the haar cascade cl
 
 \section{Developer Documentation}\label{sec:devdoc}
 
-\subsection{Dependencies}
-
-TODO
-\\
-OpenCV 2.4.X
-\\
-Boost
 
 \subsection{Build environment}
 
-The project’s codebase can be configured with CMake. CMake is a platform independent build
-tool for C++ that automatically generates compiler configurations. On linux systems the Makefiles that are used by the GNU compiler chain and on Microsoft Windows Visual Studio project files can be generated from the given configurations. This eliminates the need for tracking such files for different platforms or different versions of development environments.
+The project’s codebase can be configured with CMake \footnote{https://cmake.org/}. CMake is a platform independent build tool for C++ that automatically generates compiler configurations. On linux systems the Makefiles that are used by the GNU compiler chain and on Microsoft Windows Visual Studio project files can be generated from the given configurations. This eliminates the need for tracking such files for different platforms or different versions of development environments.
 \\
 \\
-CMake comes with either commandline or GUI tools to configure the concrete setup. The main configuration is defined in the file CMakeLists.txt in the code root folder of the application. Please refer to the CMake documentation on how to configure and generate the desired build files.
+CMake comes with either commandline or GUI tools to configure the concrete setup. The main configuration is defined in the file CMakeLists.txt in the root code folder of the application. Using one of the GUI-tools for configuration for example, the CMakeLists.txt has to be loaded. The configuration then provides variables to set the path to the dependencies. When the configuration is finished, the Makefiles or Visual Studio project files can be generated.
 
-\subsection{Automated Documentation}
 
-TODO
+\subsection{Dependencies}
+
+The application has dependencies on OpenCV and the boost c++ libraries. Both libraries have to be installed and added to the systems library path variable. There are non-commercial licenses for both dependencies, so they are freely available and usable without infringement.
 \\
-Doxygen definitions, inline comments and documentation generation.
+\\
+OpenCV \footnote{http://opencv.org/} is used in the version 2.4. OpenCV version 3 is not supported, as there are major API changes making it incompatible. The reason for not choosing the latest version was, that this version was released too shortly before the start of this project and seemed to be not in a stable state at that time. OpenCV provides the image processing and machine learning algorithms and techniques used in the application. As it is also configured with CMake, the dependency is configured by simply providing the CMake configuration files of OpenCV, usually located in the root OpenCV installation folder.
+\\
+\\
+The boost c++ libraries \footnote{http://www.boost.org/} are used in the version 1.59.0. As these libraries are downward compatible, later versions can also be used. The boost c++ libraries provide the mechanisms used for filesystem handling like reading and writing data to and from the filesystem and for the configuration handling. Though most parts of the libraries are header-only, the filesystem module requires to either build the libraries or install a complete package containing built libraries. In the CMake configuration, the path to the include files folder and to the installed libraries folder has to be provided so that the build configuration can set up the Makefiles or project files correctly.
+
+
+\subsection{Automated HMTL API Documentation Generation}
+
+The application's code contains annotations and comments that can be processed by Doxygen \footnote{www.doxygen.org} to automatically generate API documentation in HTML. A corresponding configuration file is located in the root code folder, called "`doxyfile"', providing all necessary information to the generator. The generator is invoked with that file as parameter and will put the generated documentation into a local folder called "`doc"'. The "`index.htm"' file in the "`doc"' folder is the starting reference for the documentation.
+
 
 \subsection{Application}
 
