@@ -1,0 +1,13 @@
+\section{Discussion}
+For the manually extracted patches the best overall results were obtained for the mouth region, with over 80\% of the images classified correctly.
+This confirms our intuition as this region is the most distinguishable
+from a human perspective. Results for the eye regions were better than expected, as visually the extracted patches look very similar. For the disgust emotion all 
+four regions lead to comparable results, while for the anger emotion the region between the eyes is almost as discriminative as the mouth. 
+Rescaling the images does not appear to have a very significant effect. 
+
+Performing SVM classification on the entire facial region led to good results if the region was rescaled to 96x96 pixels, better than all manually extracted 
+patches except the mouth. In this case there is a clear loss
+of precision if the image is rescaled to 32x32 pixels. % TODO Run the experiment without face detection to measure the effect, discuss the original paper
+
+
+
