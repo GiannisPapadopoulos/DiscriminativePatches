@@ -222,6 +222,7 @@ void mai::CatalogueTraining::detectFaces()
 
 		if(faces != NULL)
 		{
+			// replace original image with face part
 			delete it->second;
 			it->second = faces;
 		}

@@ -34,9 +34,9 @@ class umSVM
 {
 public:
 	/**
-	 * Initializes object
+	 * Initializes object with new OpenCV SVM.
 	 *
-	 * @param dCValue	penalty multiplier for outliers on imperfect separation.
+	 * @param dCValue	Penalty multiplier for outliers on imperfect separation.
 	 */
 	umSVM(double dCValue = 0.1);
 
@@ -46,61 +46,65 @@ public:
 	virtual ~umSVM();
 
 	/**
-	 * Train linear SVM with standard parameters
+	 * Train linear SVM with standard parameters.
 	 *
-	 * @param data		training data
-	 * @param labels	labels
-	 * @param[out] vSupport	support vectors
-	 * @return			number of support vectors
+	 * @param[in] data		Training data
+	 * @param[in] labels	Labels
+	 * @param[out] vSupport	Support vectors
+	 * @return				Number of support vectors
 	 */
 	int trainSVM(const cv::Mat &data,
 			const cv::Mat &labels,
 			std::vector<std::vector<float> > &vSupport);
 
 	/**
-	 * Predict the given image
+	 * Predict the given image.
 	 *
-	 * @param data		input image
-	 * @param bReturnfDFValue	return DFValue or label (@see OpenCV documentation)
-	 * @return	label(false) or value depending on bReturnfDFValue
+	 * @param data				Input image
+	 * @param bReturnfDFValue	Return DFValue or label ? (@see OpenCV documentation)
+	 * @return					Label(false) or value depending on bReturnfDFValue
 	 */
 	float predict(const cv::Mat &data, bool bReturnfDFValue = false);
 
 	/**
-	 * Predict the given data
+	 * Predict the given data.
 	 *
-	 * @param data		input matrix, images row-wise
-	 * @param results	prediction results corresponding row-wise ( labels of type float )
+	 * @param data		Input matrix, images row-wise
+	 * @param results	Prediction results corresponding row-wise ( labels of type float )
 	 */
 	void predict(const cv::Mat &data, cv::Mat &results);
 
 	/**
 	 * Save svm as xml. ".xml" will be added to the given name.
+	 *
+	 * @param strFilename	Filename to save the SVM at.
 	 */
 	void saveSVM(const std::string &strFilename);
 
 	/**
 	 * Load svm from given file.
+	 *
+	 * @param strFilename	Filename of trained SVM to load.
 	 */
 	void loadSVM(const std::string &strFilename);
 
 	/**
-	 * Search vectors of vSupport in input data vData
+	 * Search vectors of vSupport in input data vData.
 	 *
-	 * @param vData		svm training data
-	 * @param vSupport	svm support vectors
-	 * @param bSort		should the vectors be sorted before comparison ?
+	 * @param vData		SVM training data
+	 * @param vSupport	SVM support vectors
+	 * @param bSort		Should the vectors be sorted before comparison ?
 	 */
 	static void searchSupportVector(const std::vector<std::vector<float> > &vData,
 				const std::vector<std::vector<float> > &vSupport,
 				bool bSort = false);
 
 	/**
-	 * Search vectors of vSupport in input data data
+	 * Search vectors of vSupport in input data data.
 	 *
-	 * @param data		svm training data
-	 * @param vSupport	svm support vectors
-	 * @param bSort		should the vectors be sorted before comparison ?
+	 * @param data		SVM training data
+	 * @param vSupport	SVM support vectors
+	 * @param bSort		Should the vectors be sorted before comparison ?
 	 */
 	static void searchSupportVector(const DataSet* const data,
 			const std::vector<std::vector<float> > &vSupport,

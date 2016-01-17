@@ -27,8 +27,7 @@ class umSVM;
 class Configuration;
 
 /**
- * Unsupervised discovery of mid-level discriminative patches
- *
+ * Holds map of categorized SVMs and provides necessary methods to interact with them.
  */
 class ClassificationSVM
 {
@@ -45,16 +44,19 @@ public:
 	virtual ~ClassificationSVM();
 
 	/**
-	 * Train svms.
+	 * Train SVMs for each given category.
 	 * @see svm/umSVM::train
 	 *
-	 * Saves trained svms by catalogue category labels.
+	 * Saves trained SVMs by catalogue category labels.
+	 *
+	 * @param[in] mTrainingData	Training and label matrices.
+	 * @param dcValue			Linear SVM c value.
 	 */
 	void trainSVMs(const std::map<std::string, TrainingData*> &mTrainingData,
 			const double dCValue);
 
 	/**
-	 * Load trained svms from filesystem.
+	 * Load trained SVMs from filesystem.
 	 *
 	 * @param strPath	Path to folder containing traind svm descriptions.
 	 * @return			Were there any errors on loading ?
@@ -63,7 +65,7 @@ public:
 
 
 	/**
-	 * Predict data using the stored svms.
+	 * Predict data using the stored SVMs.
 	 *
 	 * @param[in] mData		Data that has to be predicted.
 	 * @param[out] mResults	Result matrix containing predicted labels according to input matrices
@@ -72,28 +74,26 @@ public:
 			std::map<std::string, cv::Mat> &mResults);
 
 	/**
-	 * Classify a single image by the stored svms.
+	 * Classify a single image or a folder of images by the stored SVMs.
 	 *
 	 * @param[in] image		Image to be classified
 	 * @param[out] mResults Predicted distances for each svm category
-	 * @param config		Configuration containing HOG parameters as used for training
 	 * @return				Category name of best prediction
 	 */
-	std::string predict(const cv::Mat &image);
+	std::string predict(const cv::Mat &image,
+			std::map<std::string, float> &mResults);
 
 	/**
 	 * Load and predict images according to configuration.
-	 *
-	 * @param config	defining parameters.
 	 */
 	void loadAndPredict();
 
 	/**
-	 * Access the stored svms
+	 * @return	The stored and trained SVMs.
 	 */
 	const std::map<std::string, umSVM*>& getSVMs() const {
 		return m_mSVMs;
-	}
+	};
 
 private:
 

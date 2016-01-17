@@ -24,7 +24,7 @@ using namespace std;
 namespace mai{
 
 /**
- * Dataset with images and corresponding feature vectors
+ * Dataset with images and corresponding feature vectors.
  */
 class DataSet
 {
@@ -52,7 +52,10 @@ public:
 	};
 
 	/**
-	 * Add an image and its filename to the dataset.
+	 * Add an image and it's filename to the dataset.
+	 *
+	 * @param image	To be added.
+	 * @param strImageName	Name of the image.
 	 */
 	unsigned int addImage(const cv::Mat* const image,
 			const std::string &strImageName)
@@ -63,7 +66,7 @@ public:
 	};
 
 	/**
-	 * Get number of images in the dataset.
+	 * @return	Number of images in the dataset.
 	 */
 	unsigned int getImageCount() const
 	{
@@ -74,7 +77,7 @@ public:
 	 * Get the image at position iIndex.
 	 * Image may be NULL depending on current state of the processing pipeline !
 	 *
-	 * @return	image or NULL
+	 * @return	Image or NULL
 	 */
 	const cv::Mat* getImageAt(const int iIndex) const
 	{
@@ -86,7 +89,7 @@ public:
 	};
 
 	/**
-	 * Get the name of the image at position iIndex.
+	 * @return	The name of the image at position iIndex. May be empty.
 	 */
 	std::string getImageNameAt(const int iIndex) const
 	{
@@ -98,7 +101,11 @@ public:
 	};
 
 	/**
-	 * Add feature vector for image at position iIndex,
+	 * Add feature vector for image at position iIndex.
+	 *
+	 * @param iIndex	Index of image.
+	 * @param[in] vDescriptorValues	Feature vector to add to the dataset.
+	 * @return	True, if there is data at position iIndex.
 	 */
 	bool addDescriptorValuesToImageAt(const int iIndex,
 			const std::vector<float> &vDescriptorValues);
@@ -110,7 +117,9 @@ public:
 			const std::vector<vector<vector<float>>> &patchDescriptorValues);
 
 	/**
-	 * Get the feature vector from the image at position iIndex.
+	 * @param iIndex	The index to get the vector from.
+	 * @param[out] vDescriptorValues	The feature vector from the image at position iIndex.
+	 * @return	True, if there is data at position iIndex.
 	 */
 	bool getDescriptorValuesFromImageAt(const int iIndex,
 			std::vector<float> &vDescriptorValues) const
@@ -140,6 +149,9 @@ public:
 	/**
 	 * Add all images with their names from the input vectors.
 	 * Uses DataSet::AddImage
+	 *
+	 * @param[in] vImage	Images to add to the dataset:
+	 * @param[in] vImageNames	Names of the siages to add to the dataset:
 	 */
 	int setImages(const std::vector<cv::Mat*> &vImages,
 			const std::vector<std::string> &vImageNames);
@@ -151,7 +163,7 @@ public:
 	void removeImages();
 
 	/**
-	 * Get maximum dimension of all images in the dataset
+	 * G@return	Maximum dimension of all images in the dataset
 	 */
 	void getMaxDImensions(int &iMaxWidth, int &iMaxHeight) const
 	{
@@ -160,7 +172,7 @@ public:
 	};
 
 	/**
-	 * Are all the image of the same size ?
+	 * @return	Are all the images of the same size ?
 	 */
 	bool getImageSizesUniform() const
 	{
@@ -168,7 +180,7 @@ public:
 	};
 
 	/**
-	 * Get the size of the feature vectors.
+	 * @return	Get the uniform size of the feature vectors.
 	 */
 	int getDescriptorValueSize() const
 	{
@@ -179,6 +191,10 @@ public:
 	 * Divide the dataset into two parts according to iDivider.
 	 * The division will be adjusted for the first part of the filenames split by '_'
 	 * to make sure that images of such name are exclusively contained in first part.
+	 *
+	 * @param iDivider			Divider of dataset size defining first part, e.g. 4 -> 1/4 of patches will be in first set.
+	 * @param[out] vFirstPart	Part of dataset divided according to divider.
+	 * @param[out] vSecondPart	Remaining part of dataset.
 	 */
 	void getDescriptorsSeparated(const int iDivider,
 			std::vector<std::vector<float> > &vFirstPart,

@@ -44,14 +44,15 @@ public:
 	 * Method used:
 	 * @see featureExtraction/umHOG::extractFeatures
 	 *
-	 * @param data			from which features are extracted
-	 * @param imageSize
-	 * @param blockSize
-	 * @param blockStride
-	 * @param cellSize
-	 * @param iNumBins
-	 * @param winStride		?
-	 * @param padding		?
+	 * @param data			From which features are extracted.
+	 * @param imageSize		Images will be resized to this size.
+	 * @param blockSize		HOG feature extraction block size.
+	 * @param blockStride	HOG feature extraction block stride.
+	 * @param cellSize		HOG feature extraction cell size.
+	 * @param iNumBins		HOG feature extraction gradient directions.
+	 * @param winstride		HOG feature extraction window stride.
+	 * @param padding		HOG feature extraction padding.
+	 * @param bApplyPCA		Apply Principal Component Analysis to feature vectors ?
 	 */
 	static void computeHOGForDataSet(DataSet* const data,
 			const cv::Size imageSize,
@@ -74,16 +75,16 @@ public:
 	 *
 	 * @see http://docs.opencv.org/ref/2.4/d5/d33/structcv_1_1HOGDescriptor.html
 	 *
-	 * @param[out] descriptorsValues	extracted features
-	 * @param[in] image		from which features are extracted
-	 * @param imageSize
-	 * @param blockSize
-	 * @param blockStride
-	 * @param cellSize
-	 * @param iNumBins
-	 * @param winStride		?
-	 * @param padding		?
-	 * @param bApplyPCA		reduce features by applying PCA. @see featureExtraction/umPCA::decreaseHOGDescriptorCellsByPCA
+	 * @param[out] descriptorsValues	Extracted features
+	 * @param[in] image		From which features are extracted
+	 * @param imageSize		Images will be resized to this size.
+	 * @param blockSize		HOG feature extraction block size.
+	 * @param blockStride	HOG feature extraction block stride.
+	 * @param cellSize		HOG feature extraction cell size.
+	 * @param iNumBins		HOG feature extraction gradient directions.
+	 * @param winstride		HOG feature extraction window stride.
+	 * @param padding		HOG feature extraction padding.
+	 * @param bApplyPCA		Reduce features by applying PCA. @see featureExtraction/umPCA::decreaseHOGDescriptorCellsByPCA
 	 */
 	static void extractFeatures(std::vector<float> &descriptorsValues,
 			const cv::Mat &image,
@@ -99,6 +100,18 @@ public:
 	/**
 	 * Visualize HOG descriptor on image
 	 * @see http://www.juergenwiki.de/work/wiki/doku.php?id=public:hog_descriptor_computation_and_visualization#computing_the_hog_descriptor_using_opencv
+	 *
+	 * @param[out] outImage	Image containing gradient visualization.
+	 * @param[in] origImage	Original image.
+	 * @param[in] descriptorValues	Extracted features of the original image.
+	 * @param winSize		Images will be resized to this size.
+	 * @param cellSize		HOG feature extraction cell size.
+	 * @param blockSize		HOG feature extraction block size.
+	 * @param blockStride	HOG feature extraction block stride.
+	 * @param iNumBins		HOG feature extraction gradient directions.
+	 * @param scaleFactor	Scaling factor for gradient visualization.
+	 * @param visFactor		Scaling factor for the output image.
+	 * @param printValue	Should the average gradient value be printed per cell ?
 	 */
 	static void getHOGDescriptorVisualImage(cv::Mat &outImage,
 			const cv::Mat &origImg,

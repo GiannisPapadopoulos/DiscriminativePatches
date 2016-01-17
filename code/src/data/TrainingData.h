@@ -31,6 +31,10 @@ public:
 
 	/**
 	 * Builds the training and label matrices from the given data vectors.
+	 * Labels are set up according to Constants::SVM_NEGATIVE_LABEL and Constants::SVM_POSITIVE_LABEL.
+	 *
+	 * @param[in] vPositiveFeatures Positive training samples.
+	 * @param[in] vNegativeFeatures Negative training samples.
 	 */
 	TrainingData(const std::vector<std::vector<float> > &vPositiveFeatures,
 			const std::vector<std::vector<float> > &vNegativeFeatures);
@@ -41,11 +45,17 @@ public:
 	virtual ~TrainingData()
 	{};
 
+	/**
+	 * @return	The training matrix.
+	 */
 	cv::Mat getData() const
 	{
 		return m_Data;
 	};
 
+	/**
+	 * @return	The label matrix.
+	 */
 	cv::Mat getLabels() const
 	{
 		return m_Labels;

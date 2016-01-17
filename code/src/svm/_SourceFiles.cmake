@@ -7,8 +7,6 @@ set( DirFiles
 	CatalogueTraining.h
 	ClassificationSVM.cpp
 	ClassificationSVM.h
-	svmtest.cpp
-	svmtest.h
 	umSVM.cpp
 	umSVM.h
 )

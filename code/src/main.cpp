@@ -17,8 +17,6 @@
 
 #include "Configuration.h"
 #include "svm/CatalogueTraining.h"
-#include "svm/svmtest.h"
-#include "IO/IOUtils.h"
 #include "svm/ClassificationSVM.h"
 
 using namespace std;
@@ -31,7 +29,10 @@ int main(int argc, char** argv )
 {
 	if(argc < 2)
 	{
-		cerr << "Train svms on categorized image catalogue." << endl
+		cerr << "The application has 3 operating modes defined in the configuration file:" << endl
+			<< "\t1. Train SVMs on a categorized image catalogue." << endl
+			<< "\t2. Retrain SVMs on a categorized image catalogue." << endl
+			<< "\t3. Classify images using trained SVMs." << endl
 			<< "Usage:" << endl
 			<< argv[0] << " [options]" << endl
 			<< "options:" << endl
@@ -55,34 +56,6 @@ int main(int argc, char** argv )
 				return -1;
 			}
 		}
-
-		if(string(argv[i]) == "-svmtest")
-		{
-			if(i+1 < argc)
-			{
-				int iTest = atoi(argv[i+1]);
-
-				if(iTest == 1)
-				{
-					SVMTest::test1();
-				}
-				else if (iTest == 2)
-				{
-					SVMTest::test2();
-				}
-				else
-				{
-					SVMTest::testGeneratedTestData();
-				}
-
-				return 0;
-			}
-			else
-			{
-				cerr << "ERROR: Option -svmtest given without number." << endl;
-				return -1;
-			}
-		}
 	}
 
 	if(strConfigFile.empty())
@@ -102,7 +75,7 @@ int main(int argc, char** argv )
 	if(config->getApplicationMode() == Configuration::appMode::Train
 			|| config->getApplicationMode() == Configuration::appMode::Retrain)
 	{
-		cout << "Training classifiers according to configuration given in " << strConfigFile << endl;
+		cout << "[Main] Training classifiers according to configuration given in " << strConfigFile << endl;
 		CatalogueTraining* trainer = new CatalogueTraining(config);
 		trainer->processPipeline();
 		delete trainer;
@@ -110,7 +83,7 @@ int main(int argc, char** argv )
 
 	if(config->getApplicationMode() == Configuration::appMode::Predict)
 	{
-		cout << "Predicting image according to configuration given in " << strConfigFile << endl;
+		cout << "[Main] Predicting image according to configuration given in " << strConfigFile << endl;
 		ClassificationSVM* classifier = new ClassificationSVM(config);
 		classifier->loadAndPredict();
 		delete classifier;

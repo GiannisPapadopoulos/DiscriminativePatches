@@ -146,7 +146,8 @@ void mai::ClassificationSVM::predict(const map<string, TrainingData*> &mData,
 	}
 }
 
-string mai::ClassificationSVM::predict(const Mat &image)
+string mai::ClassificationSVM::predict(const Mat &image,
+		map<string, float> &mResults)
 {
 	if(m_mSVMs.size() < 1)
 	{
@@ -207,6 +208,8 @@ string mai::ClassificationSVM::predict(const Mat &image)
 			fBestResultValue = fResultValue;
 			strBest = strCategory;
 		}
+
+		mResults.insert(pair<string, float>(strCategory, fResultValue));
 	}
 
 	if(Constants::DEBUG_SVM_PREDICTION)
@@ -299,7 +302,9 @@ void mai::ClassificationSVM::loadAndPredictImage()
 void mai::ClassificationSVM::predictAndShowResults(const Mat &image,
 		const string &strName)
 {
-	string strClassifiedAs = predict(image);
+	map<string, float> mResults;
+
+	string strClassifiedAs = predict(image, mResults);
 
 	cout << "#-------------------------------------------------------------------------------#" << endl;
 	cout << " Prediction for image " << strName << endl;

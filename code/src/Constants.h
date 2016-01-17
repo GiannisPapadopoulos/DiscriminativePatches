@@ -8,6 +8,10 @@
 #ifndef CONSTANTS_H_
 #define CONSTANTS_H_
 
+/**
+ * GLobal parameters that should not change.
+ * Debugging flags.
+ */
 class Constants {
 public:
 

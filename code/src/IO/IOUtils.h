@@ -51,16 +51,23 @@ public:
 	static bool getIsFile(const std::string &strPath);
 
 	/**
-	 * Load all images from given directory containing labeled image catalogue.
+	 * Create given directory if it does not already exist.
+	 *
+	 * @param strPath	relative or absolute path of directory.
+	 */
+	static bool createDirectory(const std::string &strPath );
+
+	/**
+	 * Load all images from given directory containing labeled image cataloge.
 	 * Subfolders define label separation, their names define the labels themselves.
 	 *
 	 * Uses IO/IOUtils::loadImagesOrdered
 	 *
-	 * @param[out] vImages	loaded images
-	 * @param iMode			OpenCV loading mode
-	 * @param directory		file path to load from
-	 * @param bAddFlipped	add horizontally flipped version of each image
-	 * @param bEqualize		apply histogram equalization on images
+	 * @param[out] vImages	Loaded images.
+	 * @param iMode			OpenCV loading mode.
+	 * @param strDirectory	File path to load from.
+	 * @param bAddFlipped	Add horizontally flipped version of each image.
+	 * @param bEqualize		Apply histogram equalization on images.
 	 */
 	static bool loadCatalogue(std::map<std::string, DataSet*> &mImages,
 				int iCVLoadMode,
@@ -73,10 +80,11 @@ public:
 	 *
 	 * Uses IO/IOUtils::loadAndAddImage
 	 *
-	 * @param[out] vImages	loaded images
-	 * @param iMode			OpenCV loading mode
-	 * @param directory		file path to load from
-	 * @param bEqualize		apply histogram equalization on images
+	 * @param[out] vImages	Loaded images.
+	 * @param[out] vImageNames	Filenames of the images.
+	 * @param iMode			OpenCV loading mode.
+	 * @param strDirectory	File path to load from.
+	 * @param bEqualize		Apply histogram equalization on images.
 	 */
 	static bool loadImagesOrdered(std::vector<cv::Mat*> &vImages,
 			std::vector<std::string> &vImageNames,
@@ -86,6 +94,12 @@ public:
 
 	/**
 	 * Uses IO/IOUtils::loadImage
+	 *
+	 * @param[out] vImages	Loaded images.
+	 * @param[out] vImageNames	Filenames of the images.
+	 * @param iMode			OpenCV loading mode.
+	 * @param strDirectoryItem	File path to load from.
+	 * @param bEqualize		Apply histogram equalization on images.
 	 */
 	static void loadAndAddImage(std::vector<cv::Mat*> &vImages,
 			std::vector<std::string> &vImageNames,
@@ -103,11 +117,10 @@ public:
 	 * IMREAD_ANYCOLOR   = 4,  //!< If set, the image is read in any possible color format.
 	 * IMREAD_LOAD_GDAL  = 8   //!< If set, use the gdal driver for loading the image.
 	 *
-	 * @param[out] image	loaded image
-	 * @param iMode			OpenCV loading mode
-	 * @param strFileName	file path to load from
-	 * @param bEqualize		apply histogram equalization on image
-	 *
+	 * @param[out] image	Loaded image.
+	 * @param iMode			OpenCV loading mode.
+	 * @param strFileName	File path to load from.
+	 * @param bEqualize		Apply histogram equalization on images.
 	 */
 	static bool loadImage(cv::Mat &image,
 			const int iMode,
@@ -115,11 +128,12 @@ public:
 			const bool bEqualize = true);
 
 	/**
-	 * Double the images by adding flipped versions
+	 * Double the images by adding flipped versions.
+	 * Image names will be duplicated with an addition of "_flipped" before the ending.
 	 *
-	 * @param [out] vImages		image vector
-	 * @param [out] vImageNames		image names vector
-	 * @param		iFlipmode	horizontally: > 0
+	 * @param [out] vImages		Image vector.
+	 * @param [out] vImageNames	Image names vector.
+	 * @param		iFlipmode	Horizontally: > 0.
 	 */
 	static void addFlippedImages( std::vector<cv::Mat*> &vImages,
 			std::vector<std::string> &vImageNames,
@@ -133,9 +147,9 @@ public:
 	 * (COLOR_RGB2GRAY)
 	 * ..
 	 *
-	 * @param[in] vImages			to be converted
-	 * @param[out] vConvertedImages	converted results
-	 * @param iMode					OpenCV conversion mode
+	 * @param[in] vImages			To be converted.
+	 * @param[out] vConvertedImages	Converted results.
+	 * @param iMode					OpenCV conversion mode.
 	 */
 	static void convertImages(const std::vector<cv::Mat*> &vImages,
 			std::vector<cv::Mat*> &vConvertedImages,
@@ -144,8 +158,8 @@ public:
 	/**
 	 * Apply histogram equalization on the input images
 	 *
-	 * @param[in] vImages			to be converted
-	 * @param[out] vConvertedImages	converted results
+	 * @param[in] vImages			To be converted.
+	 * @param[out] vConvertedImages	Converted results.
 	 */
 	static void equalizeImages(const std::vector<cv::Mat*> &vImages,
 			std::vector<cv::Mat*> &vConvertedImages);
@@ -153,9 +167,9 @@ public:
 	/**
 	 * Calculate max dimension of given images
 	 *
-	 * @param[in] vImages	images to calculate from
-	 * @param iMaxHeight	max height
-	 * @param iMaxWidth		max width
+	 * @param[in] vImages	Images to calculate from.
+	 * @param iMaxHeight	Max height.
+	 * @param iMaxWidth		Max width.
 	 */
 	static void getMaxImageDimensions(const std::vector<cv::Mat> &vImages,
 			int &iMaxHeight,
@@ -164,10 +178,10 @@ public:
 	/**
 	 * Sample image to given size
 	 *
-	 * @param[in] images			to be sampled
-	 * @param[out] iampledImages	sampled result
-	 * @param iHeight				sample height
-	 * @param iWidth				sample width
+	 * @param[in] images			To be sampled.
+	 * @param[out] iampledImages	Sampled result.
+	 * @param iHeight				Sample height.
+	 * @param iWidth				Sample width.
 	 */
 	static void sampleImage(const cv::Mat &image,
 			cv::Mat &sampledImage,
@@ -177,10 +191,10 @@ public:
 	/**
 	 * Sample images to given size
 	 *
-	 * @param[in] vImages			to be sampled
-	 * @param[out] vSampledImages	sampled results
-	 * @param iHeight				sample height
-	 * @param iWidth				sample width
+	 * @param[in] vImages			To be sampled.
+	 * @param[out] vSampledImages	Sampled results.
+	 * @param iHeight				Sample height.
+	 * @param iWidth				Sample width.
 	 */
 	static void sampleImages(const std::vector<cv::Mat> &vImages,
 			std::vector<cv::Mat> &vSampledImages,
@@ -199,18 +213,11 @@ public:
 	static void showImage( const cv::Mat* const image );
 
 	/**
-	 * Create given directory if it does not already exist.
-	 *
-	 * @param strPath	relative or absolut path of directory
-	 */
-	static bool createDirectory(const std::string &strPath );
-
-	/**
 	 * Write images as jpgs to a folder with indexed filename strFileNameBase_Index.jpg
 	 *
-	 * @param[in] vImages	images to write
-	 * @param strPath		filesystem folder without trailing slash
-	 * @param strFileNameBase	base part of filename
+	 * @param[in] vImages	Images to write.
+	 * @param strPath		Filesystem folder without trailing slash. Will be created, if it does not exist.
+	 * @param strFileNameBase	Base part of filename.
 	 */
 	static void writeImages(const std::vector<cv::Mat*> &vImages,
 			const std::vector<std::string> &vImageNames,
@@ -221,9 +228,17 @@ public:
 	 *
 	 * Uses featureExtraction/umHOG::getHOGDescriptorVisualImage
 	 *
-	 * @param[in] data		images and descriptorvalues to write
-	 * @param strPath		filesystem folder without trailing slash
-	 * @param strFileNameBase	base part of filename
+	 * @param[in] data		Images and descriptorvalues to write
+	 * @param strPath		Filesystem folder without trailing slash. Will be created, if it does not exist.
+	 * @param strFileNameBase	Base part of filename
+	 * @param imageSize		Images will be resized to this size.
+	 * @param cellSize		HOG feature extraction cell size.
+	 * @param blockSize		HOG feature extraction block size.
+	 * @param blockStride	HOG feature extraction block stride.
+	 * @param iNumBins		HOG feature extraction gradient directions.
+	 * @param scaleFactor	Scaling factor for gradient visualization.
+	 * @param visFactor		Scaling factor for the output image.
+	 * @param printValue	Should the average gradient value be printed per cell ?
 	 */
 	static void writeHOGImages(const DataSet* const data,
 			const std::string &strPath,
@@ -238,14 +253,20 @@ public:
 			const bool printValue = false);
 
 	/**
-	 * Write svms to given folder.
+	 * Write SVMs to given folder.
 	 *
-	 * @param mSVMs		trained svms
-	 * @param strPath	filesystem folder without trailing slash
+	 * @param mSVMs		Trained SVMs
+	 * @param strPath	Filesystem folder without trailing slash. Will be created, if it does not exist.
 	 */
 	static void writeSVMs(const std::map<std::string, umSVM*> &mSVMs,
 			const std::string &strPath);
 
+	/**
+	 * Load trained SVMs from a given directory. Filenames (without ending) will be map keys.
+	 *
+	 * @param[out] mSVMs	Map of trained SVMs.
+	 * @param strPath		Path and name of folder to load from.
+	 */
 	static bool loadSVMsFromDirectory(std::map<std::string, umSVM*> &mSVMs,
 			const std::string &strPath);
 
