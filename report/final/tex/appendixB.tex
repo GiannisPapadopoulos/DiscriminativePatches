@@ -11,7 +11,7 @@ CMake comes with either commandline or GUI tools to configure the concrete setup
 
 \subsection{Dependencies}
 
-The application has dependencies on OpenCV and the boost c++ libraries. Both libraries have to be installed and added to the systems library path variable. There are non-commercial licenses for both dependencies, so they are freely available and usable without infringement.
+The application has dependencies on OpenCV and the boost c++ libraries. Both libraries have to be installed and added to the system's library path variable. There are non-commercial licenses for both dependencies, so they are freely available and usable without infringement.
 \\
 \\
 OpenCV \footnote{http://opencv.org/} is used in the version 2.4. OpenCV version 3 is not supported, as there are major API changes making it incompatible. The reason for not choosing the latest version was, that this version was released too shortly before the start of this project and has not been in a stable and coherent state at that time regarding the API and the official documentation. OpenCV provides the image processing and machine learning algorithms and techniques used in the application. As it is also configured with CMake, the dependency is configured by simply providing the CMake configuration files of OpenCV, usually located in the root OpenCV installation folder.
