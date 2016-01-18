@@ -3,7 +3,7 @@
 
 \subsection{Build environment}
 
-The project’s codebase can be configured with CMake \footnote{https://cmake.org/}. CMake is a platform independent build and freely available tool for C++, that automatically generates compiler configurations. On linux systems, the Makefiles, that are used by the GNU compiler chain, and on Microsoft Windows, Visual Studio project files can be generated from the given configurations. This eliminates the need for tracking such files for different platforms or different versions of development environments.
+The project’s codebase can be configured with CMake \footnote{https://cmake.org/} for development on Linux and Windows. CMake is a platform independent build and freely available tool for C++, that automatically generates compiler configurations. On linux systems, the Makefiles, that are used by the GNU compiler chain, and on Microsoft Windows, Visual Studio project files can be generated from the given configurations. This eliminates the need for tracking such files for different platforms or different versions of development environments.
 \\
 \\
 CMake comes with either commandline or GUI tools to configure the concrete setup. The main configuration is defined in the file CMakeLists.txt in the root code folder of the application. Using one of the GUI-tools for configuration for example, the CMakeLists.txt has to be loaded. The configuration then provides variables to set the path to the dependencies. When the configuration is finished, the Makefiles or Visual Studio project files can be generated.
