@@ -3,6 +3,99 @@
 
 TODO: describe setup of datasets sued for training and validation.Present results
 
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000001_conew1.png}
+		\caption{Neutral-neutral}
+		\label{fig:timeseriesHappy:a}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000002_conew1.png}
+		\caption{Neutral-neutral}
+		\label{fig:timeseriesHappy:b}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000003_conew1.png}
+		\caption{Neutral-neutral}
+		\label{fig:timeseriesHappy:c}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000004.png}
+		\caption{Intermediate-disgust}
+		\label{fig:timeseriesHappy:d}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000005.png}
+		\caption{Intermediate-happy}
+		\label{fig:timeseriesHappy:e}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000006.png}
+		\caption{Intermediate-happy}
+		\label{fig:timeseriesHappy:f}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000007.png}
+		\caption{Happy-happy}
+		\label{fig:timeseriesHappy:g}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000008.png}
+		\caption{Happy-happy}
+		\label{fig:timeseriesHappy:h}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000009.png}
+		\caption{Happy-happy}
+		\label{fig:timeseriesHappy:i}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000010.png}
+		\caption{Happy-happy}
+		\label{fig:timeseriesHappy:j}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000011.png}
+		\caption{Happy-happy}
+		\label{fig:timeseriesHappy:k}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000012.png}
+		\caption{Happy-happy}
+		\label{fig:timeseriesHappy:l}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000013.png}
+		\caption{Happy-happy}
+		\label{fig:timeseriesHappy:m}
+	\end{subfigure}
+	\caption{Extracted mouth patch of size 96x96 pixels showing the development of
+	the facial expression of happiness from neutral to maximal happy expression.
+	Patches \ref{fig:timeseriesHappy:a} to \ref{fig:timeseriesHappy:c} have been
+	categorized for training as neutral, patches \ref{fig:timeseriesHappy:d} to
+	\ref{fig:timeseriesHappy:g} have been excluded from training and patches
+	\ref{fig:timeseriesHappy:e} to \ref{fig:timeseriesHappy:m} have been used as
+	positive samples for training happy expressions. Classification identified
+	\ref{fig:timeseriesHappy:a} to \ref{fig:timeseriesHappy:c} correctly as
+	neutral, \ref{fig:timeseriesHappy:d} was identified as disgust and
+	\ref{fig:timeseriesHappy:e} to \ref{fig:timeseriesHappy:m} were classified as
+	happy expressions according to table \ref{table:predict_mouth}.}
+	\label{fig:timeseriesHappy}
+\end{figure}
+
 \subsection{Data}
 For training a system to recognize facial expression effectively, the dataset should focus on several main expressions including anger, disgust, fear, happiness, sadness and surprise. Moreover, a proper dataset should be composed of faces with kinds of face shapes, colors, facial and scalp hairs from many participants with different genders, ethnic backgrounds and ages. 
 \\
