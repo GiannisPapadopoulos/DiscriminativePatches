@@ -107,8 +107,7 @@ For training a system to recognize facial expression effectively, the dataset sh
 The dataset this paper adopted is from the Cohn-Kanade Facial Expression Database. The dataset refers to eight emotions including anger, contempt, disgust, fear, happiness, sadness, surprise and neutral expression. There are 5105 images from 123 subjects, who ranged in age from 18 to 30 years. Sixty-five percent are female, eight-five percent are Euro-American and fifteen percent are African-American and Asian. They were observed in an observation room equipped with a chair on which to sit and a camera was located directly in front of the subject. Therefore all images have the uniform background and lighting. The images were digitized into 640*480 or 490 pixel arrays with 8-bit precision for grayscale values and are available in png and jpg. 
 \\
 \\
-In the Cohn-Kanade Facial Expression Dataset, subjects performed a series of several facial displays from neutral expressions to peak expressions and images were taken frame by frame. In order to train a powerful system, we chose neutral faces and obvious expressions. That means there is no indistinguishable expression in our dataset. Figure 1 shows some example of the dataset.
-
+In the Cohn-Kanade Facial Expression Dataset, subjects performed a series of several facial displays that varied from mild to intense expression for each emotion and images were taken frame by frame. In the mild ones, the emotion is barely noticeable and in the intense ones, it is clearly noticeable. In order to train a robust system, we chose the images mostly with intense expressions which were clearly noticeable. That means all the expressions in our dataset are clearly representing the emotion they belong to and are also distinguishable from other emotions. Figure 1 shows some example of the dataset.
 
 
 \begin{figure}[h!]
@@ -122,7 +121,7 @@ In the Cohn-Kanade Facial Expression Dataset, subjects performed a series of sev
 The experiments were performed doing one versus all classification. The data for each expression is divided into a training and a validation set and an SVM
 classifier is calculated based on the training set. The accuracy of the classifiers is then measured on the validation set. It was ensured that images of the same
 person are not present in both the training and validation set. The fraction of the data used for the validation set is a configurable parameter, for the 
-following experiments 75\% of the data was used for the training set and 25\% for the valdiation set. 
+following experiments 75\% of the data was used for the training set and 25\% for the validiation set. 
 
 \subsection{Manual Patches}
 
@@ -135,10 +134,11 @@ An image can have multiple discriminating patches. As shown in Figure \ref{fig:m
   \label{fig:manual_patch}
 \end{figure}
 
-We identified four such patches, that 2 patches for eyes and one each for mouth and glabella. We extracted them manually and and it was ensured that extracted images of same patch are consistent with each other in terms feature content of the patch. For example, in case of mouth patches, it was ensured that the boundaries of the patch touch the edges of lips in all mouth patches.
+We identified four such patches, that 2 patches for eyes and one each for mouth and glabella. We extracted them manually and it was ensured that extracted images of same patch are consistent with each other in terms feature content of the patch. For example, in case of mouth patches, it was ensured that the boundaries of the patch touch the edges of lips in all mouth patches.
 
 Tables \ref{table:left_eye}, \ref{table:right_eye}, \ref{table:between_eyes} and \ref{table:mouth} show the results for each region, for classifiers trained 
-with the original patch size of 96x96 and also rescaled to 32x32 and 64x64 pixels. Shrinking the images on the one hand results in fewer hog features which is likely to reduce the effect of  verfitting, on the other hand some visual information may be lost. The table entries represent the fraction of the images of the corresponding expression that were correctly classified, in the 0 to 1 range.
+with the original patch size of 96x96 and also rescaled to 32x32 and 64x64 pixels. Shrinking the images on the one hand results in fewer hog features which is likely to reduce the effect of overfitting, on the other hand some visual information may be lost. The table entries represent the fraction of the images of the corresponding expression that were correctly classified, in the 0 to 1 range.
+
 
 
 
