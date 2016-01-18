@@ -1,0 +1,36 @@
+\begin{tikzpicture}[-latex][H]
+  \matrix (chart)
+    [
+      matrix of nodes,
+      column sep      = 3em,
+      row sep         = 5ex,
+      column 1/.style = {nodes={decision}},
+      column 2/.style = {nodes={env}}
+    ]
+    {
+      |[root]| Load images           &                \\
+      Detect faces?               & Perform face detection       \\
+      Apply PCA?                 & Apply PCA feature reduction         \\
+     |[treenode]| Compute HOG  & \\
+     |[treenode]| Train SVM &        \\
+      |[treenode]| Predict validation data  &        \\
+    %   & & |[decision]| numbered? \\
+    %   & & |[treenode]| Add a \texttt{*} & |[finish]| Done \\
+    };
+    
+  \draw
+    (chart-1-1) edge (chart-2-1)
+    \foreach \x/\y in {2/3, 3/4} {
+      (chart-\x-1) \no (chart-\y-1) 
+     }
+    \foreach \x in {2,...,3} {
+      (chart-\x-1) \yes (chart-\x-2)
+    }
+    (chart-2-2) edge (chart-3-1)
+    (chart-3-2) edge (chart-4-1)
+    
+    (chart-4-1) edge (chart-5-1)
+    (chart-5-1) edge (chart-6-1)
+    ;
+
+\end{tikzpicture}
