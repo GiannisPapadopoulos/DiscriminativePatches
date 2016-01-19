@@ -159,7 +159,7 @@ In the Cohn-Kanade Facial Expression Dataset, subjects performed a series of sev
 		\caption{surprise}
 		\label{fig:dataset:surprise}
 	\end{subfigure}
-    \caption{Examples of intense facial expressions from two subjects in the dataset}
+    \caption[Examples of intense facial expressions]{Examples of intense facial expressions from two subjects in the dataset}
     \label{fig:dataset images}
 \end{figure}
 
@@ -183,67 +183,8 @@ An image can have multiple discriminating patches. As shown in Figure \ref{fig:m
 <<<<<<< Updated upstream
 We extracted them manually and rescaled them to 36*36 pixels, 64*64 pixels and 96*96 pixels. Tables \ref{table:left_eye}, \ref{table:right_eye}, \ref{table:between_eyes} and \ref{table:mouth} show the results for each region, for classifiers trained  with the  patch size of 96*96 , 32*32 and 64*64 pixels. Shrinking the images on the one hand results in fewer hog features which is likely to reduce the effect of overfitting, on the other hand some visual information may be lost. The table entries represent the fraction of the images of the corresponding expression that were correctly classified, in the 0 to 1 range.
 
-It was ensured that extracted images of same patch are consistent with each other in terms feature content of the patch. For example, in case of mouth patches, it was ensured that the boundaries of the patch touch the edges of lips in all mouth patches.  It is very important that the patches are consistent and optimal otherwise the results can be poor. This is reflected from Table \ref{table:predict_unaliged_surprise} and Table \ref{table:predict_unaliged_fear}.
+It was ensured that extracted images of same patch are consistent with each other in terms feature content of the patch. For example, in case of mouth patches, it was ensured that the boundaries of the patch touch the edges of lips in all mouth patches.  It is very important that the patches are consistent and optimal otherwise the results can be poor. This is reflected from Table \ref{table:predict_unaliged_surprise} and Table \ref{table:predict_unaliged_fear} in the section 4.5.
 
-\begin{table*}
-\centering
-\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
-\caption{Predicting the unaligned patches from surprise emotion}
-\label{table:predict_unaliged_surprise}
-
-\begin{tabular}{| c | c | c | c | c |}
-\hline
-Patches & Mouth & Left-eye  & Right-eye & \tabincell{c}{Part \\ between eyes}  \\
-\hline
-1 & sadness & disgust & surprise & fear \\
-2 & sadness & fear & disgust & fear \\
-3 & neutral & surprise & happy & disgust \\
-4 & neutral & disgust & happy & surprise \\
-5 & disgust & fear & disgust & fear \\
-6 & surprise & fear & sadness & disgust \\
-7 & surprise & surprise & sadness & disgust \\
-8 & disgust & sadness & disgust & fear \\
-9 & surprise & angry & surprise & surprise \\
-10 & fear & surprise & disgust & surprise \\
-11 & surprise & angry & sadness & fear \\
-12 & surprise & angry & disgust & disgust \\
-13 & fear & surprise & disgust & disgust \\
-14 & surprise & fear & surprise & disgust \\
-15 & surprise & surprise & fear & fear \\
-
-\hline
-\end{tabular}
-\end{table*}
-
-
-\begin{table*}
-\centering
-\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
-\caption{Predicting the unaligned patches from fear emotion}
-\label{table:predict_unaliged_fear}
-
-\begin{tabular}{| c | c | c | c | c |}
-\hline
-Patches & Mouth &  Left-eye  & Right-eye & \tabincell{c}{Part \\ between eyes} \\
-\hline
-1 & happy & fear & fear & disgust \\
-2 & happy & disgust & fear & fear \\
-3 & contempt & surprise & contempt & fear \\
-4 & contempt & disgust & contempt & disgust \\
-5 & fear & disgust & disgust & fear \\
-6 & fear & fear & sadness & angry \\
-7 & disgust & sadness & sadness & surprise \\
-8 & fear & disgust & disgust & angry \\
-9 & fear & disgust & disgust & fear \\
-10 & fear & surprise & disgust & disgust \\
-11 & fear & surprise & surprise & fear \\
-12 & contempt & fear & disgust & fear \\
-13 & fear & disgust & disgust & surprise \\
-14 & contempt & disgust & fear & disgust \\
-15 & happy & fear & fear & disgust \\
-\hline
-\end{tabular}
-\end{table*}
 
 =======
 We identified four such patches, that 2 patches for eyes and one each for mouth and glabella. We extracted them manually and it was ensured that extracted images of same patch are consistent with each other in terms feature content of the patch. For example, in case of mouth patches, it was ensured that the boundaries of the patch touch the edges of lips in all mouth patches.
