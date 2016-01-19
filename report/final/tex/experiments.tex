@@ -110,11 +110,45 @@ The dataset this paper adopted is from the Cohn-Kanade Facial Expression Databas
 In the Cohn-Kanade Facial Expression Dataset, subjects performed a series of several facial displays that varied from mild to intense expression for each emotion and images were taken frame by frame. In the mild ones, the emotion is barely noticeable and in the intense ones, it is clearly noticeable. In order to train a robust system, we chose the images mostly with intense expressions which were clearly noticeable. That means all the expressions in our dataset are clearly representing the emotion they belong to and are also distinguishable from other emotions. Figure 1 shows some example of the dataset.
 
 
-\begin{figure}[h!]
-\centering
-\includegraphics[scale=0.55]{img/example.png}
-\caption{Example of dataset}
-\label{Example of dataset}
+\begin{figure}%[H]
+	\centering
+	\begin{subfigure}[b]{0.2\textwidth}
+		\includegraphics[width=\textwidth]{./img/indistinguishable/angry.png}
+		\caption{From angry}
+		\label{fig:indistinguishable:angry}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.2\textwidth}
+		\includegraphics[width=\textwidth]{./img/indistinguishable/disgust.png}
+		\caption{From disgust}
+		\label{fig:indistinguishable:disgust}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.2\textwidth}
+		\includegraphics[width=\textwidth]{./img/indistinguishable/fear.png}
+		\caption{From fear}
+		\label{fig:indistinguishable:fear}
+	\end{subfigure}
+%\hspace{\fill}
+	\begin{subfigure}[b]{0.2\textwidth}
+		\includegraphics[width=\textwidth]{./img/indistinguishable/happy.png}
+		\caption{From happy}
+		\label{fig:indistinguishable:happy}
+	\end{subfigure}
+%\hspace{\fill}
+	\begin{subfigure}[b]{0.2\textwidth}
+		\includegraphics[width=\textwidth]{./img/indistinguishable/sadness.png}
+		\caption{From sadness}
+		\label{fig:indistinguishable:sadness}
+	\end{subfigure}
+%\hspace{\fill}
+	\begin{subfigure}[b]{0.2\textwidth}
+		\includegraphics[width=\textwidth]{./img/indistinguishable/surprise.png}
+		\caption{From surprise}
+		\label{fig:indistinguishable:surprise}
+	\end{subfigure}
+    \caption{Indistinguishable image from each emotion}
+    \label{Indistinguishable images from six emotions}
 \end{figure}
 
 \subsection{Experiment setup}
@@ -262,16 +296,17 @@ Surprise & 0.8765 & 0.9405 & 0.9665	\\
 
 
 \subsection{Results of Prediction}
-After training SVM classifier, we needed to know whether the classifier is able to predict the training data. We picked out all patches (the part between eyes, left eye, right eye and mouth) from one subject with complete time series of almost emotions. These patches were predicted respectively after being rescaled to 96*96 pixels in the process of training. 
+After training SVM classifier, we needed to know whether the classifier is able to predict the training data. We picked out all aligned patches (the part between eyes, left eye, right eye and mouth) from one subject with complete time series of almost emotions. These patches were predicted respectively after being rescaled to 96*96 pixels in the process of training.We listed the results of mouth and right-eye patches in the Table \ref{table:predict_mouth} and Table\ref{table:predict_righteye}.
 \\
+\\
+Moreover, we also experimented with some patches which were not aligned with training data. These pathes were all from obvious expressions of our dataset and were rescaled to 96*96 pixels before being predicted. We listed the results of four patches from surprise and fear emotion in the Table \ref{table:predict_unaliged_surprise} and Table \ref{table:predict_unaliged_fear}. The results will indicate the effect of alignment of patches.
 
-Table \ref{table:predict_mouth} shows the result of prediction of mouth patches. Most parts of mouth patches were given correct classifications. However, for angry, fear, happy and surprise emotion, there are one or two ambiguous facial expressions so that the patches of them were classified to an incorrect emotion. By contrast, the prediction of right-eye patches was not as good as that of mouth patches. As Table\ref{table:predict_righteye} shows, right-eye patches of angry and fear emotions were not predicted correctly. For other emotions, the accuracy of the prediction of right-eye patches was lower than that of mouth patches.
-
-\begin{table}
-\caption{Predicting the Mouth Patches}
+\begin{table*}[bp]
+\centering
+\caption{Predicting the aligned mouth patches}
 \label{table:predict_mouth}
 
-\begin{tabular}{| c | c | c | c | c | c | c |}
+\begin{tabular}{|*{15}{p{1.34cm}<{\centering}|}|}
 \hline
 Time & Angry &  Disgust  & Fear & Happy & Sadness & Surprise  \\
 \hline
@@ -279,7 +314,7 @@ Time & Angry &  Disgust  & Fear & Happy & Sadness & Surprise  \\
 2 & neutral & neutral & neutral & neutral & neutral & neutral \\
 3 & neutral & neutral & neutral & neutral & neutral & neutral \\
 4 & neutral & neutral & neutral & disgust & neutral & neutral \\
-5 & neutral & neutral & neutral & happy & neutral & neutral \\
+5 & neutral & neutral &neutral & happy & neutral & neutral \\
 6 & neutral & neutral & disgust & happy & neutral & disgust \\
 7 & neutral & disgust & fear & happy & neutral & surprise \\
 8 & neutral & disgust & fear & happy & neutral & surprise \\
@@ -287,20 +322,21 @@ Time & Angry &  Disgust  & Fear & Happy & Sadness & Surprise  \\
 10 & contempt & disgust & fear & happy & sadness & surprise \\
 11 & neutral & disgust & fear & happy & sadness & surprise \\
 12 & contempt & disgust & fear & happy & sadness & surprise \\
-13 & angry &  & fear &  & sadness & surprise \\
-14 & angry &  & fear &  & sadness & surprise \\
-15 & angry &  &  &  & sadness & \\
+13 & angry & disgust & fear & happy & sadness & surprise \\
+14 & angry & disgust & fear & happy & sadness & surprise \\
+15 & angry & disgust & fear & happy & sadness & surprise\\
 
 \hline
 \end{tabular}
-\end{table}
+\end{table*}
 
 
-\begin{table}
-\caption{Predicting the Right-Eye Patches}
+\begin{table*}[bp]
+\centering
+\caption{Predicting the aligned right-eye patches}
 \label{table:predict_righteye}
 
-\begin{tabular}{| c | c | c | c | c | c | c |}
+\begin{tabular}{|*{15}{p{1.34cm}<{\centering}|}|}
 \hline
 Time & Angry &  Disgust  & Fear & Happy & Sadness & Surprise  \\
 \hline
@@ -316,10 +352,71 @@ Time & Angry &  Disgust  & Fear & Happy & Sadness & Surprise  \\
 10 & contempt & disgust & contempt & happy & sadness & surprise	\\
 11 & contempt & disgust & contempt & happy & sadness & surprise \\
 12 & neutral & disgust & neutral & happy & sadness & surprise \\
-13 & contempt &  & contempt &  & sadness & surprise \\
-14 & contempt &  & neutral &  & sadness & surprise \\
-15 & neutral &  &  &  & sadness & \\
+13 & contempt & disgust & contempt & happy & sadness & surprise \\
+14 & contempt & disgust & neutral & happy & sadness & surprise \\
+15 & neutral & disgust & neutral & happy & sadness & surprise\\
 
 \hline
 \end{tabular}
-\end{table}
+\end{table*}
+
+
+\begin{table*}
+\centering
+\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
+\caption{Predicting the unaligned patches from surprise emotion}
+\label{table:predict_unaliged_surprise}
+
+\begin{tabular}{| c | c | c | c | c |}
+\hline
+Patches & Mouth & Left-eye  & Right-eye & \tabincell{c}{Part \\ between eyes}  \\
+\hline
+1 & sadness & disgust & surprise & fear \\
+2 & sadness & fear & disgust & fear \\
+3 & neutral & surprise & happy & disgust \\
+4 & neutral & disgust & happy & surprise \\
+5 & disgust & fear & disgust & fear \\
+6 & surprise & fear & sadness & disgust \\
+7 & surprise & surprise & sadness & disgust \\
+8 & disgust & sadness & disgust & fear \\
+9 & surprise & angry & surprise & surprise \\
+10 & fear & surprise & disgust & surprise \\
+11 & surprise & angry & sadness & fear \\
+12 & surprise & angry & disgust & disgust \\
+13 & fear & surprise & disgust & disgust \\
+14 & surprise & fear & surprise & disgust \\
+15 & surprise & surprise & fear & fear \\
+
+\hline
+\end{tabular}
+\end{table*}
+
+
+\begin{table*}
+\centering
+\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
+\caption{Predicting the unaligned patches from fear emotion}
+\label{table:predict_unaliged_fear}
+
+\begin{tabular}{| c | c | c | c | c |}
+\hline
+Patches & Mouth &  Left-eye  & Right-eye & \tabincell{c}{Part \\ between eyes} \\
+\hline
+1 & happy & fear & fear & disgust \\
+2 & happy & disgust & fear & fear \\
+3 & contempt & surprise & contempt & fear \\
+4 & contempt & disgust & contempt & disgust \\
+5 & fear & disgust & disgust & fear \\
+6 & fear & fear & sadness & angry \\
+7 & disgust & sadness & sadness & surprise \\
+8 & fear & disgust & disgust & angry \\
+9 & fear & disgust & disgust & fear \\
+10 & fear & surprise & disgust & disgust \\
+11 & fear & surprise & surprise & fear \\
+12 & contempt & fear & disgust & fear \\
+13 & fear & disgust & disgust & surprise \\
+14 & contempt & disgust & fear & disgust \\
+15 & happy & fear & fear & disgust \\
+\hline
+\end{tabular}
+\end{table*}
