@@ -94,7 +94,7 @@
 	\ref{fig:timeseriesHappy:a} to \ref{fig:timeseriesHappy:c} correctly as
 	neutral, \ref{fig:timeseriesHappy:d} was identified as disgust and
 	\ref{fig:timeseriesHappy:e} to \ref{fig:timeseriesHappy:m} were classified as
-	happy expressions according to table \ref{table:predict_mouth}.}
+	happy expressions according to Table \ref{table:predict_mouth}.}
 	\label{fig:timeseriesHappy}
 \end{figure}
 
@@ -180,20 +180,16 @@ An image can have multiple discriminating patches. As shown in Figure \ref{fig:m
   \label{fig:manual_patch}
 \end{figure}
 
-<<<<<<< Updated upstream
+
 We extracted them manually and rescaled them to 36*36 pixels, 64*64 pixels and 96*96 pixels. Tables \ref{table:left_eye}, \ref{table:right_eye}, \ref{table:between_eyes} and \ref{table:mouth} show the results for each region, for classifiers trained  with the  patch size of 96*96 , 32*32 and 64*64 pixels. Shrinking the images on the one hand results in fewer hog features which is likely to reduce the effect of overfitting, on the other hand some visual information may be lost. The table entries represent the fraction of the images of the corresponding expression that were correctly classified, in the 0 to 1 range.
 
 It was ensured that extracted images of same patch are consistent with each other in terms feature content of the patch. For example, in case of mouth patches, it was ensured that the boundaries of the patch touch the edges of lips in all mouth patches.  It is very important that the patches are consistent and optimal otherwise the results can be poor. This is reflected from Table \ref{table:predict_unaliged_surprise} and Table \ref{table:predict_unaliged_fear} in the section 4.5.
 
 
-=======
 We identified four such patches, that 2 patches for eyes and one each for mouth and glabella. We extracted them manually and it was ensured that extracted images of same patch are consistent with each other in terms feature content of the patch. For example, in case of mouth patches, it was ensured that the boundaries of the patch touch the edges of lips in all mouth patches.
->>>>>>> Stashed changes
 
 Tables \ref{table:left_eye}, \ref{table:right_eye}, \ref{table:between_eyes} and \ref{table:mouth} show the ratios of correct detections for eight facial expressions for each region, for classifiers trained
 with the original patch size of 96x96 and also rescaled to 32x32 and 64x64 pixels. Shrinking the images on the one hand results in fewer hog features which is likely to reduce the effect of overfitting, on the other hand some visual information may be lost. The table entries represent the fraction of the images of the corresponding expression that were correctly classified, in the 0 to 1 range.
-
-
 
 
 %\subsection{Results}
