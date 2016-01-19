@@ -213,7 +213,7 @@ with the original patch size of 96x96 and also rescaled to 32x32 and 64x64 pixel
     \hline
     \end{tabular}
     \caption{Left eye patches}
-    \label{table:left eye}
+    \label{table:left_eye}
     \end{subtable}
 \quad
 
@@ -235,7 +235,7 @@ with the original patch size of 96x96 and also rescaled to 32x32 and 64x64 pixel
     \hline
     \end{tabular}
     \caption{Right eye patches}
-    \label{table:right eye}
+    \label{table:right_eye}
     \end{subtable}
 \quad
 
@@ -257,7 +257,7 @@ with the original patch size of 96x96 and also rescaled to 32x32 and 64x64 pixel
     \hline
     \end{tabular}
     \caption{Right eye patches}
-    \label{table:between eyes}
+    \label{table:between_eyes}
     \end{subtable}
 \quad
 
@@ -282,7 +282,7 @@ with the original patch size of 96x96 and also rescaled to 32x32 and 64x64 pixel
     \end{subtable}
 
 \label{table:results of patches}
-\caption[Ratios of correct detections for eight facial expressions]{Ratios of correct detections for eight facial expressions. Table \ref{table:left eye}, Table \ref{table:right eye}, Table \ref{table:between eyes} and Table \ref{table:mouth} shows the result of all left-eye patches, all right-eye patches, patches of the part between eyes and all mouth patches respectively. The results of four kind of patches were all based on the sizes of 32x32 pixels, 64x64 pixels and 96x96 pixels.}
+\caption[Ratios of correct detections for eight facial expressions]{Ratios of correct detections for eight facial expressions. Table \ref{table:left_eye}, Table \ref{table:right_eye}, Table \ref{table:between_eyes} and Table \ref{table:mouth} shows the result of all left-eye patches, all right-eye patches, patches of the part between eyes and all mouth patches respectively. The results of four kind of patches were all based on the sizes of 32x32 pixels, 64x64 pixels and 96x96 pixels.}
 \end{table}
 
 \subsection{SVM on the entire facial images}
@@ -344,10 +344,9 @@ Moreover, we also experimented with some patches from several subjects which wer
     15 & angry & disgust & fear & happy & sadness & surprise\\
     \hline
     \end{tabular}
+    \caption{Aligned right-eye patches}
     \label{table:predict_mouth}
-    \caption{Aligned mouth patches}
     \end{subtable}
-\qquad
 
     \begin{subtable}{4.7in}
     %\centering
@@ -378,7 +377,7 @@ Moreover, we also experimented with some patches from several subjects which wer
     \end{subtable}
 
 \caption[Results of prediction of aligned patches]{Results of prediction of aligned mouth and right-eye patches with time series from all images of one subject. That means each kind of patches was ordered from neutral to intense one. All predicted patches were of size 96x96 pixels. }
-\label{table:predict_righteye}
+\label{table:predict_aligned_patches}
 \end{table*}
 
 
@@ -440,5 +439,5 @@ Moreover, we also experimented with some patches from several subjects which wer
     \end{subtable}
 
     \caption[Results of prediction of unaligned patches]{Results of prediction of unaligned patches with size of 96x96 from 15 subjects in the dataset. Table \ref{table:predict_unaliged_surprise} and Table \ref{table:predict_unaliged_fear} shows the outputs of four kind of patches in the surprise and fear emotions}
-    \label{table:predict unaliged image}
+    \label{table:predict_unaliged_image}
 \end{table}
