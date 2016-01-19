@@ -1,12 +1,12 @@
 # _SourceFiles.cmake
-set( RelativeDir "src/imageCataloge" )
-set( RelativeSourceGroup "Source Files\\imageCataloge" )
+set( RelativeDir "src/imageCatalog" )
+set( RelativeSourceGroup "Source Files\\imageCatalog" )
 
 set( DirFiles
-	CatalogeTraining.cpp
-	CatalogeTraining.h
-	CatalogeClassificationSVM.cpp
-	CatalogeClassificationSVM.h
+	CatalogTraining.cpp
+	CatalogTraining.h
+	CatalogClassificationSVM.cpp
+	CatalogClassificationSVM.h
 )
 
 set( DirFiles_SourceGroup "${RelativeSourceGroup}" )

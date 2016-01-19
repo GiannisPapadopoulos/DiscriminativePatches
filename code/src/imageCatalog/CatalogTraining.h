@@ -12,8 +12,8 @@
  * NO CASE SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY DAMAGES.
  *****************************************************************************/
 
-#ifndef SRC_IMAGECATALOGE_CATALOGETRAINING_H_
-#define SRC_IMAGECATALOGE_CATALOGETRAINING_H_
+#ifndef SRC_IMAGECATALOG_CATALOGTRAINING_H_
+#define SRC_IMAGECATALOG_CATALOGTRAINING_H_
 
 #include <string>
 #include <vector>
@@ -25,25 +25,25 @@ namespace mai{
 class Configuration;
 class DataSet;
 class TrainingData;
-class CatalogeClassificationSVM;
+class CatalogClassificationSVM;
 
 /**
  * Train classifiers and predict sampled images on a cataloge of labeled images.
  *
  */
-class CatalogeTraining
+class CatalogTraining
 {
 public:
 
 	/**
 	 * Load image catalogue according to configuration
 	 */
-	CatalogeTraining(const Configuration* const config);
+	CatalogTraining(const Configuration* const config);
 
 	/**
 	 * Deletes everything
 	 */
-	virtual ~CatalogeTraining();
+	virtual ~CatalogTraining();
 
 	/**
 	 * Processing pipeline for extracted patches:
@@ -181,7 +181,7 @@ private:
 	/**
 	 * Trained svms
 	 */
-	CatalogeClassificationSVM* m_Classifiers;
+	CatalogClassificationSVM* m_Classifiers;
 
 	/**
 	 * Application settings
@@ -193,4 +193,4 @@ private:
 
 
 
-#endif /* SRC_IMAGECATALOGE_CATALOGETRAINING_H_ */
+#endif /* SRC_IMAGECATALOG_CATALOGTRAINING_H_ */

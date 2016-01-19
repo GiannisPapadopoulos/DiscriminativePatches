@@ -12,8 +12,8 @@
  * NO CASE SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY DAMAGES.
  *****************************************************************************/
 
-#ifndef SRC_IMAGECATALOGE_CATALOGECLASSIFICATIONSVM_H_
-#define SRC_IMAGECATALOGE_CATALOGECLASSIFICATIONSVM_H_
+#ifndef SRC_IMAGECATALOG_CATALOGCLASSIFICATIONSVM_H_
+#define SRC_IMAGECATALOG_CATALOGCLASSIFICATIONSVM_H_
 
 #include <string>
 #include <vector>
@@ -29,19 +29,19 @@ class Configuration;
 /**
  * Holds map of categorized SVMs and provides necessary methods to interact with them.
  */
-class CatalogeClassificationSVM
+class CatalogClassificationSVM
 {
 public:
 
 	/**
 	 * Constructor
 	 */
-	CatalogeClassificationSVM(const Configuration* const config);
+	CatalogClassificationSVM(const Configuration* const config);
 
 	/**
 	 * Deletes classifiers
 	 */
-	virtual ~CatalogeClassificationSVM();
+	virtual ~CatalogClassificationSVM();
 
 	/**
 	 * Train SVMs for each given category.
@@ -117,4 +117,4 @@ private:
 
 }// namespace mai
 
-#endif /* SRC_IMAGECATALOGE_CATALOGECLASSIFICATIONSVM_H_ */
+#endif /* SRC_IMAGECATALOG_CATALOGCLASSIFICATIONSVM_H_ */

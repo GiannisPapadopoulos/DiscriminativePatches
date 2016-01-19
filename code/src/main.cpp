@@ -16,8 +16,8 @@
 #include <string>
 
 #include "configuration/Configuration.h"
-#include "imageCataloge/CatalogeClassificationSVM.h"
-#include "imageCataloge/CatalogeTraining.h"
+#include "imageCatalog/CatalogClassificationSVM.h"
+#include "imageCatalog/CatalogTraining.h"
 
 using namespace std;
 using namespace mai;
@@ -76,7 +76,7 @@ int main(int argc, char** argv )
 			|| config->getApplicationMode() == Configuration::appMode::Retrain)
 	{
 		cout << "[Main] Training classifiers according to configuration given in " << strConfigFile << endl;
-		CatalogeTraining* trainer = new CatalogeTraining(config);
+		CatalogTraining* trainer = new CatalogTraining(config);
 		trainer->processPipeline();
 		delete trainer;
 	}
@@ -84,7 +84,7 @@ int main(int argc, char** argv )
 	if(config->getApplicationMode() == Configuration::appMode::Predict)
 	{
 		cout << "[Main] Predicting image according to configuration given in " << strConfigFile << endl;
-		CatalogeClassificationSVM* classifier = new CatalogeClassificationSVM(config);
+		CatalogClassificationSVM* classifier = new CatalogClassificationSVM(config);
 		classifier->loadAndPredict();
 		delete classifier;
 	}
