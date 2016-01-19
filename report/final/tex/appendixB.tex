@@ -41,7 +41,7 @@ Program flow
 The data module provides data types and data structures for the application. The class DataSet is the basic data type. It holds the images each together with the file name and the feature vectors extracted from that image. In the course of the main processing pipeline, the images themselves are deleted after the feature extraction step to free memory. The class furthermore provides a method to split the images and respectively their feature vectors into two parts of definable size for training and validation purpose. The class TrainingData holds the training and label matrix needed by the SVM for training in OpenCV matrix format. The constructor creates these matrices from the given vectors of positive and negative training samples, i.e. feature vectors.
 \\
 \\
-The module IOUtils provides static methods for file system handling, input and output of images and basic image operations. There are methods to load a complete catalog of images and methods to load single images or all images contained in a folder. In a catalog of images, the images have to be organized in sub folders according to their categories and the sub folder names define the category names. There are methods to load and save SVMs from and to the file system. Furthermore, basic image operations like histogram equalization and adding flipped versions of images are part of this module as this functionality is integrated into the loading process to avoid memory issues due to allocation of images multiple times during the according process.
+The module IOUtils provides static methods for file system handling, input and output of images and basic image operations. There are methods to load a complete catalogue of images and methods to load single images or all images contained in a folder. In a catalogue of images, the images have to be organized in sub folders according to their categories and the sub folder names define the category names. There are methods to load and save SVMs from and to the file system. Furthermore, basic image operations like histogram equalization and adding flipped versions of images are part of this module as this functionality is integrated into the loading process to avoid memory issues due to allocation of images multiple times during the according process.
 \\
 TODO this structure needs to be changed in code, move stuff to utils!
 \\
@@ -50,15 +50,15 @@ The featureExtraction module provides the functionality for the HOG feature extr
 %\footnote{http://www.juergenwiki.de/work/wiki/doku.php?id\=public:hog\_descriptor\_computation\_and\_visualization\#computing\_the\_hog\_descriptor\_using\_opencv}
 \\
 \\
-The svm module provides the functionality for the machine learning parts of the processing pipeline. The class umSVM holds an object of OpenCV CvSVM and provides methods to train this SVM instance, to predict data and load and save this instance. The SVM instance is of type linear SVM C\_SVC, which can be configured using the SVM C value to refine the hyperplane on imperfect separation. The class ClassificationSVM holds a map of categorized umSVM instances and provides necessary methods to interact with them. These methods include training the SVMs on the complete catalog of images, loading and saving categorized SVMs, and using the SVM instances for prediction.
+The svm module provides the functionality for the machine learning parts of the processing pipeline. The class umSVM holds an object of OpenCV CvSVM and provides methods to train this SVM instance, to predict data and load and save this instance. The SVM instance is of type linear SVM C\_SVC, which can be configured using the SVM C value to refine the hyperplane on imperfect separation. The class ClassificationSVM holds a map of categorized umSVM instances and provides necessary methods to interact with them. These methods include training the SVMs on the complete catalogue of images, loading and saving categorized SVMs, and using the SVM instances for prediction.
 \\
 \\
 TODO needs to be moved in code !!
 \\
-The class CatalogeTraining defines the main processing pipeline for training categorized SVMs with a catalog of categorized images. The processing pipeline for single patch images, i.e. manual extracted patches, is setup like this:
+The class catalogueeTraining defines the main processing pipeline for training categorized SVMs with a catalogue of categorized images. The processing pipeline for single patch images, i.e. manual extracted patches, is setup like this:
 
 \begin{enumerate}
-	\item Loading an image catalog from disc.
+	\item Loading an image catalogue from disc.
 	\item Refine the images through histogram equalization.
 	\item Double the sample size by adding flipped versions (Optional).
 	\item Compute the HOG features for the images.
