@@ -288,14 +288,12 @@ Moreover, we also experimented with some patches from several subjects which wer
 \label{table:predict_series}
 \end{table*}
 
-
 \begin{table}
-
     \begin{subtable}{3in}
     \newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
-    \begin{tabular}{|*{1}{p{0.3cm}<{\centering}|} c | c | c | c |}
+    \begin{tabular}{|*{1}{p{0.2cm}<{\centering}|} *{1}{p{1.22cm}<{\centering}|} *{1}{p{1.22cm}<{\centering}|} *{1}{p{1.22cm}<{\centering}|} *{1}{p{1.2cm}<{\centering}|}}
     \hline
-      & Mouth & Left-eye  & Right-eye & \tabincell{c}{Part \\ between\\ eyes}  \\
+      & Mouth & \tabincell{c}{Left\\ eye} & \tabincell{c}{Right\\ eye} & \tabincell{c}{Part \\ between\\ eyes} \\
     \hline
     1 & sadness & disgust & surprise & fear \\
     2 & sadness & fear & disgust & fear \\
@@ -318,12 +316,11 @@ Moreover, we also experimented with some patches from several subjects which wer
     \label{table:predict_unaliged_surprise}
         \end{subtable}
 \qquad
-
     \begin{subtable}{3in}
     \newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
-    \begin{tabular}{|*{1}{p{0.3cm}<{\centering}|} c | c | c | c |}
+    \begin{tabular}{|*{1}{p{0.2cm}<{\centering}|} *{1}{p{1.24cm}<{\centering}|} *{1}{p{1.2cm}<{\centering}|} *{1}{p{1.24cm}<{\centering}|} *{1}{p{1.2cm}<{\centering}|}}
     \hline
-      & Mouth &  Left-eye  & Right-eye & \tabincell{c}{Part \\ between\\ eyes} \\
+      & Mouth & \tabincell{c}{Left\\ eye} & \tabincell{c}{Right\\ eye} & \tabincell{c}{Part \\ between\\ eyes} \\
     \hline
     1 & happy & fear & fear & disgust \\
     2 & happy & disgust & fear & fear \\
