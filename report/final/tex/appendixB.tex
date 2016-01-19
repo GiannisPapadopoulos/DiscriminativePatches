@@ -30,14 +30,6 @@ The application's code contains annotations and comments that can be processed b
 
 \subsection{Implementation Details}
 
-TODO
-\\
-Classes
-\\
-Program flow
-%\input{./tex/flow_diagram.tex}
-\\
-\\
 The data module provides data types and data structures for the application. The class DataSet is the basic data type. It holds the images each together with the file name and the feature vectors extracted from that image. In the course of the main processing pipeline, the images themselves are deleted after the feature extraction step to free memory. The class furthermore provides a method to split the images and respectively their feature vectors into two parts of definable size for training and validation purpose. The class TrainingData holds the training and label matrix needed by the SVM for training in OpenCV matrix format. The constructor creates these matrices from the given vectors of positive and negative training samples, i.e. feature vectors.
 \\
 \\
