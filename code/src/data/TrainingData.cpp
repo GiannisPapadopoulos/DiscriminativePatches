@@ -13,7 +13,8 @@
 // *****************************************************************************/
 
 #include "TrainingData.h"
-#include "../Constants.h"
+
+#include "../configuration/Constants.h"
 
 #include <iostream>
 

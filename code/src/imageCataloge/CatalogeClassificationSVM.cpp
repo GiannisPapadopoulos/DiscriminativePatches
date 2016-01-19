@@ -12,25 +12,25 @@
  * NO CASE SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY DAMAGES.
  *****************************************************************************/
 
-#include "ClassificationSVM.h"
+#include "CatalogeClassificationSVM.h"
 
-#include "umSVM.h"
+#include "../svm/umSVM.h"
 #include "../IO/IOUtils.h"
-#include "../Constants.h"
 #include "../data/TrainingData.h"
-#include "../Configuration.h"
 #include "../featureExtraction/umHOG.h"
+#include "../configuration/Configuration.h"
+#include "../configuration/Constants.h"
 
 #include <opencv2/highgui/highgui.hpp>
 
 using namespace std;
 using namespace cv;
 
-mai::ClassificationSVM::ClassificationSVM(const Configuration* const config)
+mai::CatalogeClassificationSVM::CatalogeClassificationSVM(const Configuration* const config)
 :	m_Config(config)
 {}
 
-mai::ClassificationSVM::~ClassificationSVM()
+mai::CatalogeClassificationSVM::~CatalogeClassificationSVM()
 {
 	for(map<string, umSVM*>::iterator it = m_mSVMs.begin(); it != m_mSVMs.end(); it++)
 	{
@@ -39,7 +39,7 @@ mai::ClassificationSVM::~ClassificationSVM()
 	m_mSVMs.clear();
 }
 
-void mai::ClassificationSVM::trainSVMs(const map<string, TrainingData*> &mTrainingData,
+void mai::CatalogeClassificationSVM::trainSVMs(const map<string, TrainingData*> &mTrainingData,
 		const double dCValue)
 {
 	// Train svms for each category
@@ -75,7 +75,7 @@ void mai::ClassificationSVM::trainSVMs(const map<string, TrainingData*> &mTraini
 	}
 }
 
-bool mai::ClassificationSVM::loadSVMs(const std::string &strPath)
+bool mai::CatalogeClassificationSVM::loadSVMs(const std::string &strPath)
 {
 	if(!IOUtils::loadSVMsFromDirectory(m_mSVMs, strPath))
 	{
@@ -85,7 +85,7 @@ bool mai::ClassificationSVM::loadSVMs(const std::string &strPath)
 	return true;
 }
 
-void mai::ClassificationSVM::predict(const map<string, TrainingData*> &mData,
+void mai::CatalogeClassificationSVM::predict(const map<string, TrainingData*> &mData,
 		map<string, Mat> &mResults)
 {
 	if(m_mSVMs.size() < 1)
@@ -146,7 +146,7 @@ void mai::ClassificationSVM::predict(const map<string, TrainingData*> &mData,
 	}
 }
 
-string mai::ClassificationSVM::predict(const Mat &image,
+string mai::CatalogeClassificationSVM::predict(const Mat &image,
 		map<string, float> &mResults)
 {
 	if(m_mSVMs.size() < 1)
@@ -220,7 +220,7 @@ string mai::ClassificationSVM::predict(const Mat &image,
 	return strBest;
 }
 
-void mai::ClassificationSVM::loadAndPredict()
+void mai::CatalogeClassificationSVM::loadAndPredict()
 {
 	string strFilename = m_Config->getImageInputPath();
 	string strSVMPath = m_Config->getSvmOutputPath();
@@ -250,7 +250,7 @@ void mai::ClassificationSVM::loadAndPredict()
 	}
 }
 
-void mai::ClassificationSVM::loadAndPredictImages()
+void mai::CatalogeClassificationSVM::loadAndPredictImages()
 {
 	string strFilename = m_Config->getImageInputPath();
 
@@ -282,7 +282,7 @@ void mai::ClassificationSVM::loadAndPredictImages()
 	}
 }
 
-void mai::ClassificationSVM::loadAndPredictImage()
+void mai::CatalogeClassificationSVM::loadAndPredictImage()
 {
 	string strFilename = m_Config->getImageInputPath();
 
@@ -299,7 +299,7 @@ void mai::ClassificationSVM::loadAndPredictImage()
 	predictAndShowResults(image, strFilename);
 }
 
-void mai::ClassificationSVM::predictAndShowResults(const Mat &image,
+void mai::CatalogeClassificationSVM::predictAndShowResults(const Mat &image,
 		const string &strName)
 {
 	map<string, float> mResults;

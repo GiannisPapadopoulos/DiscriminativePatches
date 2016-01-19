@@ -15,12 +15,11 @@
 #include "FaceDetection.h"
 
 #include "../data/DataSet.h"
-#include "../Constants.h"
 #include "../IO/IOUtils.h"
+#include "../configuration/Constants.h"
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-//#include "opencv2/ml/ml.hpp"
 
 #include <iostream>
 #include <stdio.h>

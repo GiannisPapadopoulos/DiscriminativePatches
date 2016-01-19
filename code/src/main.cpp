@@ -15,9 +15,9 @@
 #include <iostream>
 #include <string>
 
-#include "Configuration.h"
-#include "svm/CatalogueTraining.h"
-#include "svm/ClassificationSVM.h"
+#include "configuration/Configuration.h"
+#include "imageCataloge/CatalogeClassificationSVM.h"
+#include "imageCataloge/CatalogeTraining.h"
 
 using namespace std;
 using namespace mai;
@@ -30,8 +30,8 @@ int main(int argc, char** argv )
 	if(argc < 2)
 	{
 		cerr << "The application has 3 operating modes defined in the configuration file:" << endl
-			<< "\t1. Train SVMs on a categorized image catalogue." << endl
-			<< "\t2. Retrain SVMs on a categorized image catalogue." << endl
+			<< "\t1. Train SVMs on a categorized image cataloge." << endl
+			<< "\t2. Retrain SVMs on a categorized image cataloge." << endl
 			<< "\t3. Classify images using trained SVMs." << endl
 			<< "Usage:" << endl
 			<< argv[0] << " [options]" << endl
@@ -76,7 +76,7 @@ int main(int argc, char** argv )
 			|| config->getApplicationMode() == Configuration::appMode::Retrain)
 	{
 		cout << "[Main] Training classifiers according to configuration given in " << strConfigFile << endl;
-		CatalogueTraining* trainer = new CatalogueTraining(config);
+		CatalogeTraining* trainer = new CatalogeTraining(config);
 		trainer->processPipeline();
 		delete trainer;
 	}
@@ -84,7 +84,7 @@ int main(int argc, char** argv )
 	if(config->getApplicationMode() == Configuration::appMode::Predict)
 	{
 		cout << "[Main] Predicting image according to configuration given in " << strConfigFile << endl;
-		ClassificationSVM* classifier = new ClassificationSVM(config);
+		CatalogeClassificationSVM* classifier = new CatalogeClassificationSVM(config);
 		classifier->loadAndPredict();
 		delete classifier;
 	}

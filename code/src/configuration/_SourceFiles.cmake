@@ -1,15 +1,12 @@
 # _SourceFiles.cmake
-set( RelativeDir "src/utils" )
-set( RelativeSourceGroup "Source Files\\utils" )
+set( RelativeDir "src/configuration" )
+set( RelativeSourceGroup "Source Files\\configuration" )
 
 set( DirFiles
-	FaceDetection.cpp
-	FaceDetection.h
-	ImageDisplayUtils.h
-	ImageDisplayUtils.cpp
-	ImageUtils.cpp
-	ImageUtils.h
-)	
+	Configuration.cpp
+	Configuration.h
+	Constants.h
+)
 
 set( DirFiles_SourceGroup "${RelativeSourceGroup}" )
 set( LocalSourceGroupFiles )

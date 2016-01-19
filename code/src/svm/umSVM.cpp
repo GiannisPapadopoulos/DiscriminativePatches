@@ -13,8 +13,9 @@
  *****************************************************************************/
 
 #include "umSVM.h"
+
 #include "../data/DataSet.h"
-#include "../Constants.h"
+#include "../configuration/Constants.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>

@@ -13,17 +13,17 @@
  *****************************************************************************/
 
 #include "IOUtils.h"
-#include "../Constants.h"
 #include "../data/DataSet.h"
 #include "../featureExtraction/umHOG.h"
 #include "../svm/umSVM.h"
+#include "../utils/ImageUtils.h"
+#include "../configuration/Constants.h"
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/ml/ml.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include <boost/filesystem.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <iostream>
 
@@ -103,7 +103,7 @@ bool mai::IOUtils::loadCatalogue(map<string, DataSet* > &mCatalogue,
 			{
 				if(bAddFlipped)
 				{
-					addFlippedImages(vImages, vImageNames, 1);
+					ImageUtils::addFlippedImages(vImages, vImageNames, 1);
 				}
 
 				DataSet* pData = new DataSet();
@@ -261,180 +261,6 @@ bool mai::IOUtils::loadImage(Mat &image,
 		cout << "[mai::IOUtils::loadImagesOrdered] ERROR loading Image: " << strFileName << endl;
 		return false;
 	}
-}
-
-void mai::IOUtils::addFlippedImages(vector<Mat*> &vImages,
-		std::vector<std::string> &vImageNames,
-		const int iFlipMode)
-{
-	vector<Mat*> vDoubledImages;
-
-	for(int i = 0; i < vImages.size(); ++i)
-	{
-		Mat* image = vImages.at(i);
-		Mat flippedImage;
-		flip(*image, flippedImage, iFlipMode);
-
-		// Check for valid input
-		if( !flippedImage.empty() )
-		{
-			Mat* pImage = new Mat(flippedImage);
-			vDoubledImages.push_back(pImage);
-
-			// Add new name for new image
-			std::vector<std::string> strs;
-			boost::split(strs, vImageNames.at(i), boost::is_any_of("."));
-
-			std::stringstream ss;
-			for(int j = 0; j < strs.size(); ++j)
-			{
-				if(j == strs.size() - 1)
-				{
-					ss << "_flipped." << strs.at(j);
-				}
-				else
-				{
-					ss << strs.at(j);
-				}
-			}
-			vImageNames.push_back(ss.str());
-		}
-	}
-
-	vImages.insert(end(vImages), begin(vDoubledImages), end(vDoubledImages));
-}
-
-void mai::IOUtils::convertImages(const vector<Mat*> &vImages,
-		vector<Mat*> &vConvertedImages,
-		const int iMode )
-{
-	for( Mat* image : vImages)
-	{
-		Mat convertedImage;
-		cvtColor(*image, convertedImage, iMode);
-
-		// Check for valid input
-		if( !convertedImage.empty() )
-		{
-			Mat* pImage = new Mat(convertedImage);
-			vConvertedImages.push_back(pImage);
-		}
-	}
-}
-
-void mai::IOUtils::equalizeImages(const vector<Mat*> &vImages,
-		vector<Mat*> &vConvertedImages )
-{
-	for( Mat* image : vImages)
-	{
-		Mat convertedImage;
-		equalizeHist(*image, convertedImage);
-
-		// Check for valid input
-		if( !convertedImage.empty() )
-		{
-			Mat* pImage = new Mat(convertedImage);
-			vConvertedImages.push_back ( pImage );
-		}
-	}
-}
-
-void mai::IOUtils::getMaxImageDimensions(const vector<Mat> &vImages,
-		int &iMaxHeight,
-		int &iMaxWidth)
-{
-	iMaxHeight = 0;
-	iMaxWidth = 0;
-
-	for( Mat image : vImages)
-	{
-		Size s = image.size();
-		int iW = s.width;
-		int iH = s.height;
-
-		iMaxWidth = max(iMaxWidth, iW);
-		iMaxHeight = max(iMaxHeight, iH);
-	}
-}
-
-void mai::IOUtils::sampleImage(const Mat &image,
-		Mat &sampledImage,
-		const int iHeight,
-		const int iWidth )
-{
-	Size s = image.size();
-	int iW = s.width;
-	int iH = s.height;
-
-	if ( iW * iH == iHeight * iWidth )
-		sampledImage = image;
-	else
-	{
-		if ( iW * iH < iHeight * iWidth )
-		{
-			pyrUp( image, sampledImage, Size( iWidth, iHeight ) );
-		}
-		else
-		{
-			pyrDown( image, sampledImage, Size( iWidth, iHeight ) );
-		}
-	}
-
-	assert( !sampledImage.empty() );
-}
-
-void mai::IOUtils::sampleImages(const vector<Mat> &vImages,
-		vector<Mat> &vSampledImages,
-		const int iHeight,
-		const int iWidth )
-{
-	for( Mat image : vImages)
-	{
-		Size s = image.size();
-		int iW = s.width;
-		int iH = s.height;
-
-		Mat sampledImage;
-
-		if ( iW * iH == iHeight * iWidth )
-			sampledImage = image;
-		else
-		{
-			if ( iW * iH < iHeight * iWidth )
-			{
-				pyrUp( image, sampledImage, Size( iWidth, iHeight ) );
-			}
-			else
-			{
-				pyrDown( image, sampledImage, Size( iWidth, iHeight ) );
-			}
-		}
-
-		if( !sampledImage.empty() )// Check for valid input
-		{
-			vSampledImages.push_back ( sampledImage );
-		}
-	}
-}
-
-void mai::IOUtils::showImages(const vector<Mat> &vImages)
-{
-	for( Mat image : vImages)
-	{
-		showImage( image );
-	}
-}
-
-void mai::IOUtils::showImage(const Mat &image)
-{
-	imshow("Image", image);
-	waitKey(0);
-}
-
-void mai::IOUtils::showImage(const Mat* const image)
-{
-	imshow("Image", *image);
-	waitKey(0);
 }
 
 bool mai::IOUtils::createDirectory(const string &strPath)

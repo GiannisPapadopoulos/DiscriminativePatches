@@ -12,16 +12,16 @@
  * NO CASE SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY DAMAGES.
  *****************************************************************************/
 
-#include "CatalogueTraining.h"
+#include "CatalogeTraining.h"
 
-#include "ClassificationSVM.h"
-#include "../Constants.h"
-#include "../Configuration.h"
 #include "../data/DataSet.h"
 #include "../data/TrainingData.h"
 #include "../IO/IOUtils.h"
 #include "../featureExtraction/umHOG.h"
 #include "../utils/FaceDetection.h"
+#include "../configuration/Configuration.h"
+#include "../configuration/Constants.h"
+#include "CatalogeClassificationSVM.h"
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -35,12 +35,12 @@
 using namespace cv;
 using namespace std;
 
-mai::CatalogueTraining::CatalogueTraining(const Configuration* const config)
+mai::CatalogeTraining::CatalogeTraining(const Configuration* const config)
 :	m_Config(config)
-,	m_Classifiers(new ClassificationSVM(config))
+,	m_Classifiers(new CatalogeClassificationSVM(config))
 {}
 
-mai::CatalogueTraining::~CatalogueTraining()
+mai::CatalogeTraining::~CatalogeTraining()
 {
 	for(map<string, DataSet*>::iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); it++)
 	{
@@ -63,7 +63,7 @@ mai::CatalogueTraining::~CatalogueTraining()
 	delete m_Classifiers;
 }
 
-void mai::CatalogueTraining::processPipeline()
+void mai::CatalogeTraining::processPipeline()
 {
 	cout << "[mai::CatalogueDetection::processPipeline] Loading data ..." << endl;
 
@@ -203,7 +203,7 @@ void mai::CatalogueTraining::processPipeline()
 	}
 }
 
-void mai::CatalogueTraining::detectFaces()
+void mai::CatalogeTraining::detectFaces()
 {
 	for(map<string, DataSet*>::iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); it++)
 	{
@@ -233,7 +233,7 @@ void mai::CatalogueTraining::detectFaces()
 	}
 }
 
-void mai::CatalogueTraining::computeHOG(const Size imageSize,
+void mai::CatalogeTraining::computeHOG(const Size imageSize,
 		const Size blockSize,
 		const Size blockStride,
 		const Size cellSize,
@@ -279,7 +279,7 @@ void mai::CatalogueTraining::computeHOG(const Size imageSize,
 	}
 }
 
-void mai::CatalogueTraining::performClustering(const Size imageSize,
+void mai::CatalogeTraining::performClustering(const Size imageSize,
 		const Size blockSize,
 		const Size blockStride,
 		const Size cellSize,
@@ -319,7 +319,7 @@ void mai::CatalogueTraining::performClustering(const Size imageSize,
 	}
 }
 
-void mai::CatalogueTraining::setupSVMData(const int iDataSetDivider)
+void mai::CatalogeTraining::setupSVMData(const int iDataSetDivider)
 {
 	// Positive training and validation data per named category
 	map<string, vector<vector<float> > > mPositiveTrain;
@@ -357,7 +357,7 @@ void mai::CatalogueTraining::setupSVMData(const int iDataSetDivider)
 	setupTrainingData(m_mValidate, mPositiveValidate, mNegativeValidate);
 }
 
-void mai::CatalogueTraining::divideDataSets(map<string, vector<vector<float> > > &mTrain,
+void mai::CatalogeTraining::divideDataSets(map<string, vector<vector<float> > > &mTrain,
 			map<string, vector<vector<float> > > &mValidate,
 			const int iDataSetDivider)
 {
@@ -373,7 +373,7 @@ void mai::CatalogueTraining::divideDataSets(map<string, vector<vector<float> > >
 	}
 }
 
-void mai::CatalogueTraining::collectRandomNegatives(const map<string, vector<vector<float> > > &mPositives,
+void mai::CatalogeTraining::collectRandomNegatives(const map<string, vector<vector<float> > > &mPositives,
 		map<string, vector<vector<float> > > &mNegatives)
 {
 	// Count all sample vector sizes
@@ -433,7 +433,7 @@ void mai::CatalogueTraining::collectRandomNegatives(const map<string, vector<vec
 	}
 }
 
-void mai::CatalogueTraining::calculateSampleSizes(const string &strKey,
+void mai::CatalogeTraining::calculateSampleSizes(const string &strKey,
 		const map<string, int> &mFeatureSizes,
 		map<string, int> &mSampleSizes)
 {
@@ -512,7 +512,7 @@ void mai::CatalogueTraining::calculateSampleSizes(const string &strKey,
 	}
 }
 
-void mai::CatalogueTraining::setupTrainingData(map<string, TrainingData*> &mTrainingData,
+void mai::CatalogeTraining::setupTrainingData(map<string, TrainingData*> &mTrainingData,
 			const map<string, vector<vector<float> > > &mPositives,
 			const map<string, vector<vector<float> > > &mNegatives)
 {

@@ -14,7 +14,7 @@
 
 
 #include "umPCA.h"
-#include "../Constants.h"
+#include "../configuration/Constants.h"
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/ml/ml.hpp>

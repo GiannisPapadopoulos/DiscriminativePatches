@@ -24,6 +24,9 @@ namespace mai{
 
 class DataSet;
 
+/**
+ * Haar cascade classifier from OpenCV
+ */
 class FaceDetection
 {
 public:
