@@ -1,113 +1,16 @@
-\section{Experiments}
+\section{Experiments}\label{sec:experiments}
 \nocite{Kanade2000CK+}\nocite{Lucey2010CK+}
 
 %TODO: describe setup of datasets sued for training and validation.Present results
-
-%\onecolumn
-
-\begin{figure}%[H]
-	\centering
-	\begin{subfigure}[b]{0.15\textwidth}
-		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000001_conew1.png}
-		\caption{Neutral-neutral}
-		\label{fig:timeseriesHappy:a}
-	\end{subfigure}
-	%\hspace{\fill}
-	\begin{subfigure}[b]{0.15\textwidth}
-		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000002_conew1.png}
-		\caption{Neutral-neutral}
-		\label{fig:timeseriesHappy:b}
-	\end{subfigure}
-	%\hspace{\fill}
-	\begin{subfigure}[b]{0.15\textwidth}
-		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000003_conew1.png}
-		\caption{Neutral-neutral}
-		\label{fig:timeseriesHappy:c}
-	\end{subfigure}
-	%\hspace{\fill}
-	\begin{subfigure}[b]{0.15\textwidth}
-		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000004.png}
-		\caption{Intermediate-disgust}
-		\label{fig:timeseriesHappy:d}
-	\end{subfigure}
-	%\hspace{\fill}
-	\begin{subfigure}[b]{0.15\textwidth}
-		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000005.png}
-		\caption{Intermediate-happy}
-		\label{fig:timeseriesHappy:e}
-	\end{subfigure}
-	%\hspace{\fill}
-	\begin{subfigure}[b]{0.15\textwidth}
-		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000006.png}
-		\caption{Intermediate-happy}
-		\label{fig:timeseriesHappy:f}
-	\end{subfigure}
-	%\hspace{\fill}
-	\begin{subfigure}[b]{0.15\textwidth}
-		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000007.png}
-		\caption{Happy-happy}
-		\label{fig:timeseriesHappy:g}
-	\end{subfigure}
-	%\hspace{\fill}
-	\begin{subfigure}[b]{0.15\textwidth}
-		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000008.png}
-		\caption{Happy-happy}
-		\label{fig:timeseriesHappy:h}
-	\end{subfigure}
-	%\hspace{\fill}
-	\begin{subfigure}[b]{0.15\textwidth}
-		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000009.png}
-		\caption{Happy-happy}
-		\label{fig:timeseriesHappy:i}
-	\end{subfigure}
-	%\hspace{\fill}
-	\begin{subfigure}[b]{0.15\textwidth}
-		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000010.png}
-		\caption{Happy-happy}
-		\label{fig:timeseriesHappy:j}
-	\end{subfigure}
-	%\hspace{\fill}
-	\begin{subfigure}[b]{0.15\textwidth}
-		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000011.png}
-		\caption{Happy-happy}
-		\label{fig:timeseriesHappy:k}
-	\end{subfigure}
-	%\hspace{\fill}
-	\begin{subfigure}[b]{0.15\textwidth}
-		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000012.png}
-		\caption{Happy-happy}
-		\label{fig:timeseriesHappy:l}
-	\end{subfigure}
-	%\hspace{\fill}
-	\begin{subfigure}[b]{0.15\textwidth}
-		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000013.png}
-		\caption{Happy-happy}
-		\label{fig:timeseriesHappy:m}
-	\end{subfigure}
-	\caption[Complete time series of happy mouth patches]{Extracted mouth patch of size 96x96 pixels showing the development of
-	the facial expression of happiness from neutral to maximal happy expression.
-	Patches \ref{fig:timeseriesHappy:a} to \ref{fig:timeseriesHappy:c} have been
-	categorized for training as neutral, patches \ref{fig:timeseriesHappy:d} to
-	\ref{fig:timeseriesHappy:g} have been excluded from training and patches
-	\ref{fig:timeseriesHappy:e} to \ref{fig:timeseriesHappy:m} have been used as
-	positive samples for training happy expressions. Classification identified
-	\ref{fig:timeseriesHappy:a} to \ref{fig:timeseriesHappy:c} correctly as
-	neutral, \ref{fig:timeseriesHappy:d} was identified as disgust and
-	\ref{fig:timeseriesHappy:e} to \ref{fig:timeseriesHappy:m} were classified as
-	happy expressions according to table \ref{table:predict_mouth}.}
-	\label{fig:timeseriesHappy}
-\end{figure}
-
-%\twocolumn
 
 \subsection{Data}
 For training a system to recognize facial expression effectively, the dataset should focus on several main expressions including anger, disgust, fear, happiness, sadness and surprise. Moreover, a proper dataset should be composed of faces with kinds of face shapes, colors, facial and scalp hairs from many participants with different genders, ethnic backgrounds and ages.
 \\
 \\
-The dataset this paper adopted is from the Cohn-Kanade Facial Expression Database. The dataset refers to eight emotions including anger, contempt, disgust, fear, happiness, sadness, surprise and neutral expression. There are 5105 images from 123 subjects, who ranged in age from 18 to 30 years. Sixty-five percent are female, eight-five percent are Euro-American and fifteen percent are African-American and Asian. They were observed in an observation room equipped with a chair on which to sit and a camera was located directly in front of the subject. Therefore all images have the uniform background and lighting. The images were digitized into 640*480 or 490 pixel arrays with 8-bit precision for grayscale values and are available in png and jpg.
+The dataset this paper adopted is from the Cohn-Kanade Facial Expression Database. The dataset refers to the emotions anger, contempt, disgust, fear, happiness, sadness, surprise and neutral. There are 5105 images from 123 subjects, who ranged in age from 18 to 30 years. Sixty-five percent are female, eight-five percent are Euro-American and fifteen percent are African-American and Asian. They were observed in an observation room equipped with a chair on which to sit and a camera was located directly in front of the subject. Therefore all images have the uniform background and lighting. The images were digitized into 640*480 or 490 pixel arrays with 8-bit precision for grayscale values and are available in png and jpg.
 \\
 \\
-In the Cohn-Kanade Facial Expression Dataset, subjects performed a series of several facial displays that varied from mild to intense expression for each emotion and images were taken frame by frame. In the mild ones, the emotion is barely noticeable and in the intense ones, it is clearly noticeable. In order to train a robust system, we chose the images mostly with intense expressions which were clearly noticeable. That means all the expressions in our dataset are clearly representing the emotion they belong to and are also distinguishable from other emotions. Figure \ref{fig:dataset images} shows eight examples from eight emotions respectively.
+In the Cohn-Kanade Facial Expression Dataset, subjects performed a series of several facial displays that varied from mild to intense expression for each emotion and images were taken frame by frame.  In the mild ones, the emotion is barely noticeable and in the intense ones, it is clearly noticeable. In order to train a robust system, we chose the images mostly with intense expressions which were clearly noticeable. That means all the expressions in our dataset are clearly representing the emotion they belong to and are also distinguishable from other emotions. Figure \ref{fig:dataset images} shows eight examples from eight emotions respectively.
 
 
 \begin{figure}%[H]
@@ -169,7 +72,7 @@ classifier is calculated based on the training set. The accuracy of the classifi
 person are not present in both the training and validation set. The fraction of the data used for the validation set is a configurable parameter, for the
 following experiments 75\% of the data was used for the training set and 25\% for the validiation set.
 
-\subsection{Manual Patches}
+\subsection{Manual Patches}\label{sec:experiments:manual}
 
 An image can have multiple discriminating patches. As shown in Figure \ref{fig:manual_patch}, some patches are highly noticeably discriminating such an open mouth and raised eyebrows in "`surprise"' expression or a wrinkled glabella (area between eyes) in "`disgust"' expression. Such patches can be the best approximation of most discriminating patches. Hence, they make a good basis for testing the algorithm.
 
@@ -316,10 +219,104 @@ Surprise & 0.8765 & 0.9405 & 0.9665	\\
 \end{table}
 
 
-\subsection{Results of Prediction}
-After training SVM classifier, we needed to know whether the classifier is able to predict the training data. We picked out all aligned patches (the part between eyes, left eye, right eye and mouth) from one subject with complete time series of almost emotions. As above memtioned, rescaling has no great influence on the results, so we just experimented with all patches with the size of 96x96 pixels.We listed the best classifications the prediction provided of mouth and right-eye patches in the Table \ref{table:predict_mouth} and Table\ref{table:predict_righteye}.
-\\
-\\
+\subsection{Classification of Expression Development}
+After training SVM classifier, we needed to know whether the classifier is able to predict and classify the images of a complete time series, where the emotional expression develops from neutral to the particular peak expression. We picked out all aligned patches (the part between eyes, left eye, right eye and mouth) from one subject with complete time series for each emotion. An example of extracted mouth patches from a happy person can be seen in figure \ref{fig:timeseriesHappy}. As shown in the previous experiments in section \ref{sec:experiments:manual}, rescaling has no great influence on the results, so all patches inthis experiment were of the size of 96x96 pixels. We listed the best classifications, the prediction provided of mouth and right-eye patches, in the table \ref{table:predict_series}. The results show, which images are still regarded as neutral and which image marks the point towards the concrete emotional expression. They also show, that the images, where the expression changes, can not always be clearly classified, while the mouth patches still provide more stable and correct results than the eye patches.
+
+\begin{figure}%[H]
+	\centering
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000001_conew1.png}
+		\caption{}
+		\label{fig:timeseriesHappy:a}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000002_conew1.png}
+	  \caption{}
+		\label{fig:timeseriesHappy:b}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000003_conew1.png}
+		\caption{}
+		\label{fig:timeseriesHappy:c}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000004.png}
+		\caption{}
+		\label{fig:timeseriesHappy:d}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000005.png}
+		\caption{}
+		\label{fig:timeseriesHappy:e}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000006.png}
+		\caption{}
+		\label{fig:timeseriesHappy:f}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000007.png}
+		\caption{}
+		\label{fig:timeseriesHappy:g}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000008.png}
+		\caption{}
+		\label{fig:timeseriesHappy:h}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000009.png}
+		\caption{}
+		\label{fig:timeseriesHappy:i}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000010.png}
+		\caption{}
+		\label{fig:timeseriesHappy:j}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000011.png}
+		\caption{}
+		\label{fig:timeseriesHappy:k}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000012.png}
+		\caption{}
+		\label{fig:timeseriesHappy:l}
+	\end{subfigure}
+	%\hspace{\fill}
+	\begin{subfigure}[b]{0.15\textwidth}
+		\includegraphics[width=\textwidth]{./img/timeseriesHappy/S026_006_00000013.png}
+		\caption{}
+		\label{fig:timeseriesHappy:m}
+	\end{subfigure}
+	\caption[Complete time series of happy mouth patches]{Extracted mouth patch of size 96x96 pixels showing the development of
+	the facial expression of happiness from neutral to maximal happy expression.
+	Patches \ref{fig:timeseriesHappy:a} to \ref{fig:timeseriesHappy:c} have been
+	categorized for training as neutral, patches \ref{fig:timeseriesHappy:d} to
+	\ref{fig:timeseriesHappy:g} have been excluded from training and patches
+	\ref{fig:timeseriesHappy:e} to \ref{fig:timeseriesHappy:m} have been used as
+	positive samples for training happy expressions. Classification identified
+	\ref{fig:timeseriesHappy:a} to \ref{fig:timeseriesHappy:c} correctly as
+	neutral, \ref{fig:timeseriesHappy:d} was identified as disgust and
+	\ref{fig:timeseriesHappy:e} to \ref{fig:timeseriesHappy:m} were classified as
+	happy expressions according to table \ref{table:predict_series}.}
+	\label{fig:timeseriesHappy}
+\end{figure}
+
+
+\subsection{Classification of Unaligned Patches}
 Moreover, we also experimented with some patches from several subjects which were not aligned with training data. These pathes were all from intense expressions of our dataset. The predicted patches were of size 96x96 pixels because rescaling has no effect as mentioned. We experimented with four kind of patches respectively from one emotion and observed how much outputs would match. Table \ref{table:predict_unaliged_surprise} and Table \ref{table:predict_unaliged_fear} listed the results of patches from 15 subjects in the surprise and fear emotions. The results will indicate the effect of alignment of patches.
 
 \begin{table*}
@@ -348,7 +345,7 @@ Moreover, we also experimented with some patches from several subjects which wer
     15 & angry & disgust & fear & happy & sadness & surprise\\
     \hline
     \end{tabular}
-    \label{table:predict_mouth}
+    \label{table:predict_series:mouth}
     \caption{Aligned mouth patches}
     \end{subtable}
 \qquad
@@ -378,11 +375,11 @@ Moreover, we also experimented with some patches from several subjects which wer
     \hline
     \end{tabular}
     \caption{Aligned right-eye patches}
-    \label{table:predict_righteye}
+    \label{table:predict_series:righteye}
     \end{subtable}
 
 \caption[Results of prediction of aligned patches]{Results of prediction of aligned mouth and right-eye patches with time series from all images of one subject. That means each kind of patches was ordered from neutral to intense one. All predicted patches were of size 96x96 pixels. }
-\label{table:predict_righteye}
+\label{table:predict_series}
 \end{table*}
 
 
