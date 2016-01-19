@@ -192,7 +192,7 @@ with the original patch size of 96x96 and also rescaled to 32x32 and 64x64 pixel
 \caption[Ratios of correct detections for eight facial expressions]{Ratios of correct detections for eight facial expressions. Table \ref{table:left eye}, Table \ref{table:right eye}, Table \ref{table:between eyes} and Table \ref{table:mouth} shows the result of all left-eye patches, all right-eye patches, patches of the part between eyes and all mouth patches respectively. The results of four kind of patches were all based on the sizes of 32x32 pixels, 64x64 pixels and 96x96 pixels.}
 \end{table}
 
-\subsection{SVM on the entire facial images}
+\subsection{Classification of Entire Facial Images}
 We also experimented with training SVM classifiers considering the entire facial area as a single patch. First the bounding box of the face was detected
 for each image using the Viola-Jones algorithm, then rescaled to a uniform size. % TODO: Add Reference.
 The rest of the procedure was identical to the preceding experiment. The results can be found in Table \ref{table:entire_images}.
@@ -220,7 +220,7 @@ Surprise & 0.8765 & 0.9405 & 0.9665	\\
 
 
 \subsection{Classification of Expression Development}
-After training SVM classifier, we needed to know whether the classifier is able to predict and classify the images of a complete time series, where the emotional expression develops from neutral to the particular peak expression. We picked out all aligned patches (the part between eyes, left eye, right eye and mouth) from one subject with complete time series for each emotion. An example of extracted mouth patches from a happy person can be seen in figure \ref{fig:timeseriesHappy}. As shown in the previous experiments in section \ref{sec:experiments:manual}, rescaling has no great influence on the results, so all patches inthis experiment were of the size of 96x96 pixels. We listed the best classifications, the prediction provided of mouth and right-eye patches, in the table \ref{table:predict_series}. The results show, which images are still regarded as neutral and which image marks the point towards the concrete emotional expression. They also show, that the images, where the expression changes, can not always be clearly classified, while the mouth patches still provide more stable and correct results than the eye patches.
+After training SVM classifier, we needed to know whether the classifier is able to predict and classify the images of a complete time series, where the emotional expression develops from neutral to the particular peak expression. We picked out all aligned patches (the part between eyes, left eye, right eye and mouth) from one subject with complete time series for each emotion. An example of extracted mouth patches from a happy person can be seen in figure \ref{fig:timeseriesHappy}. As shown in the previous experiments in section \ref{sec:experiments:manual}, rescaling has no great influence on the results, so all patches in this experiment were of the size of 96x96 pixels. We listed the best classifications, the prediction provided of mouth and right-eye patches, in the table \ref{table:predict_series}. The results show, which images are still regarded as neutral and which image marks the point towards the concrete emotional expression. They also show, that the images, where the expression changes, can not always be clearly classified, while the mouth patches still provide more stable and correct results than the eye patches.
 
 \begin{figure}%[H]
 	\centering
