@@ -53,7 +53,8 @@ public:
 		Undef = 0,
 		Train = 1,
 		Retrain,
-		Predict
+		Predict,
+		Live
 	};
 
 	/**
