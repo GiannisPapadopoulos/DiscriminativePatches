@@ -1,7 +1,13 @@
 \section{Conclusion and Future Work}
 
-The paper described the work and results of the research project on Mid-level Discriminative Patches. An application has been developed making use of the main parts of the algorithm proposed by Singh et Al. \cite{Singh2012DiscPat} namely the feature extraction using HOG and the trained classifier using SVM.
+The paper described the work and results of the research project on Mid-level Discriminative Patches. An application has been developed, making use of parts of the algorithm proposed by Singh et Al. \cite{Singh2012DiscPat} namely the feature extraction using HOG and the classifier using linear SVM. Preprocessing of the data applying histogram equalization ensured good results on the feature extraction. Special care was taken with regard to the setup of the training data in terms of equality in the size of the positive and negative samples and the even distribution of the negative samples among all available negative categories. The acquired data was carefully chosen to contain expressive images to accomplish the task of classifying emotional expressions. Proper separation of the image series in combination with the possibility to add additional images on application runtime ensured the maximum size of training samples available.
+\\
+\\
+From the results of the experiments, it is clear, that among all the manually extracted patches, mouth patch is the most representative and distinguishable. The face, as a whole patch, is a high-level patch and has too much information. Results of the experiments performed on the whole face patches are poorer than mid-level (manually extracted) patches. 
+\\
+\\
+An important component of the algorithm, the k-means clustering, has not been integrated. Fully unsupervised detection has not been achieved. In order to accomplish that, subsets of the possible patches (memory constraints prohibit loading all of them at once) have to be clustered, and SVM classifiers trained for the largest clusters. New cluster centers can then be calculated using the SVMs as a distance measure. This process can be repeated, until the clusters converge, likely resulting in classifiers similar to the ones, we have obtained for the manually extracted patches.
+\\
+\\
+The dataset used in this project has subjects with static expressions. That is, the subjects were asked to pose for those expressions, which means the expressions were deliberate. For a more accurate experimentation, a dataset with spontaneous expressions can be used. Cohen et al \cite{cohen2000emotion} discuss some potential extensions and applications of emotional recognition using facial expressions. The algorithm can be used to recognize real-time face detection using face tracking. A better and efficient extension can make use of factors such as heart rate and skin conductivity along with face pictures. Emotion recognition can also improve human-computer interaction. 
 
-From the results of the experiments, it is clear that among all the manually extracted patches, mouth patch is the most representative and distinguishable. The face, as a whole patch, is high-level patch and has too much information. Results of the experiments performed on whole face patches are poorer than mid-level (manually extracted) patches. 
-
-  

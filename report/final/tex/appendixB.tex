@@ -3,10 +3,10 @@
 
 \subsection{Build environment}
 
-The project’s codebase can be configured with CMake \footnote{https://cmake.org/} for development on Linux and Windows. CMake is a platform independent build and freely available tool for C++, that automatically generates compiler configurations. On linux systems, the Makefiles, that are used by the GNU compiler chain, and on Microsoft Windows, Visual Studio project files can be generated from the given configurations. This eliminates the need for tracking such files for different platforms or different versions of development environments.
+The project’s codebase can be configured with CMake \footnote{https://cmake.org/} for development on Linux and Windows. CMake is a platform independent and freely available build tool for C++, that automatically generates compiler configurations. On linux systems, the Makefiles, that are used by the GNU compiler chain, and on Microsoft Windows, Visual Studio project files can be generated from the given configuration. This eliminates the need for tracking such files for different platforms or different versions of development environments.
 \\
 \\
-CMake comes with either command line or GUI tools to configure the concrete setup. The main configuration is defined in the file CMakeLists.txt in the root code folder of the application. Using one of the GUI-tools for configuration for example, the CMakeLists.txt has to be loaded. The configuration then provides variables to set the path to the dependencies. When the configuration is finished, the Makefiles or Visual Studio project files can be generated.
+CMake comes with either command line or GUI tools to configure the concrete setup. The main configuration is defined in the file CMakeLists.txt in the root code folder of the application. Using one of the GUI-tools for configuration, for example, the CMakeLists.txt has to be loaded. The configuration then provides variables to set the path to the dependencies. When the configuration is finished, the Makefiles or Visual Studio project files can be generated.
 
 
 \subsection{Dependencies}
@@ -22,23 +22,15 @@ The boost c++ libraries \footnote{http://www.boost.org/} are used in the version
 
 \subsection{Automated HMTL API Documentation Generation}
 
-The application's code contains annotations and comments that can be processed by Doxygen \footnote{http://www.doxygen.org} to automatically generate API documentation in HTML. In combination with the tool "`dot"' from the GraphViz package \footnote{http://www.graphviz.org/}, UML diagrams and flow charts can be generated automatically from the code. A corresponding configuration file is located in the root code folder, called "`Doxyfile"', providing all necessary information to the generator. The generator is invoked from the root code folder as working directory, as the local "`src"' folder is the base for the source files, that have to be processed. Giving the configuration file "`Doxyfile"' as parameter, the generator will put the generated documentation into a local folder called "`doc"'. The "`index.html"' file in the "`doc"' folder is the starting reference for the documentation. An example call from the command line executed in the root code folder of the application looks like this:
+The application's code contains annotations and comments, that can be processed by Doxygen \footnote{http://www.doxygen.org} to automatically generate API documentation in HTML. In combination with the tool "`dot"' from the GraphViz package \footnote{http://www.graphviz.org/}, UML diagrams and flow charts can be generated automatically from the code. A corresponding configuration file is located in the root code folder, called "`Doxyfile"', providing all necessary information to the generator. The generator is invoked from the root code folder as working directory, as the local "`src"' folder is the base for the source files, that have to be processed. Giving the configuration file "`Doxyfile"' as parameter, the generator will put the generated documentation into a local folder called "`doc"'. The "`index.html"' file in the "`doc/html"' folder is the starting reference for the documentation. An example call from the command line executed in the root code folder of the application looks like this:
 \begin{verbatim}
 ./doxygen Doxyfile
 \end{verbatim}
 
 
-\subsection{Implementation Details}
+\subsection{Implementation Details}\label{sec:implem}
 
-TODO
-\\
-Classes
-\\
-Program flow
-%\input{./tex/flow_diagram.tex}
-\\
-\\
-The data module provides data types and data structures for the application. The class DataSet is the basic data type. It holds the images each together with the file name and the feature vectors extracted from that image. In the course of the main processing pipeline, the images themselves are deleted after the feature extraction step to free memory. The class furthermore provides a method to split the images and respectively their feature vectors into two parts of definable size for training and validation purpose. The class TrainingData holds the training and label matrix needed by the SVM for training in OpenCV matrix format. The constructor creates these matrices from the given vectors of positive and negative training samples, i.e. feature vectors.
+The data module provides data types and data structures for the application. The class DataSet is the data structure used in the application. It holds the images each together with the file name and the feature vectors extracted from that image. In the course of the main processing pipeline, the images themselves are deleted after the feature extraction step to free memory. The class furthermore provides a method to split the images and respectively their feature vectors into two parts of definable size for training and validation purpose. The class TrainingData holds the training and label matrix needed by the SVM for training in OpenCV matrix format. The constructor creates these matrices from the given vectors of positive and negative training samples, i.e. feature vectors.
 \\
 \\
 The imageCatalog module contains the main application classes for training SVMs on a catalog of images and for classifying images on these trained SVMs. The class CatalogTraining defines the main processing pipeline for training categorized SVMs with a catalog of categorized images. The processing pipeline for single patch images, i.e. manual extracted patches, is setup like this:
@@ -57,7 +49,7 @@ The imageCatalog module contains the main application classes for training SVMs 
 In the course of the process, according methods of the application modules are invoked. The class itself handles the data setup. The class holds a map of categorized DataSets and maps for categorized TrainingData for training and validation purpose. It provides methods to collect positive and negative training samples, from which the TrainingData instances are constructed. These methods ensure equality of the size of positive and negative samples and an even distribution of negative samples among all other categories apart from the current positive one as far as the category sizes permit such equality and even distribution. The class CatalogClassificationSVM holds a map of categorized umSVM instances and provides necessary methods to interact with them. These methods include training the SVMs on the complete catalog of images, loading and saving categorized SVMs, and using the SVM instances for prediction.
 \\
 \\
-The module IOUtils provides static methods for file system handling, input and output of images and basic image operations. There are methods to load a complete catalog of images and methods to load single images or all images contained in a folder. In a catalog of images, the images have to be organized in sub folders according to their categories and the sub folder names define the category names. There are methods to load and save SVMs from and to the file system.
+The module IOUtils provides static methods for file system handling. There are methods to load a complete catalog of images and methods to load single images or all images contained in a folder. In a catalog of images, the images have to be organized in sub folders according to their categories and the sub folder names define the category names. There are methods to load and save SVMs from and to the file system.
 \\
 \\
 The featureExtraction module provides the functionality for the HOG feature extraction. The class umHOG provides static methods to compute the HOG features for a DataSet object or a single image in OpenCV matrix format. It makes use of the OpenCV HOGDescriptor class to accomplish this task. The feature vectors are of the type vector of floats. The parameters for the extraction process correspond to those needed for the OpenCV HOGDescriptor extraction method. Furthermore the class provides a method to visualize the extracted gradients together with the original image. This method  has been enhanced to support generic input sizes and print out concrete values for gradient average or distinct gradients per extracted cell. The class umPCA provides static methods to reduce the dimensionality of the feature space. It makes use of the OpenCV PCA class and applies the Principal Component Analysis on the cells of the HOG features reducing the dimensionality to the number of gradient bins per cell.

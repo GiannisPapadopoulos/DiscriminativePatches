@@ -1,18 +1,18 @@
 \section{Discussion}
-For the manually extracted patches the best overall results were obtained for the mouth region, with over 80\% of the images classified correctly.
-This confirms our intuition as this region is the most distinguishable
+As table \ref{table:results_of_patches} shows, for the manually extracted patches, the best overall results were obtained for the mouth region, with over 80\% of the images classified correctly.
+This confirms our intuition, that this region is the most distinguishable
 from a human perspective. Results for the eye regions were better than expected, as visually the extracted patches look very similar. For the disgust emotion all
-four regions lead to comparable results, while for the anger emotion the region between the eyes is almost as discriminative as the mouth.
-Rescaling the images does not appear to have a very significant effect.
+four regions lead to comparable results, while for the anger emotion the region between the eyes is almost as discriminative as the mouth. It is important to notice, that rescaling the images does not appear to have a very significant effect.
 \\
 \\
-Performing SVM classification on the entire facial region led to good results if the region was rescaled to 96x96 pixels, better than all manually extracted
-patches except the mouth. In this case there is a clear loss
-of precision if the image is rescaled to 32x32 pixels.
+Performing SVM classification on the entire facial region, which was produced by face detection, led to good results, as table \ref{table:entire_images} shows. If the region was rescaled to 96x96 pixels, the results were better than all manually extracted
+patches except the mouth. However, in this case, rescaling has a great influence on the ratios of correct detection. Since the output images of face region of size 32x32 were really blurring. It means, there is a clear loss of precision if the image is rescaled to 32x32 pixels. %Moreover, when the size is 96x96 pixel, the ratio of correct detection for surprise reached up to 96.65\%. The results of disgust and happy were close to the top one, both around 93.6\%.
 \\
 \\
-Table \ref{table:predict_mouth} shows the result of prediction of mouth patches. Most parts of mouth patches were given correct classifications. However, for angry, fear, happy and surprise emotion, there are one or two ambiguous facial expressions so that the patches of them were classified to an incorrect emotion. By contrast, the prediction of right-eye patches was not as good as that of mouth patches. As Table\ref{table:predict_righteye} shows, right-eye patches of angry and fear emotions were not predicted correctly. For other emotions, the accuracy of the prediction of right-eye patches was lower than that of mouth patches.% TODO Run the experiment without face detection to measure the effect, discuss the original paper
+Table \ref{table:predict_series:mouth} shows the result of the prediction of mouth patches. For each emotion, the patches were ordered from neutral to intense within a time series. Therefore, most parts of mouth patches were given correct classifications, as we expected. However, for angry, fear, happy and surprise emotion, there are one or two ambiguous facial expressions, so that the patches were classified as an incorrect emotion. By contrast, the prediction of right-eye patches was not as good as that of mouth patches. As Table \ref{table:predict_series:righteye} shows, right-eye patches of angry and fear emotions were not predicted correctly. For instance, there is no correct result of patches from angry. For other emotions, the accuracy of the prediction of right-eye patches was lower than that of mouth patches.
 \\
 \\
-
-
+Table \ref{table:predict_unaliged_image} lists the results of prediction of unaligned patches with size of 96x96. Clearly, the predictions are poor when compared to aligned patches. Unaligned patches are not consistent with each other. They also contain some unnecessary part of skin, which adds noise to the images. It is to be noted, that these unaligned patches also follow the generic trend of mouth being the most discriminative patch. The prediction of left-eye patches, right-eye patches and patches of the part between eyes were almost incorrect, while about a half of mouth patches were predicted accurately. Comparing the result obtained from unaligned patches in table \ref{table:predict_unaliged_image} with table \ref{table:predict_series} shows, that inconsistency among patches can affect the training significantly.
+\\
+\\
+According to the results mentioned above, we think the SVM classifiers have robust qualities and good performance, in some cases reaching up to 96\% accuracy. It has also been demonstrated that aligned patches can be used to train accurate SVM classifiers.
