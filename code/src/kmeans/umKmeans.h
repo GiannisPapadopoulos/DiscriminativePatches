@@ -25,7 +25,7 @@ class umKmeans {
    * @param labels  The label for each instance
    * @return  The cluster centers
    */
-  cv::Mat performClustering(cv::Mat &data, int numClusters, cv::Mat &labels);
+  cv::Mat performClustering(const cv::Mat &data, const int numClusters, cv::Mat &labels);
 
 };
 

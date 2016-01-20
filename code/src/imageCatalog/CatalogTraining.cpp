@@ -15,6 +15,7 @@
 #include "CatalogTraining.h"
 
 #include "CatalogClassificationSVM.h"
+#include "../kmeans/ClassificationKmeans.h"
 #include "../data/DataSet.h"
 #include "../data/TrainingData.h"
 #include "../IO/IOUtils.h"
@@ -144,12 +145,11 @@ void mai::CatalogTraining::processPipeline()
 	{
 		cout << "[mai::CatalogueDetection::processPipeline] clustering data ..." << endl;
 
-		performClustering(imageSize,
-			blockSize,
-			blockStride,
-			cellSize,
-			iNumBins);
-	}
+		ClassificationKmeans kMeans;
+
+    kMeans.performClustering(m_mCatalogue, imageSize, blockSize, blockStride,
+                             cellSize, iNumBins);
+  }
 
 	cout << "[mai::CatalogueDetection::processPipeline] Setting up svm data ..." << endl;
 	setupSVMData(iDataSetDivider);
@@ -277,46 +277,6 @@ void mai::CatalogTraining::computeHOG(const Size imageSize,
 
 		// free memory
 		pDataset->removeImages();
-	}
-}
-
-void mai::CatalogTraining::performClustering(const Size imageSize,
-		const Size blockSize,
-		const Size blockStride,
-		const Size cellSize,
-		const int iNumBins)
-{
-	int cellsPerBlock = (blockSize.width / cellSize.width) * (blockSize.height / cellSize.height);
-	int blockFeatures = cellsPerBlock * iNumBins;
-	int blocksPerRow = imageSize.width / blockStride.width - (blockSize.width / blockStride.width - 1) ;
-	int blocksPerColumn = imageSize.height / blockStride.height - (blockSize.height / blockStride.height - 1) ;
-
-	for(map<string, DataSet*>::iterator it = m_mCatalogue.begin(); it != m_mCatalogue.end(); it++)
-	{
-		DataSet* pDataset = it->second;
-
-		// Extract features from all images in dataset.
-		for(unsigned int i = 0; i < pDataset->getImageCount(); ++i)
-		{
-			vector<float> descriptorsValues;
-			pDataset->getDescriptorValuesFromImageAt(i, descriptorsValues);
-
-			vector<vector<vector<float>>> patchDescriptorValues(blocksPerColumn);
-			for(int i = 0; i < blocksPerColumn; i++) {
-				patchDescriptorValues[i] = vector<vector<float>>(blocksPerRow);
-			}
-
-			for(int i = 0; i < blocksPerColumn; i++) {
-				for(int j = 0; j < blocksPerRow; j++) {
-					patchDescriptorValues[i][j] = vector<float>(blockFeatures);
-					int block = blocksPerColumn * i + j;
-					std::copy(descriptorsValues.begin() + block * blockFeatures, descriptorsValues.begin() + (block +1) * blockFeatures, patchDescriptorValues[i][j].begin());
-				}
-			}
-			pDataset->addPatchDescriptorValuesToImageAt(i, patchDescriptorValues);
-
-			//		cout << patchDescriptorValues.size() << " " << patchDescriptorValues[0].size() << " " << patchDescriptorValues[0][0].size() << endl;
-		}
 	}
 }
 
