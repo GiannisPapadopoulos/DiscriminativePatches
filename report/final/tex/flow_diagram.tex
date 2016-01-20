@@ -5,16 +5,18 @@
       matrix of nodes,
       column sep      = 3em,
       row sep         = 5ex,
-      column 1/.style = {nodes={decision}},
+      column 1/.style = {nodes={env}},
       column 2/.style = {nodes={env}}
     ]
     {
       |[treenode]| Load images           &                \\
-     |[treenode]| Add flipped images                &        \\
-      Detect faces?               & Perform face detection       \\
-      Apply PCA?                 & Apply PCA feature reduction         \\
-     |[treenode]| Compute HOG  & \\
-     |[treenode]| Train SVM &        \\
+     |[treenode]| Perform HOG equalization            &        \\
+    |[decision]| Add flipped images?                 & Add flipped images to the dataset        \\
+     |[decision]| Detect faces?               & Perform face detection       \\
+      
+      Compute HOG  & \\
+       Split data into training and validation sets  & \\
+     |[treenode]| Train SVM on training data &        \\
       |[treenode]| Predict validation data  &        \\
     %   & & |[decision]| numbered? \\
     %   & & |[treenode]| Add a \texttt{*} & |[finish]| Done \\
@@ -34,6 +36,7 @@
     
     (chart-5-1) edge (chart-6-1)
     (chart-6-1) edge (chart-7-1)
+    (chart-7-1) edge (chart-8-1)
     ;
 
 \end{tikzpicture}
