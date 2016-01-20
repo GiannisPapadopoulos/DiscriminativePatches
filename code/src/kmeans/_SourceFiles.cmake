@@ -5,6 +5,8 @@ set( RelativeSourceGroup "Source Files\\kmeans" )
 set( DirFiles
 	umKmeans.cpp
 	umKmeans.h
+	ClassificationKmeans.h
+	ClassificationKmeans.cpp
 )
 
 set( DirFiles_SourceGroup "${RelativeSourceGroup}" )

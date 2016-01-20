@@ -90,22 +90,6 @@ private:
 				const bool bWriteHOGImages = false,
 				const bool bApplyPCA = false);
 
-	/**
-	 * k-means clustering.
-	 * First patches are extracted from feature vectors according to extraction parameters.
-	 * Then these patches are clustered.
-	 *
-	 * @param imageSize			Images will be resized to this size.
-	 * @param blockSize			HOG feature extraction block size.
-	 * @param blockStride		HOG feature extraction block stride.
-	 * @param cellSize			HOG feature extraction cell size.
-	 * @param iNumBins			HOG feature extraction gradient directions.
-	 */
-	void performClustering(const cv::Size imageSize,
-			const cv::Size blockSize,
-			const cv::Size blockStride,
-			const cv::Size cellSize,
-			const int iNumBins);
 
 	/**
 	 * Setup training data for support vector machine.
