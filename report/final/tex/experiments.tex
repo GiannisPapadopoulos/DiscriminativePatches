@@ -102,7 +102,7 @@ Tables \ref{table:left_eye}, \ref{table:right_eye}, \ref{table:between_eyes} and
 
 \subsection{Classification of Entire Facial Images}\label{sec:experiments:face}
 We also experimented with training SVM classifiers considering the entire facial area as a single patch. First the bounding box of the face was detected
-for each image using the Viola-Jones algorithm \cite{Viola01}, then rescaled to a uniform size. 
+for each image, then the images rescaled to a uniform size. 
 The rest of the procedure was identical to the preceding experiment. In this case, the complete face is a high-level discriminative patch. As anticipated, high-level patches contains too much information. The irrelevant patches of face contribute to unnecessary noise in the images. The results can be found in Table \ref{table:entire_images}. The results are clearly poorer as compared to mid-level patches were extracted manually. 
 
 \begin{table}
