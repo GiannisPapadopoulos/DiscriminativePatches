@@ -95,6 +95,10 @@ public:
 		return m_mSVMs;
 	};
 
+	const Configuration* const getConfig() const {
+		return m_Config;
+	}
+
 private:
 
 	void loadAndPredictImage();

@@ -18,17 +18,18 @@
 #include "configuration/Configuration.h"
 #include "imageCatalog/CatalogClassificationSVM.h"
 #include "imageCatalog/CatalogTraining.h"
+#include "configuration/Constants.h"
 
 using namespace std;
 using namespace mai;
 
 #include "opencv2/highgui/highgui.hpp"
 #include <opencv2/imgproc/imgproc.hpp>
-#include <iostream>
+#include <chrono>
 
 using namespace cv;
-using namespace std;
 
+typedef std::chrono::high_resolution_clock Clock;
 
 
 void livePrediction(CatalogClassificationSVM* classifier)
@@ -41,16 +42,26 @@ void livePrediction(CatalogClassificationSVM* classifier)
 		return;
 	}
 
-	double dWidth = cap.get(CV_CAP_PROP_FRAME_WIDTH); //get the width of frames of the video
-	double dHeight = cap.get(CV_CAP_PROP_FRAME_HEIGHT); //get the height of frames of the video
+	double dWidth = cap.get(CV_CAP_PROP_FRAME_WIDTH);
+	double dHeight = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
 
-	double dSize = 96.0;
+	double dRectSize = 96.0;
+	Size patchSize = classifier->getConfig()->getImageSize();
 
-	cout << "Frame size : " << dWidth << " x " << dHeight << endl;
+	cout << "[livePrediction] Frame size : " << dWidth << " x " << dHeight  << ", patchsize " << patchSize << endl;
 
-	namedWindow("LivePrediciton", CV_WINDOW_AUTOSIZE); //create a window called "MyVideo"
+	namedWindow("LivePrediciton", CV_WINDOW_AUTOSIZE);
+	Rect rect = Rect(dWidth/2.0 - dRectSize/2.0, 2 * dHeight/3.0, dRectSize, dRectSize);
 
 	string strClassifiedAs = "undefined";
+	int fontFace = FONT_HERSHEY_TRIPLEX;
+	double fontScale = 1.5;
+	int thickness = 2;
+	int baseline=0;
+
+	map<string, float> mResults;
+
+    auto timer = Clock::now();
 
 	while(true)
 	{
@@ -60,48 +71,43 @@ void livePrediction(CatalogClassificationSVM* classifier)
 
 		if (!bSuccess) //if not success, break loop
 		{
-			cout << "Cannot read a frame from video stream" << endl;
+			cout << "[livePrediction] ERROR! Cannot read a frame from video stream" << endl;
 			break;
 		}
 
-		Rect rect = Rect(dWidth/2.0 - dSize/2.0, 2 * dHeight/3.0, dSize, dSize);
 		rectangle(frame, rect, Scalar( 0, 0, 255 ), 2, 8);
 
-		if(waitKey(50) == 32)
+		// Check emotion every LIVE_TICK
+	    auto action = Clock::now();
+	    if((action - timer).count() % Constants::LIVE_TICK == 0)
 		{
-			//Rect rect2 = Rect(dWidth/2.0 - dSize/2.0, 2 * dHeight/3.0, dSize, dSize / 2.0);
-
-			map<string, float> mResults;
 			Mat cut = frame(rect);
-
 			Mat resized;
 
-			resize(cut, resized, Size(96, 96));
-			strClassifiedAs = classifier->predict(cut, mResults);
+			resize(cut, resized, patchSize);
+			strClassifiedAs = classifier->predict(resized, mResults);
 
-			cout << "Classified as " << strClassifiedAs << endl;
+			cout << "[livePrediction] Classified as " << strClassifiedAs << endl;
 //			imshow("cut", resized);
+
+			mResults.clear();
 		}
 
 		stringstream sstm;
 		sstm << "You feel " << strClassifiedAs;
 		string strText = sstm.str();
 
-		int fontFace = FONT_HERSHEY_TRIPLEX;
-		double fontScale = 1.5;
-		int thickness = 2;
-		int baseline=0;
 		Size textSize = getTextSize(strText, fontFace,
 				fontScale, thickness, &baseline);
 		// then put the text itself
 		putText(frame, strText, Point(1* dWidth/20.0, 2* dHeight/10.0), fontFace, fontScale,
 				Scalar( 0, 0, 255 ), thickness, 8);
 
-		imshow("LivePrediciton", frame); //show the frame in "MyVideo" window
+		imshow("LivePrediciton", frame);
 
-		if (waitKey(50) == 27) //wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
+		if (waitKey(30) == 27) //wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
 		{
-			cout << "esc key is pressed by user" << endl;
+			cout << "[livePrediction] esc key is pressed by user" << endl;
 			break;
 		}
 	}
