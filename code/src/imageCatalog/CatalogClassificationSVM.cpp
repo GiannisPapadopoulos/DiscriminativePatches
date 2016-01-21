@@ -202,7 +202,7 @@ string mai::CatalogClassificationSVM::predict(const Mat &image,
 	}
 
 	float fBestResultValue = std::numeric_limits<float>::max();
-	string strBest = "None";
+	string strBest = "undefined";
 	for(map<string, umSVM*>::iterator itSVMs = m_mSVMs.begin(); itSVMs != m_mSVMs.end(); itSVMs++)
 	{
 		string strCategory = itSVMs->first;
@@ -215,7 +215,7 @@ string mai::CatalogClassificationSVM::predict(const Mat &image,
 		    cout << "[mai::ClassificationSVM::predict] SVM prediction in category " << strCategory << " is " << fResultLabel << ", DFvalue " << fResultValue << endl;
 		}
 
-		if(fResultValue < -0.2 && fResultValue < fBestResultValue)
+		if(fResultValue < Constants::SVM_PREDICT_THRESHOLD && fResultValue < fBestResultValue)
 		{
 			fBestResultValue = fResultValue;
 			strBest = strCategory;

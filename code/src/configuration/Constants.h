@@ -41,6 +41,10 @@ public:
 	static const int SVM_POSITIVE_LABEL = 1;
 	static const int SVM_NEGATIVE_LABEL = 0;
 
+	static constexpr double SVM_PREDICT_THRESHOLD = -0.5;
+
+	static const int LIVE_TICK = 20;
+
 };
 
 #endif /* UTILS_IMAGEDISPLAYUTILS_H_ */
