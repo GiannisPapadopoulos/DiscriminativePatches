@@ -391,6 +391,7 @@ void mai::CatalogTraining::collectRandomNegatives(const map<string, vector<vecto
 				}
 			}
 		}
+		mSampleSizes.clear();
 	}
 }
 
@@ -425,7 +426,7 @@ void mai::CatalogTraining::calculateSampleSizes(const string &strKey,
 	}
 
 	// Disperse possible rest evenly
-	while(iRest > 0)
+	do
 	{
 		map<string, int>::iterator itSampleSize = mSampleSizes.begin();
 		map<string, int>::const_iterator itFeatureSize = mFeatureSizes.begin();
@@ -457,6 +458,7 @@ void mai::CatalogTraining::calculateSampleSizes(const string &strKey,
 			itSampleSize++;
 		}
 	}
+	while(iRest > 0);
 
 	if(Constants::DEBUG_MAIN_ALG)
 	{

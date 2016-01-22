@@ -25,6 +25,7 @@
 
 
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 using namespace std;
 using namespace cv;
@@ -170,9 +171,20 @@ string mai::CatalogClassificationSVM::predict(const Mat &image,
 
 	int iNumBins = m_Config->getNumBins();
 
+	Mat updated;
+	if(image.channels() == 3 || image.channels() == 4)
+	{
+		cvtColor(image, updated, CV_BGR2GRAY);
+		equalizeHist(updated, updated);
+	}
+	else
+	{
+		equalizeHist(image, updated);
+	}
+
 	vector<float> descriptorsValues;
 	umHOG::extractFeatures(descriptorsValues,
-			image,
+			updated,
 			imageSize,
 			blockSize,
 			blockStride,
@@ -194,7 +206,7 @@ string mai::CatalogClassificationSVM::predict(const Mat &image,
 	}
 
 	float fBestResultValue = std::numeric_limits<float>::max();
-	string strBest = "";
+	string strBest = "undefined";
 	for(map<string, umSVM*>::iterator itSVMs = m_mSVMs.begin(); itSVMs != m_mSVMs.end(); itSVMs++)
 	{
 		string strCategory = itSVMs->first;
@@ -207,7 +219,7 @@ string mai::CatalogClassificationSVM::predict(const Mat &image,
 		    cout << "[mai::ClassificationSVM::predict] SVM prediction in category " << strCategory << " is " << fResultLabel << ", DFvalue " << fResultValue << endl;
 		}
 
-		if(fResultValue < fBestResultValue)
+		if(fResultValue < Constants::SVM_PREDICT_THRESHOLD && fResultValue < fBestResultValue)
 		{
 			fBestResultValue = fResultValue;
 			strBest = strCategory;
@@ -310,7 +322,7 @@ PredictionResults mai::CatalogClassificationSVM::getPredictionInfo(
 void mai::CatalogClassificationSVM::loadAndPredict()
 {
 	string strFilename = m_Config->getImageInputPath();
-	string strSVMPath = m_Config->getSvmOutputPath();
+	string strSVMPath = m_Config->getSVMInputPath();
 
 	if(Constants::DEBUG_SVM_PREDICTION)
 	{

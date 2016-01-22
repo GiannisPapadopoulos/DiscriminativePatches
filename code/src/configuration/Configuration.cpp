@@ -45,6 +45,10 @@ mai::Configuration::Configuration(const string &strFilename)
 	{
 		m_AppMode = appMode::Predict;
 	}
+	else if (strMode.compare("LIVE") == 0)
+	{
+		m_AppMode = appMode::Live;
+	}
 	else
 	{
 		m_AppMode = appMode::Undef;
@@ -55,7 +59,7 @@ mai::Configuration::Configuration(const string &strFilename)
 		m_strImageInputPath = pt.get<std::string>("MAIN.IMAGE_FILEPATH");
 	}
 
-	if (m_AppMode == appMode::Predict || m_AppMode == appMode::Retrain)
+	if (m_AppMode == appMode::Predict || m_AppMode == appMode::Retrain || m_AppMode == appMode::Live)
 	{
 		m_strSVMInputPath = pt.get<std::string>("MAIN.SVM_FILEPATH", "outSVM");
 	}
