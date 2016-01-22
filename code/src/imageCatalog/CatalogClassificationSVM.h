@@ -25,6 +25,7 @@ namespace mai{
 class TrainingData;
 class umSVM;
 class Configuration;
+class PredictionResults;
 
 /**
  * Holds map of categorized SVMs and provides necessary methods to interact with them.
@@ -82,6 +83,9 @@ public:
 	 */
 	std::string predict(const cv::Mat &image,
 			std::map<std::string, float> &mResults);
+
+  PredictionResults getPredictionInfo(const cv::Mat &image,
+      std::map<std::string, float> &mResults);
 
 	/**
 	 * Load and predict images according to configuration.

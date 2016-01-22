@@ -14,6 +14,8 @@
 
 #include "CatalogClassificationSVM.h"
 
+#include "PredictionResults.h"
+
 #include "../svm/umSVM.h"
 #include "../IO/IOUtils.h"
 #include "../data/TrainingData.h"
@@ -21,10 +23,12 @@
 #include "../configuration/Configuration.h"
 #include "../configuration/Constants.h"
 
+
 #include <opencv2/highgui/highgui.hpp>
 
 using namespace std;
 using namespace cv;
+using namespace mai;
 
 mai::CatalogClassificationSVM::CatalogClassificationSVM(const Configuration* const config)
 :	m_Config(config)
@@ -218,6 +222,89 @@ string mai::CatalogClassificationSVM::predict(const Mat &image,
 	}
 
 	return strBest;
+}
+
+PredictionResults mai::CatalogClassificationSVM::getPredictionInfo(
+    const Mat &image, map<string, float> &mResults) {
+  if(m_mSVMs.size() < 1)
+  {
+    cout << "[mai::ClassificationSVM::predict] ERROR! No traind svms." << endl;
+  }
+
+  Size cellSize = m_Config->getCellSize();
+  Size blockStride = m_Config->getBlockStride();
+  Size blockSize = m_Config->getBlockSize();
+  Size imageSize = m_Config->getImageSize();
+
+  // Not sure about these
+  Size winStride = Size(0,0);
+  Size padding = Size(0,0);
+
+  int iNumBins = m_Config->getNumBins();
+
+  Mat updated;
+  if(image.channels() == 3 || image.channels() == 4)
+  {
+    cvtColor(image, updated, CV_BGR2GRAY);
+    equalizeHist(updated, updated);
+  }
+  else
+  {
+    equalizeHist(image, updated);
+  }
+
+  vector<float> descriptorsValues;
+  umHOG::extractFeatures(descriptorsValues,
+      updated,
+      imageSize,
+      blockSize,
+      blockStride,
+      cellSize,
+      iNumBins,
+      winStride,
+      padding);
+
+  // setup matrix
+  Mat predictionData(1, descriptorsValues.size(), CV_32FC1, &descriptorsValues[0]);;
+  //    for(unsigned int j = 0; j < descriptorsValues.size(); ++j)
+  //    {
+  //      predictionData.at<float>(0, j) = descriptorsValues[j];
+  //    }
+
+  if(Constants::DEBUG_SVM_PREDICTION)
+  {
+    cout << "[mai::ClassificationSVM::predict] Prediction matrix " << predictionData.rows << "x" << predictionData.cols << endl;
+  }
+
+  float fBestResultValue = std::numeric_limits<float>::max();
+  std::string strBest = "undefined";
+  for(map<string, umSVM*>::iterator itSVMs = m_mSVMs.begin(); itSVMs != m_mSVMs.end(); itSVMs++)
+  {
+    string strCategory = itSVMs->first;
+    umSVM* svm = itSVMs->second;
+    float fResultLabel = svm->predict(predictionData, false);
+    float fResultValue = svm->predict(predictionData, true);
+
+    if(Constants::DEBUG_SVM_PREDICTION)
+    {
+        cout << "[mai::ClassificationSVM::predict] SVM prediction in category " << strCategory << " is " << fResultLabel << ", DFvalue " << fResultValue << endl;
+    }
+
+    if(fResultValue < Constants::SVM_PREDICT_THRESHOLD && fResultValue < fBestResultValue)
+    {
+      fBestResultValue = fResultValue;
+      strBest = strCategory;
+    }
+
+    mResults.insert(pair<string, float>(strCategory, fResultValue));
+  }
+
+  if(Constants::DEBUG_SVM_PREDICTION)
+  {
+      cout << "[mai::ClassificationSVM::predict] Best prediction for given image is " << strBest << endl;
+  }
+  PredictionResults results(strBest.c_str(), fBestResultValue);
+  return results;
 }
 
 void mai::CatalogClassificationSVM::loadAndPredict()

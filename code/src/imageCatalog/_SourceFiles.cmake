@@ -7,6 +7,8 @@ set( DirFiles
 	CatalogTraining.h
 	CatalogClassificationSVM.cpp
 	CatalogClassificationSVM.h
+	PredictionResults.h
+	PredictionResults.cpp
 )
 
 set( DirFiles_SourceGroup "${RelativeSourceGroup}" )
