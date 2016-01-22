@@ -129,8 +129,8 @@ void livePrediction(CatalogClassificationSVM* classifier)
   double dWidth = cap.get(CV_CAP_PROP_FRAME_WIDTH); //get the width of frames of the video
   double dHeight = cap.get(CV_CAP_PROP_FRAME_HEIGHT); //get the height of frames of the video
 
-  int sizes[5] = {64,72,80,88,96};
-  int displacements[11] = {-10,-8,-6,-4,-2,0,2,4,6,8,10};
+  int sizes[6] = {  56, 64, 72, 80, 88, 96 };
+  int displacements[11] = { -10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10 };
 
   double dSize = 96.0;
 
@@ -165,7 +165,7 @@ void livePrediction(CatalogClassificationSVM* classifier)
 
       for(int size : sizes) {
         for(int disp : displacements) {
-          Rect rect2 = Rect(rect.x, rect.y, dSize, dSize);
+          Rect rect2 = Rect(rect.x + disp, rect.y + disp, size, size);
 
           map<string, float> mResults;
           Mat cut = frame(rect2);
